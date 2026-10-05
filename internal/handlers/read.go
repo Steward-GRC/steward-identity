@@ -204,14 +204,13 @@ func (h *ReadHandler) applyConnectionGroups(ctx context.Context, u store.User, a
 	if err := h.store.ReplaceUserIdpGroups(ctx, u.ID, clean); err != nil {
 		return store.User{}, statusFromStoreErr(err)
 	}
-	lg := log.Ctx(ctx)
+	lg := logger.Ctx(ctx)
 	if len(clean) > 0 {
 		conn, connErr := h.store.GetIdPConnectionByAlias(ctx, alias)
 		if connErr != nil {
-			lg.Warn().Str("alias", alias).Err(connErr).
-				Msg("idp group mapping: connection lookup failed, continuing without mapping")
+			lg.Warn("idp group mapping: connection lookup failed, continuing without mapping", log.F("alias", alias), log.F("error", errText(connErr)))
 		} else if applied, _, applyErr := h.store.ApplyIdPGroupMappings(ctx, u.ID, conn.ID, clean); applyErr != nil {
-			lg.Warn().Str("alias", alias).Err(applyErr).Msg("idp group mapping: apply failed, continuing")
+			lg.Warn("idp group mapping: apply failed, continuing", log.F("alias", alias), log.F("error", errText(applyErr)))
 		} else if len(applied) > 0 {
 			names := make([]string, 0, len(applied))
 			for _, gid := range applied {
@@ -226,7 +225,7 @@ func (h *ReadHandler) applyConnectionGroups(ctx context.Context, u store.User, a
 	}
 	reloaded, err := h.store.GetUser(ctx, u.ID)
 	if err != nil {
-		lg.Warn().Str("alias", alias).Err(err).Msg("idp group mapping: re-hydrate user failed, continuing")
+		lg.Warn("idp group mapping: re-hydrate user failed, continuing", log.F("alias", alias), log.F("error", errText(err)))
 		return u, nil
 	}
 	return reloaded, nil
@@ -661,10 +660,8 @@ func guardNoIdentifyingClaims(ctx context.Context, subject, email, preferredUser
 	if email != "" || preferredUsername != "" || name != "" || firstName != "" || lastName != "" {
 		return nil
 	}
-	lg := log.Ctx(ctx)
-	lg.Warn().
-		Str("external_subject", subject).
-		Msg("refusing to JIT-provision user: no identifying claims (no email/preferred_username/name)")
+	lg := logger.Ctx(ctx)
+	lg.Warn("refusing to JIT-provision user: no identifying claims (no email/preferred_username/name)", log.F("external_subject", subject))
 	return status.Error(codes.InvalidArgument, "cannot provision user: no identifying claims")
 }
 
@@ -693,10 +690,8 @@ func (h *ReadHandler) jitDisabledForConnAlias(ctx context.Context, alias string)
 // the gateway relays as a user-safe "ask your admin" message. subject is logged
 // (external_subject or email) so the block is diagnosable.
 func ssoJitDisabledError(ctx context.Context, subject string) error {
-	lg := log.Ctx(ctx)
-	lg.Warn().
-		Str("subject", subject).
-		Msg("refusing to JIT-provision SSO user: jit_enabled=false for the org connection — failing closed")
+	lg := logger.Ctx(ctx)
+	lg.Warn("refusing to JIT-provision SSO user: jit_enabled=false for the org connection — failing closed", log.F("subject", subject))
 	return errcodes.Error(ctx, errcodes.SSOJitDisabled())
 }
 
@@ -726,8 +721,8 @@ func (h *ReadHandler) BootstrapRoot(ctx context.Context, req *identityv1.Bootstr
 		return nil, status.Errorf(codes.Internal, "setup state: %v", err)
 	}
 	if has {
-		lg := log.Ctx(ctx)
-		lg.Info().Msg("BootstrapRoot: root user already exists, no-op")
+		lg := logger.Ctx(ctx)
+		lg.Info("BootstrapRoot: root user already exists, no-op")
 		return &identityv1.BootstrapRootResponse{}, nil
 	}
 	if h.signIn == nil {

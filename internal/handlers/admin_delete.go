@@ -79,23 +79,21 @@ func (h *AdminHandler) preDeleteGuard(ctx context.Context, u store.User, actor a
 	}
 
 	if pending, ok := errors.AsType[*userdelete.PendingApprovalsError](err); ok {
-		l := log.Ctx(ctx)
-		l.Warn().Str("user_id", u.ID.String()).Int("pending_approvals", len(pending.Items)).
-			Msg("delete user: refused — account holds pending approval assignments")
+		l := logger.Ctx(ctx)
+		l.Warn("delete user: refused — account holds pending approval assignments", log.F("user_id", u.ID.String()), log.F("pending_approvals", len(pending.Items)))
 		return errcodes.Error(ctx, errcodes.UserHasPendingApprovals(len(pending.Items), userdelete.DescribeApprovals(pending.Items, 0)))
 	}
 
 	if unavailable, ok := errors.AsType[*userdelete.StepUnavailableError](err); ok {
-		l := log.Ctx(ctx)
-		l.Error().Err(unavailable.Err).Str("user_id", u.ID.String()).Str("step", unavailable.Step).
-			Msg("delete user: refused — a mandatory pre-delete step could not be completed")
+		l := logger.Ctx(ctx)
+		l.Error(unavailable.Err, "delete user: refused — a mandatory pre-delete step could not be completed", log.F("user_id", u.ID.String()), log.F("step", unavailable.Step))
 		return errcodes.Error(ctx, errcodes.UserDeleteChecksUnavailable(unavailable.Step, unavailable.Err))
 	}
 
 	// Unreachable today (Check returns only the two typed errors above), but a
 	// future step must not degrade into a generic Internal.
-	l := log.Ctx(ctx)
-	l.Error().Err(err).Str("user_id", u.ID.String()).Msg("delete user: pre-delete guard failed")
+	l := logger.Ctx(ctx)
+	l.Error(err, "delete user: pre-delete guard failed", log.F("user_id", u.ID.String()))
 	return errcodes.Error(ctx, errcodes.UserDeleteChecksUnavailable("pre_delete", err))
 }
 
@@ -129,9 +127,8 @@ func (h *AdminHandler) auditCredentialRevoked(ctx context.Context, u store.User,
 	}); err != nil {
 		// The revoke itself succeeded; losing its audit row must not resurrect a
 		// live credential by failing the delete.
-		l := log.Ctx(ctx)
-		l.Error().Err(err).Str("user_id", u.ID.String()).
-			Msg("delete user: credential revoked but its audit event could not be recorded")
+		l := logger.Ctx(ctx)
+		l.Error(err, "delete user: credential revoked but its audit event could not be recorded", log.F("user_id", u.ID.String()))
 	}
 }
 
@@ -167,8 +164,7 @@ func (h *AdminHandler) auditCategoryRulesPurged(ctx context.Context, u store.Use
 	}); err != nil {
 		// The purge itself succeeded; losing its audit row must not resurrect
 		// the removed grants by failing the delete.
-		l := log.Ctx(ctx)
-		l.Error().Err(err).Str("user_id", u.ID.String()).
-			Msg("delete user: category rules purged but their audit event could not be recorded")
+		l := logger.Ctx(ctx)
+		l.Error(err, "delete user: category rules purged but their audit event could not be recorded", log.F("user_id", u.ID.String()))
 	}
 }

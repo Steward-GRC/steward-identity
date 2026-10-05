@@ -162,27 +162,26 @@ func (h *ReadHandler) VerifyLoginOtp(ctx context.Context, req *identityv1.Verify
 func (h *ReadHandler) issueCode(ctx context.Context, username, emailAddr, purpose, subject, blurb string) {
 	// Ctx-aware logger: attaches trace_id/span_id so these OTP log lines
 	// correlate with the RPC's trace in the tracing backend.
-	lg := log.Ctx(ctx)
+	lg := logger.Ctx(ctx)
 	u, ok := h.lookupLocalUser(ctx, username, emailAddr)
 	if !ok {
-		lg.Info().Str("purpose", purpose).Msg("otp request for unknown/non-local account — no email sent")
+		lg.Info("otp request for unknown/non-local account — no email sent", log.F("purpose", purpose))
 		return
 	}
 	code, err := h.store.GenerateOTP(ctx, u.ID, purpose)
 	if err != nil {
-		lg.Warn().Err(err).Str("purpose", purpose).Str("user_id", u.ID.String()).Msg("otp generate failed")
+		lg.Warn("otp generate failed", log.F("purpose", purpose), log.F("user_id", u.ID.String()), log.F("error", errText(err)))
 		return
 	}
 	if h.otp.devEcho {
 		// Dev ergonomics: surface the code in the log like the /setup token, so
 		// it is testable without opening a mail catcher. Never enabled in prod.
-		lg.Info().Str("purpose", purpose).Str("email", u.Email).Str("otp_code", code).
-			Msg("DEV: one-time code (OTP_DEV_ECHO)")
+		lg.Info("DEV: one-time code (OTP_DEV_ECHO)", log.F("purpose", purpose), log.F("email", u.Email), log.F("otp_code", code))
 	}
 	if h.otp.sender != nil && u.Email != "" {
 		body := blurb + ":\n\n    " + code + "\n\nThis code expires in 10 minutes. If you did not request it, ignore this email."
 		if err := h.otp.sender.Send(ctx, u.Email, subject, body); err != nil {
-			lg.Warn().Err(err).Str("email", u.Email).Msg("otp email send failed")
+			lg.Warn("otp email send failed", log.F("email", u.Email), log.F("error", errText(err)))
 		}
 	}
 }

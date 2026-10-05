@@ -56,7 +56,7 @@ func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
 				mt := m.Type
 				// Only unary RPCs: func(context.Context, *Request) (*Response, error).
 				// Skips mustEmbedUnimplemented... and any stream shapes.
-				if mt.NumIn() != 2 || mt.NumOut() != 2 || !mt.In(0).Implements(ctxT) || mt.In(1).Kind() != reflect.Ptr {
+				if mt.NumIn() != 2 || mt.NumOut() != 2 || !mt.In(0).Implements(ctxT) || mt.In(1).Kind() != reflect.Pointer {
 					continue
 				}
 				name := m.Name

@@ -51,7 +51,7 @@ func emitAccountCreated(ctx context.Context, pub accountCreatedPublisher, userID
 		return
 	}
 	if err := pub.Publish(ctx, routingKeyAccountCreated, body); err != nil {
-		l := log.Ctx(ctx)
-		l.Warn().Err(err).Str("user_id", userID).Msg("account-created: emit")
+		l := logger.Ctx(ctx)
+		l.Warn("account-created: emit", log.F("user_id", userID), log.F("error", errText(err)))
 	}
 }

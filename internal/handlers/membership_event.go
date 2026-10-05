@@ -51,7 +51,7 @@ func (h *AdminHandler) emitMembershipChanged(ctx context.Context, userID string)
 		return
 	}
 	if err := h.membershipPub.Publish(ctx, routingKeyMembershipChanged, body); err != nil {
-		l := log.Ctx(ctx)
-		l.Warn().Err(err).Str("user_id", userID).Msg("membership-changed: emit")
+		l := logger.Ctx(ctx)
+		l.Warn("membership-changed: emit", log.F("user_id", userID), log.F("error", errText(err)))
 	}
 }

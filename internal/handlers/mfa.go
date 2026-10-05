@@ -230,19 +230,18 @@ func (h *ReadHandler) SendEmailOtp(ctx context.Context, req *identityv1.SendEmai
 		}
 		return nil, statusFromStoreErr(err)
 	}
-	lg := log.Ctx(ctx)
+	lg := logger.Ctx(ctx)
 	if h.mfa.devEcho {
 		// Dev ergonomics, mirrors the existing OTP flows. Never enabled in prod.
-		lg.Info().Str("purpose", purpose).Str("email", u.Email).Str("otp_code", code).
-			Msg("DEV: one-time code (OTP_DEV_ECHO)")
+		lg.Info("DEV: one-time code (OTP_DEV_ECHO)", log.F("purpose", purpose), log.F("email", u.Email), log.F("otp_code", code))
 	}
 	if h.mfa.sender != nil {
 		body := "Use this code to verify your identity on Steward:\n\n    " + code +
 			"\n\nThis code expires in 5 minutes and can be used once. If you did not request it, ignore this email."
 		if err := h.mfa.sender.Send(ctx, u.Email, "Your verification code", body); err != nil {
-			lg.Warn().Err(err).Str("email", u.Email).Msg("mfa otp email send failed")
+			lg.Warn("mfa otp email send failed", log.F("email", u.Email), log.F("error", errText(err)))
 			if cErr := h.store.CancelEmailOTP(ctx, otpID); cErr != nil {
-				lg.Warn().Err(cErr).Msg("cancel undeliverable mfa otp failed")
+				lg.Warn("cancel undeliverable mfa otp failed", log.F("error", errText(cErr)))
 			}
 			return nil, status.Error(codes.Unavailable, "could not send the verification email")
 		}

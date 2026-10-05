@@ -46,12 +46,12 @@ func TestVerifyDomain_MatchesTXT(t *testing.T) {
 		&identityv1.StartDomainVerificationRequest{Domain: "partner.example.net"})
 	require.NoError(t, err)
 	require.NotEmpty(t, start.GetToken())
-	require.Equal(t, "_steward-verify.partner.com", start.GetDnsRecordName())
+	require.Equal(t, "_steward-verify.partner.example.net", start.GetDnsRecordName())
 	require.NotEmpty(t, start.GetInstructions())
 	token := start.GetToken()
 
 	h.SetTXTLookup(func(_ context.Context, name string) ([]string, error) {
-		require.Equal(t, "_steward-verify.partner.com", name)
+		require.Equal(t, "_steward-verify.partner.example.net", name)
 		return []string{"steward-verify=" + token}, nil
 	})
 	res, err := h.VerifyDomain(adminCtx(uuid.NewString()), &identityv1.VerifyDomainRequest{Domain: "partner.example.net"})
@@ -191,11 +191,11 @@ func TestStartDomainVerification_DnsRecordValuePerEnvPrefix(t *testing.T) {
 	start, err := h.StartDomainVerification(adminCtx(uuid.NewString()),
 		&identityv1.StartDomainVerificationRequest{Domain: "perenv.example.net"})
 	require.NoError(t, err)
-	require.Equal(t, "_steward-verify-dev.perenv.com", start.GetDnsRecordName())
+	require.Equal(t, "_steward-verify-dev.perenv.example.net", start.GetDnsRecordName())
 	require.Equal(t, "steward-verify-dev="+start.GetToken(), start.GetDnsRecordValue())
 
 	h.SetTXTLookup(func(_ context.Context, name string) ([]string, error) {
-		require.Equal(t, "_steward-verify-dev.perenv.com", name)
+		require.Equal(t, "_steward-verify-dev.perenv.example.net", name)
 		return []string{start.GetDnsRecordValue()}, nil
 	})
 	res, err := h.VerifyDomain(adminCtx(uuid.NewString()), &identityv1.VerifyDomainRequest{Domain: "perenv.example.net"})

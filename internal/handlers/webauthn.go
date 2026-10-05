@@ -261,9 +261,8 @@ func (h *ReadHandler) WebauthnRegisterFinish(ctx context.Context, req *identityv
 	}
 	cred, err := wa.CreateCredential(wu, session, parsed)
 	if err != nil {
-		lg := log.Ctx(ctx)
-		lg.Warn().Err(err).Str("user_id", u.ID.String()).
-			Msg("webauthn registration verification failed")
+		lg := logger.Ctx(ctx)
+		lg.Warn("webauthn registration verification failed", log.F("user_id", u.ID.String()), log.F("error", errText(err)))
 		return nil, status.Error(codes.InvalidArgument, "credential verification failed")
 	}
 	label := strings.TrimSpace(req.GetLabel())
@@ -367,11 +366,10 @@ func (h *ReadHandler) WebauthnAssertFinish(ctx context.Context, req *identityv1.
 	if err != nil {
 		return nil, err
 	}
-	lg := log.Ctx(ctx)
+	lg := logger.Ctx(ctx)
 	cred, err := wa.ValidateLogin(wu, session, parsed)
 	if err != nil {
-		lg.Info().Err(err).Str("user_id", u.ID.String()).
-			Msg("webauthn assertion verification failed")
+		lg.Info("webauthn assertion verification failed", log.F("user_id", u.ID.String()), log.F("error", errText(err)))
 		return &identityv1.WebauthnAssertFinishResponse{Ok: false}, nil
 	}
 
@@ -389,9 +387,7 @@ func (h *ReadHandler) WebauthnAssertFinish(ctx context.Context, req *identityv1.
 	// stored counter is deliberately NOT advanced. go-webauthn surfaces the
 	// same condition as CloneWarning — checked too, belt and braces.
 	if signCountRegressed(storedCount, newCount) || cred.Authenticator.CloneWarning {
-		lg.Warn().Str("user_id", u.ID.String()).Str("credential_id", credID).
-			Uint32("stored_sign_count", storedCount).Uint32("assertion_sign_count", newCount).
-			Msg("webauthn sign-count regression — possible cloned authenticator; assertion rejected")
+		lg.Warn("webauthn sign-count regression — possible cloned authenticator; assertion rejected", log.F("user_id", u.ID.String()), log.F("credential_id", credID), log.F("stored_sign_count", storedCount), log.F("assertion_sign_count", newCount))
 		return &identityv1.WebauthnAssertFinishResponse{Ok: false}, nil
 	}
 	if err := h.store.UpdateWebauthnCredentialUsage(ctx, u.ID, credID, int64(newCount)); err != nil {

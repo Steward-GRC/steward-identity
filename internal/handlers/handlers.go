@@ -8,6 +8,7 @@ package handlers
 
 import (
 	"errors"
+	log "github.com/Bugs5382/go-log"
 	"time"
 
 	"github.com/google/uuid"
@@ -175,4 +176,15 @@ func parseOptionalUUID(s, field string) (uuid.UUID, error) {
 		return uuid.Nil, status.Errorf(codes.InvalidArgument, "invalid %s: %v", field, err)
 	}
 	return id, nil
+}
+
+// logger is the handlers' go-log logger; Ctx adds the request's trace.
+var logger = log.NewLogger("identity")
+
+// errText is err's message, or "" for nil.
+func errText(err error) string {
+	if err == nil {
+		return ""
+	}
+	return err.Error()
 }

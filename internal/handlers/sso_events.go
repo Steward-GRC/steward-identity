@@ -91,7 +91,7 @@ func emitSSOEvent(ctx context.Context, pub ssoEventPublisher, event string, vars
 		return
 	}
 	if err := pub.PublishSSO(ctx, event, vars); err != nil {
-		lg := log.Ctx(ctx)
-		lg.Warn().Err(err).Str("event", event).Msg("sso: lifecycle event emit")
+		lg := logger.Ctx(ctx)
+		lg.Warn("sso: lifecycle event emit", log.F("event", event), log.F("error", errText(err)))
 	}
 }

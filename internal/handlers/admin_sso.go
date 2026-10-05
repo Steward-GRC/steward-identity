@@ -212,9 +212,8 @@ func (h *SSOAdminHandler) persistPolisSecret(ctx context.Context, connectionID, 
 	}
 	ref := polis.PolisClientSecretRef(connectionID)
 	if err := h.polisSecrets.PutKey(ctx, ref, []byte(secret)); err != nil {
-		lg := log.Ctx(ctx)
-		lg.Warn().Err(err).Str("connection_id", connectionID).
-			Msg("sso: could not store polis client secret out-of-band; teardown will address by tenant/product")
+		lg := logger.Ctx(ctx)
+		lg.Warn("sso: could not store polis client secret out-of-band; teardown will address by tenant/product", log.F("connection_id", connectionID), log.F("error", errText(err)))
 		return ""
 	}
 	return ref
@@ -234,9 +233,8 @@ func (h *SSOAdminHandler) resolvePolisSecret(ctx context.Context, conn store.IdP
 	}
 	b, err := h.polisSecrets.GetKey(ctx, ref)
 	if err != nil {
-		lg := log.Ctx(ctx)
-		lg.Warn().Err(err).Str("connection_id", conn.ID.String()).
-			Msg("sso: could not resolve polis client secret; teardown will address by tenant/product")
+		lg := logger.Ctx(ctx)
+		lg.Warn("sso: could not resolve polis client secret; teardown will address by tenant/product", log.F("connection_id", conn.ID.String()), log.F("error", errText(err)))
 		return ""
 	}
 	return string(b)
@@ -311,18 +309,14 @@ func (h *SSOAdminHandler) AddOrganization(ctx context.Context, req *identityv1.A
 		// delete itself fails we still return the provisioning error; the row is
 		// left disabled (never routing to sso, since no domain was registered).
 		if delErr := h.store.DeleteIdPConnection(ctx, conn.ID); delErr != nil {
-			lg := log.Ctx(ctx)
-			lg.Error().Err(delErr).
-				Str("connection_id", conn.ID.String()).Str("connection_alias", alias).
-				Msg("sso: compensating delete failed after provisioning error; row left disabled")
+			lg := logger.Ctx(ctx)
+			lg.Error(delErr, "sso: compensating delete failed after provisioning error; row left disabled", log.F("connection_id", conn.ID.String()), log.F("connection_alias", alias))
 		}
 		// Keep the raw provisioning cause in the logs (debug-only, never on the
 		// wire); the client gets the stable coded ErrorInfo (KC_ADMIN_UNREACHABLE
 		// / Code 5001) + a user-safe message the gateway relays verbatim.
-		dbg := log.Ctx(ctx)
-		dbg.Debug().Err(provErr).
-			Str("connection_alias", alias).Str("org", orgName).
-			Msg("sso: backend provisioning failed")
+		dbg := logger.Ctx(ctx)
+		dbg.Debug("sso: backend provisioning failed", log.F("connection_alias", alias), log.F("org", orgName), log.F("error", errText(provErr)))
 		return nil, errcodes.Error(ctx, errcodes.SSOProviderUnreachable(orgName, provErr))
 	}
 
@@ -347,7 +341,7 @@ func (h *SSOAdminHandler) AddOrganization(ctx context.Context, req *identityv1.A
 			merged[polis.ConfigKeyPolisClientSecretRef] = secretRef
 		}
 		if err := h.store.UpdateIdPConnectionConfig(ctx, conn.ID, merged); err != nil {
-			lg := log.Ctx(ctx)
+			lg := logger.Ctx(ctx)
 			if delErr := h.prov.DeleteConnection(ctx, polis.ConnectionRef{
 				Domain:       domain,
 				ClientID:     result.ClientID,
@@ -355,12 +349,10 @@ func (h *SSOAdminHandler) AddOrganization(ctx context.Context, req *identityv1.A
 				Tenant:       result.Tenant,
 				Product:      result.Product,
 			}); delErr != nil {
-				lg.Error().Err(delErr).Str("connection_id", conn.ID.String()).
-					Msg("sso: backend teardown failed after config-persist error; connection may be orphaned")
+				lg.Error(delErr, "sso: backend teardown failed after config-persist error; connection may be orphaned", log.F("connection_id", conn.ID.String()))
 			}
 			if delErr := h.store.DeleteIdPConnection(ctx, conn.ID); delErr != nil {
-				lg.Error().Err(delErr).Str("connection_id", conn.ID.String()).
-					Msg("sso: compensating delete failed after config-persist error; row left disabled")
+				lg.Error(delErr, "sso: compensating delete failed after config-persist error; row left disabled", log.F("connection_id", conn.ID.String()))
 			}
 			return nil, status.Errorf(codes.Internal, "persist sso connection identifiers: %v", err)
 		}
@@ -409,7 +401,7 @@ func (h *SSOAdminHandler) ListOrganizations(ctx context.Context, _ *identityv1.L
 		return nil, statusFromStoreErr(err)
 	}
 
-	lg := log.Ctx(ctx)
+	lg := logger.Ctx(ctx)
 	out := make([]*identityv1.Organization, 0, len(domains))
 	for _, d := range domains {
 		if d.ConnectionID == nil {
@@ -418,8 +410,7 @@ func (h *SSOAdminHandler) ListOrganizations(ctx context.Context, _ *identityv1.L
 		}
 		conn, err := h.store.GetIdPConnection(ctx, *d.ConnectionID)
 		if err != nil {
-			lg.Warn().Err(err).Str("domain", d.Domain).Str("connection_id", d.ConnectionID.String()).
-				Msg("sso: list organizations skipping domain with unresolvable connection")
+			lg.Warn("sso: list organizations skipping domain with unresolvable connection", log.F("domain", d.Domain), log.F("connection_id", d.ConnectionID.String()), log.F("error", errText(err)))
 			continue
 		}
 		out = append(out, orgToProto(conn, d.Domain, d.Verified))
@@ -563,9 +554,8 @@ func (h *SSOAdminHandler) ChangeOrgProtocol(ctx context.Context, req *identityv1
 		Tenant:       configString(conn.Config, polis.ConfigKeyPolisTenant),
 		Product:      configString(conn.Config, polis.ConfigKeyPolisProduct),
 	}); delErr != nil {
-		lg := log.Ctx(ctx)
-		lg.Warn().Err(delErr).Str("domain", domain).Str("connection_alias", conn.ConnectionAlias).
-			Msg("sso: change-protocol best-effort teardown of prior backend connection failed")
+		lg := logger.Ctx(ctx)
+		lg.Warn("sso: change-protocol best-effort teardown of prior backend connection failed", log.F("domain", domain), log.F("connection_alias", conn.ConnectionAlias), log.F("error", errText(delErr)))
 	}
 
 	// 3. Provision a fresh backend IdP (DISABLED) for the new protocol. On error
@@ -581,9 +571,8 @@ func (h *SSOAdminHandler) ChangeOrgProtocol(ctx context.Context, req *identityv1
 		Config:      reqCfg,
 	})
 	if provErr != nil {
-		dbg := log.Ctx(ctx)
-		dbg.Debug().Err(provErr).Str("connection_alias", conn.ConnectionAlias).Str("domain", domain).Str("protocol", protocol).
-			Msg("sso: change-protocol backend provisioning failed")
+		dbg := logger.Ctx(ctx)
+		dbg.Debug("sso: change-protocol backend provisioning failed", log.F("connection_alias", conn.ConnectionAlias), log.F("domain", domain), log.F("protocol", protocol), log.F("error", errText(provErr)))
 		return nil, errcodes.Error(ctx, errcodes.SSOProviderUnreachable(conn.OrgName, provErr))
 	}
 
@@ -667,9 +656,8 @@ func (h *SSOAdminHandler) StartDomainVerification(ctx context.Context, req *iden
 			// row is known to exist (GetSSODomain above), so this only revokes; a
 			// failure is logged, not fatal.
 			if err := h.store.SetDomainVerified(ctx, domain, false); err != nil {
-				lg := log.Ctx(ctx)
-				lg.Warn().Err(err).Str("domain", domain).
-					Msg("sso: token rotation failed to revoke prior verified proof")
+				lg := logger.Ctx(ctx)
+				lg.Warn("sso: token rotation failed to revoke prior verified proof", log.F("domain", domain), log.F("error", errText(err)))
 			}
 			h.emitSSODomainVerification(ctx, eventSSODomainVerificationRevoked, domain)
 		}
@@ -715,9 +703,8 @@ func (h *SSOAdminHandler) VerifyDomain(ctx context.Context, req *identityv1.Veri
 	recordName := verifyTXTRecordName(h.verifyTXTPrefix, domain)
 	records, err := h.txtLookup(ctx, recordName)
 	if err != nil {
-		lg := log.Ctx(ctx)
-		lg.Warn().Err(err).Str("domain", domain).Str("record", recordName).
-			Msg("sso: domain verification TXT lookup failed; reporting unverified")
+		lg := logger.Ctx(ctx)
+		lg.Warn("sso: domain verification TXT lookup failed; reporting unverified", log.F("domain", domain), log.F("record", recordName), log.F("error", errText(err)))
 		return &identityv1.VerifyDomainResponse{Verified: false}, nil
 	}
 
@@ -756,7 +743,7 @@ func (h *SSOAdminHandler) RecheckVerifiedDomains(ctx context.Context) (checked, 
 	if err != nil {
 		return 0, 0, err
 	}
-	lg := log.Ctx(ctx)
+	lg := logger.Ctx(ctx)
 	for _, d := range domains {
 		if d.Method != "sso" || !d.Verified {
 			continue
@@ -776,12 +763,12 @@ func (h *SSOAdminHandler) RecheckVerifiedDomains(ctx context.Context) (checked, 
 			continue
 		}
 		if serr := h.store.SetDomainVerified(ctx, d.Domain, false); serr != nil {
-			lg.Error().Err(serr).Str("domain", d.Domain).Msg("sso: recheck failed to revoke drifted domain")
+			lg.Error(serr, "sso: recheck failed to revoke drifted domain", log.F("domain", d.Domain))
 			continue
 		}
 		revoked++
 		h.emitSSODomainVerification(ctx, eventSSODomainVerificationRevoked, d.Domain)
-		lg.Warn().Str("domain", d.Domain).Msg("sso: domain verification revoked — TXT record no longer resolves")
+		lg.Warn("sso: domain verification revoked — TXT record no longer resolves", log.F("domain", d.Domain))
 	}
 	return checked, revoked, nil
 }
@@ -953,15 +940,13 @@ func (h *SSOAdminHandler) DeleteOrganization(ctx context.Context, req *identityv
 	}
 
 	if d.ConnectionID != nil {
-		lg := log.Ctx(ctx)
+		lg := logger.Ctx(ctx)
 		conn, cerr := h.store.GetIdPConnection(ctx, *d.ConnectionID)
 		if cerr != nil {
-			lg.Warn().Err(cerr).Str("domain", domain).Str("connection_id", d.ConnectionID.String()).
-				Msg("sso: delete organization could not resolve connection for cleanup; domain routing already removed")
+			lg.Warn("sso: delete organization could not resolve connection for cleanup; domain routing already removed", log.F("domain", domain), log.F("connection_id", d.ConnectionID.String()), log.F("error", errText(cerr)))
 		} else {
 			if delErr := h.store.DeleteIdPConnection(ctx, conn.ID); delErr != nil {
-				lg.Error().Err(delErr).Str("domain", domain).Str("connection_id", conn.ID.String()).
-					Msg("sso: delete organization failed to remove idp connection row; domain routing already removed")
+				lg.Error(delErr, "sso: delete organization failed to remove idp connection row; domain routing already removed", log.F("domain", domain), log.F("connection_id", conn.ID.String()))
 			}
 			// Best-effort backend teardown through the same provisioner seam
 			// AddOrganization created the connection with, addressed by the
@@ -973,8 +958,7 @@ func (h *SSOAdminHandler) DeleteOrganization(ctx context.Context, req *identityv
 				Tenant:       configString(conn.Config, polis.ConfigKeyPolisTenant),
 				Product:      configString(conn.Config, polis.ConfigKeyPolisProduct),
 			}); provErr != nil {
-				lg.Warn().Err(provErr).Str("domain", domain).Str("connection_alias", conn.ConnectionAlias).
-					Msg("sso: delete organization best-effort backend connection delete failed")
+				lg.Warn("sso: delete organization best-effort backend connection delete failed", log.F("domain", domain), log.F("connection_alias", conn.ConnectionAlias), log.F("error", errText(provErr)))
 			}
 		}
 	}
@@ -1098,9 +1082,8 @@ func (h *SSOAdminHandler) RecordBreakGlassLogin(ctx context.Context, req *identi
 		return nil, status.Errorf(codes.Internal, "break-glass eligibility: %v", err)
 	}
 	if !eligible {
-		lg := log.Ctx(ctx)
-		lg.Warn().Str("email", email).Str("reason", eligReason).
-			Msg("break-glass: refusing to record — email not break-glass-eligible")
+		lg := logger.Ctx(ctx)
+		lg.Warn("break-glass: refusing to record — email not break-glass-eligible", log.F("email", email), log.F("reason", eligReason))
 		return nil, status.Errorf(codes.PermissionDenied, "email not break-glass-eligible: %s", eligReason)
 	}
 
@@ -1111,9 +1094,8 @@ func (h *SSOAdminHandler) RecordBreakGlassLogin(ctx context.Context, req *identi
 		if id, perr := uuid.Parse(raw); perr == nil {
 			actorUserID = &id
 		} else {
-			lg := log.Ctx(ctx)
-			lg.Warn().Str("actor_user_id", raw).
-				Msg("break-glass: unparseable actor_user_id, recording without actor link")
+			lg := logger.Ctx(ctx)
+			lg.Warn("break-glass: unparseable actor_user_id, recording without actor link", log.F("actor_user_id", raw))
 		}
 	}
 
@@ -1130,9 +1112,8 @@ func (h *SSOAdminHandler) RecordBreakGlassLogin(ctx context.Context, req *identi
 		ActorUserID: actorUserID,
 		Payload:     payload,
 	}); err != nil {
-		lg := log.Ctx(ctx)
-		lg.Error().Err(err).Str("email", email).
-			Msg("break-glass: durable audit write failed")
+		lg := logger.Ctx(ctx)
+		lg.Error(err, "break-glass: durable audit write failed", log.F("email", email))
 		return nil, status.Errorf(codes.Internal, "record break-glass audit: %v", err)
 	}
 

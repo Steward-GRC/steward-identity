@@ -288,8 +288,8 @@ func (h *AdminHandler) DisableUser(ctx context.Context, req *identityv1.DisableU
 	// sessions is a second lock, so a Kratos outage doesn't fail the disable.
 	if h.accounts != nil {
 		if n, err := revokeAllSessions(ctx, h.accounts, u); err != nil {
-			lg := log.Ctx(ctx)
-			lg.Warn().Err(err).Str("user_id", id.String()).Msg("disable user: session revoke failed")
+			lg := logger.Ctx(ctx)
+			lg.Warn("disable user: session revoke failed", log.F("user_id", id.String()), log.F("error", errText(err)))
 		} else {
 			h.auditSessionsRevoked(ctx, actor, &id, n, "disabled", "")
 		}
@@ -510,8 +510,8 @@ func (h *AdminHandler) auditSessionsRevoked(ctx context.Context, actor adminActo
 		EventType: "session.revoked", ActorUserID: actorUUIDPtr(actor), ActorExternal: actor.ActorExternal,
 		TargetUserID: target, Payload: payload,
 	}); err != nil {
-		lg := log.Ctx(ctx)
-		lg.Warn().Err(err).Msg("session revoke: audit write failed")
+		lg := logger.Ctx(ctx)
+		lg.Warn("session revoke: audit write failed", log.F("error", errText(err)))
 	}
 }
 
@@ -916,33 +916,32 @@ func (h *AdminHandler) RequestStepUpOtp(ctx context.Context, _ *identityv1.Reque
 	if h.otp == nil {
 		return nil, status.Error(codes.Unavailable, "otp not configured")
 	}
-	lg := log.Ctx(ctx)
+	lg := logger.Ctx(ctx)
 	uid := actorUUIDPtr(actor)
 	if uid == nil {
 		// Toolbox/mTLS actor: no platform user id to email a code to. Nothing to
 		// do (generic success keeps the surface uniform).
-		lg.Info().Msg("step-up otp request from non-gateway actor — no email sent")
+		lg.Info("step-up otp request from non-gateway actor — no email sent")
 		return &identityv1.RequestStepUpOtpResponse{}, nil
 	}
 	u, err := h.store.GetUser(ctx, *uid)
 	if err != nil {
-		lg.Warn().Err(err).Str("user_id", uid.String()).Msg("step-up otp: actor lookup failed")
+		lg.Warn("step-up otp: actor lookup failed", log.F("user_id", uid.String()), log.F("error", errText(err)))
 		return &identityv1.RequestStepUpOtpResponse{}, nil
 	}
 	code, err := h.store.GenerateOTP(ctx, u.ID, store.OTPPurposeStepUp)
 	if err != nil {
-		lg.Warn().Err(err).Str("user_id", u.ID.String()).Msg("step-up otp generate failed")
+		lg.Warn("step-up otp generate failed", log.F("user_id", u.ID.String()), log.F("error", errText(err)))
 		return &identityv1.RequestStepUpOtpResponse{}, nil
 	}
 	if h.otp.devEcho {
-		lg.Info().Str("purpose", store.OTPPurposeStepUp).Str("email", u.Email).Str("otp_code", code).
-			Msg("DEV: one-time code (OTP_DEV_ECHO)")
+		lg.Info("DEV: one-time code (OTP_DEV_ECHO)", log.F("purpose", store.OTPPurposeStepUp), log.F("email", u.Email), log.F("otp_code", code))
 	}
 	if h.otp.sender != nil && u.Email != "" {
 		body := "Use this code to confirm transferring root of Steward:\n\n    " + code +
 			"\n\nThis code expires in 10 minutes. If you did not request it, ignore this email."
 		if err := h.otp.sender.Send(ctx, u.Email, "Your confirmation code for transferring root", body); err != nil {
-			lg.Warn().Err(err).Str("email", u.Email).Msg("step-up otp email send failed")
+			lg.Warn("step-up otp email send failed", log.F("email", u.Email), log.F("error", errText(err)))
 		}
 	}
 	return &identityv1.RequestStepUpOtpResponse{}, nil

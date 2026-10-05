@@ -141,15 +141,14 @@ func accountFromPreflight(pf store.UserDeletionPreflight) userdelete.Account {
 // delete path, so a 5009 reads the same whether it came from the preview or the
 // delete itself.
 func previewDeletionErr(ctx context.Context, userID string, err error) error {
-	l := log.Ctx(ctx)
+	l := logger.Ctx(ctx)
 	if unavailable, ok := errors.AsType[*userdelete.StepUnavailableError](err); ok {
-		l.Error().Err(unavailable.Err).Str("user_id", userID).Str("step", unavailable.Step).
-			Msg("preview user deletion: a mandatory pre-delete class could not be read")
+		l.Error(unavailable.Err, "preview user deletion: a mandatory pre-delete class could not be read", log.F("user_id", userID), log.F("step", unavailable.Step))
 		return errcodes.Error(ctx, errcodes.UserDeleteChecksUnavailable(unavailable.Step, unavailable.Err))
 	}
 	// Unreachable today (Preview returns only StepUnavailableError), but a
 	// future class must not degrade into a generic Internal.
-	l.Error().Err(err).Str("user_id", userID).Msg("preview user deletion failed")
+	l.Error(err, "preview user deletion failed", log.F("user_id", userID))
 	return errcodes.Error(ctx, errcodes.UserDeleteChecksUnavailable("pre_delete_preview", err))
 }
 
