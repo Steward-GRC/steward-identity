@@ -12,3 +12,10 @@ coverage.*
 
 # local environment - copy .env.example to .env
 .env
+
+# local Go workspace (builds against unreleased sibling modules) - never committed
+go.work
+go.work.sum
+
+# callee protos fetched by scripts/proto-generate.sh - never committed
+.protos/

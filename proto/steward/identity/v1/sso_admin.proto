@@ -1,0 +1,227 @@
+// Copyright 2026 The Steward Authors
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package steward.identity.v1;
+
+import "steward/identity/v1/types.proto";
+
+option go_package = "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1;identityv1";
+
+// IdentitySSOAdminService manages organisations' SAML and OIDC connections
+// through the SSO broker: their lifecycle, domain verification, connection
+// tests, group mappings and the service-provider signing certificate. Same
+// callers as IdentityAdminService.
+service IdentitySSOAdminService {
+  // AddOrganization registers an organisation's connection. It stays
+  // disabled until the domain is verified and the connection test passes.
+  rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse);
+  // ListOrganizations lists every organisation's connection.
+  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse);
+  // GetOrganization fetches one organisation by domain.
+  rpc GetOrganization(GetOrganizationRequest) returns (GetOrganizationResponse);
+  // UpdateIdPConnection changes an organisation's connection settings.
+  rpc UpdateIdPConnection(UpdateIdPConnectionRequest) returns (UpdateIdPConnectionResponse);
+  // ChangeOrgProtocol switches between SAML and OIDC. It sets the
+  // connection up again in the broker and resets both activation gates, so
+  // the domain must be verified and the test run again.
+  rpc ChangeOrgProtocol(ChangeOrgProtocolRequest) returns (ChangeOrgProtocolResponse);
+  // DeleteOrganization removes an organisation's connection.
+  rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse);
+  // StartDomainVerification returns the DNS TXT record that proves a domain.
+  rpc StartDomainVerification(StartDomainVerificationRequest) returns (StartDomainVerificationResponse);
+  // VerifyDomain looks the domain's TXT record up.
+  rpc VerifyDomain(VerifyDomainRequest) returns (VerifyDomainResponse);
+  // RecordIdPTestResult records an admin's connection test.
+  rpc RecordIdPTestResult(RecordIdPTestResultRequest) returns (RecordIdPTestResultResponse);
+  // ActivateOrganization enables a connection for sign-in.
+  rpc ActivateOrganization(ActivateOrganizationRequest) returns (ActivateOrganizationResponse);
+  // DisableOrganization disables a connection.
+  rpc DisableOrganization(DisableOrganizationRequest) returns (DisableOrganizationResponse);
+  // AddGroupMapping maps an asserted group claim value to a platform group.
+  rpc AddGroupMapping(AddGroupMappingRequest) returns (AddGroupMappingResponse);
+  // ListGroupMappings lists a connection's group mappings.
+  rpc ListGroupMappings(ListGroupMappingsRequest) returns (ListGroupMappingsResponse);
+  // DeleteGroupMapping removes a group mapping.
+  rpc DeleteGroupMapping(DeleteGroupMappingRequest) returns (DeleteGroupMappingResponse);
+  // GetSPCertificate fetches the active signing certificate.
+  rpc GetSPCertificate(GetSPCertificateRequest) returns (GetSPCertificateResponse);
+  // ListSPCertificates lists every signing certificate.
+  rpc ListSPCertificates(ListSPCertificatesRequest) returns (ListSPCertificatesResponse);
+  // ForceRotateSPCertificate creates a signing certificate and makes it
+  // active at once.
+  rpc ForceRotateSPCertificate(ForceRotateSPCertificateRequest) returns (ForceRotateSPCertificateResponse);
+  // RecordBreakGlassLogin records a successful break-glass sign-in in the
+  // audit trail and notifies the site-admins. The gateway calls it before the
+  // session exists; a failure here must never block the sign-in.
+  rpc RecordBreakGlassLogin(RecordBreakGlassLoginRequest) returns (RecordBreakGlassLoginResponse);
+}
+
+message AddOrganizationRequest {
+  string org_name = 1;
+  string domain = 2;
+  // "saml" or "oidc".
+  string protocol = 3;
+  string display_name = 4;
+  // The connection's non-secret settings.
+  map<string, string> config = 5;
+  // A reference to the secret the connection needs, never the secret.
+  string secret_ref = 6;
+}
+
+message AddOrganizationResponse {
+  Organization organization = 1;
+}
+
+message ListOrganizationsRequest {}
+
+message ListOrganizationsResponse {
+  repeated Organization organizations = 1;
+}
+
+message GetOrganizationRequest {
+  string domain = 1;
+}
+
+message GetOrganizationResponse {
+  Organization organization = 1;
+}
+
+message UpdateIdPConnectionRequest {
+  string domain = 1;
+  map<string, string> config = 2;
+  string secret_ref = 3;
+  // The organisation's sign-in toggles; an unset one keeps its value.
+  optional bool jit_enabled = 4;
+  optional bool allow_local = 5;
+}
+
+message UpdateIdPConnectionResponse {
+  Organization organization = 1;
+}
+
+message ChangeOrgProtocolRequest {
+  string domain = 1;
+  // "saml" or "oidc".
+  string protocol = 2;
+  // The new protocol's settings and secret reference replace the old ones.
+  map<string, string> config = 3;
+  string secret_ref = 4;
+}
+
+message ChangeOrgProtocolResponse {
+  // Always unverified, untested and disabled.
+  Organization organization = 1;
+}
+
+message DeleteOrganizationRequest {
+  string domain = 1;
+}
+
+message DeleteOrganizationResponse {
+  string domain = 1;
+}
+
+message StartDomainVerificationRequest {
+  string domain = 1;
+  // When false, a pending verification keeps its token, so a record already
+  // published stays valid. When true, a new token replaces it and the domain
+  // goes back to unverified until the new record is verified.
+  bool rotate = 2;
+}
+
+message StartDomainVerificationResponse {
+  string token = 1;
+  string dns_record_name = 2;
+  string instructions = 3;
+  // The exact TXT value to publish: <prefix>=<token>.
+  string dns_record_value = 4;
+}
+
+message VerifyDomainRequest {
+  string domain = 1;
+}
+
+message VerifyDomainResponse {
+  bool verified = 1;
+}
+
+message RecordIdPTestResultRequest {
+  string connection_id = 1;
+  bool success = 2;
+  string detail = 3;
+}
+
+message RecordIdPTestResultResponse {}
+
+message ActivateOrganizationRequest {
+  string domain = 1;
+}
+
+message ActivateOrganizationResponse {
+  Organization organization = 1;
+}
+
+message DisableOrganizationRequest {
+  string domain = 1;
+}
+
+message DisableOrganizationResponse {
+  Organization organization = 1;
+}
+
+message AddGroupMappingRequest {
+  string connection_id = 1;
+  string idp_group_claim_value = 2;
+  string target_group_id = 3;
+}
+
+message AddGroupMappingResponse {
+  GroupMapping mapping = 1;
+}
+
+message ListGroupMappingsRequest {
+  string connection_id = 1;
+}
+
+message ListGroupMappingsResponse {
+  repeated GroupMapping mappings = 1;
+}
+
+message DeleteGroupMappingRequest {
+  string mapping_id = 1;
+}
+
+message DeleteGroupMappingResponse {
+  string mapping_id = 1;
+}
+
+message GetSPCertificateRequest {}
+
+message GetSPCertificateResponse {
+  SPCertificate certificate = 1;
+}
+
+message ListSPCertificatesRequest {}
+
+message ListSPCertificatesResponse {
+  repeated SPCertificate certificates = 1;
+}
+
+message ForceRotateSPCertificateRequest {}
+
+message ForceRotateSPCertificateResponse {
+  SPCertificate certificate = 1;
+}
+
+message RecordBreakGlassLoginRequest {
+  // The account that broke glass.
+  string email = 1;
+  // An optional note.
+  string reason = 2;
+  // The platform user id when the gateway already knows it.
+  string actor_user_id = 3;
+}
+
+message RecordBreakGlassLoginResponse {}

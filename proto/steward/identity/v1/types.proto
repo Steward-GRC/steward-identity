@@ -1,0 +1,347 @@
+// Copyright 2026 The Steward Authors
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package steward.identity.v1;
+
+option go_package = "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1;identityv1";
+
+// User is a platform user. Roles and groups are plural: callers never assume
+// one of each.
+message User {
+  // The platform user id (a UUID).
+  string id = 1;
+  string email = 2;
+  // The display name, derived from first_name and last_name where both exist.
+  string name = 3;
+  // Global roles: admin, site-admin, template-admin, compliance-admin.
+  // Reader is implicit and never listed.
+  repeated string roles = 4;
+  // Ids of the groups the user is a direct member of.
+  repeated string groups = 5;
+  bool enabled = 6;
+  // Category-scoped author and approver grants.
+  repeated ScopedRole scoped_roles = 7;
+  // Group names the identity provider asserted for the user.
+  repeated string idp_groups = 8;
+  // Per-policy allow and deny overrides.
+  repeated PolicyOverride policy_overrides = 9;
+  // The protected root site-admin.
+  bool is_root = 10;
+  // The individual policy.read_sensitive grant (root-only to assign).
+  bool read_sensitive_grant = 11;
+  // True for an account with a local password, managed in Steward rather
+  // than by an identity provider.
+  bool local_account = 12;
+  // The sign-in username. For SSO accounts it is derived from the email's
+  // local part.
+  string username = 13;
+  // True until the user completes first-run onboarding.
+  bool needs_onboarding = 14;
+  // Given name, from the identity provider or set at onboarding. May be empty.
+  string first_name = 15;
+  // Family name, from the identity provider or set at onboarding. May be empty.
+  string last_name = 16;
+  // IANA time zone name, such as "America/New_York". Empty means unset;
+  // consumers fall back to UTC.
+  string timezone = 17;
+  // BCP 47 locale tag, such as "en-US". Empty means unset.
+  string locale = 18;
+  // Ids of the groups the user manages locally. A local grant, never taken
+  // from the identity provider.
+  repeated string managed_group_ids = 19;
+  // One row per entry in groups, with where the membership came from.
+  repeated Membership memberships = 20;
+  // RFC 3339 time the account was deleted; empty for a live account. A
+  // deleted account is kept so history still resolves to a name, so lookups
+  // by id and admin lists that ask for deleted accounts can return one.
+  string deleted_at = 21;
+  // The account a deleted account was merged into; empty when it was deleted
+  // outright, and always empty for a live account.
+  string merged_into_user_id = 22;
+}
+
+// Membership is one group membership with its source.
+message Membership {
+  string group_id = 1;
+  // "manual" for admin or self grants, "idp-sync" for memberships created by
+  // an SSO connection's group mappings. Clients show idp-sync rows read-only.
+  string source = 2;
+}
+
+// Group is one node of the group tree.
+message Group {
+  string id = 1;
+  string name = 2;
+  // Empty for a root group.
+  string parent_id = 3;
+  // Free-form policy-domain settings, such as delivery defaults.
+  map<string, string> metadata = 4;
+}
+
+// ScopedRole binds a category-scoped role to one category.
+message ScopedRole {
+  // "author" or "approver".
+  string role = 1;
+  // The category name the role is scoped to.
+  string category = 2;
+}
+
+// OverrideEffect is the direction of a per-user, per-policy override.
+enum OverrideEffect {
+  // No override; setting it clears one.
+  OVERRIDE_EFFECT_UNSPECIFIED = 0;
+  OVERRIDE_EFFECT_ALLOW = 1;
+  OVERRIDE_EFFECT_DENY = 2;
+}
+
+// PolicyOverride is a per-user allow or deny on one policy, overriding the
+// decision group membership would give.
+message PolicyOverride {
+  string policy_number = 1;
+  OverrideEffect effect = 2;
+}
+
+// Session is one sign-in session, as the sign-in service holds it.
+message Session {
+  string session_id = 1;
+  string user_id = 2;
+  // RFC 3339 times.
+  string issued_at = 3;
+  string authenticated_at = 4;
+  string expires_at = 5;
+  // False once the session is revoked or expired.
+  bool active = 6;
+  // The user agent of the device that last used the session.
+  string user_agent = 7;
+}
+
+// UserFactor is one second factor a user can satisfy.
+message UserFactor {
+  // "totp", "email" or "passkey".
+  string kind = 1;
+  // RFC 3339 activation time; empty for the implicit email factor.
+  string enrolled_at = 2;
+  // The user-set name; empty means the client's default for the kind.
+  string label = 3;
+  // The method id the management calls take: "totp", a passkey's credential
+  // id, or "email". Set by the admin listing, which returns one factor per
+  // passkey; the self-service listing groups passkeys and leaves it empty.
+  string id = 4;
+}
+
+// WebauthnCredential is one registered passkey.
+message WebauthnCredential {
+  // The base64url credential id.
+  string id = 1;
+  string label = 2;
+  // RFC 3339 times; last_used_at is empty when it was never used.
+  string created_at = 3;
+  string last_used_at = 4;
+  // Transport hints: usb, nfc, ble, internal, hybrid.
+  repeated string transports = 5;
+}
+
+// MergeItemKind classifies one record a merge moves.
+enum MergeItemKind {
+  MERGE_ITEM_KIND_UNSPECIFIED = 0;
+  // A policy whose owner changes.
+  MERGE_ITEM_KIND_POLICY_OWNER = 1;
+  // A user-subject category access rule that is rewritten.
+  MERGE_ITEM_KIND_RACI_GRANT = 2;
+  // An acknowledgement that is moved or deduplicated.
+  MERGE_ITEM_KIND_ACKNOWLEDGMENT = 3;
+  // A pending workflow item that is reassigned.
+  MERGE_ITEM_KIND_WORKFLOW_ITEM = 4;
+  // An identity preference that is moved.
+  MERGE_ITEM_KIND_PREFERENCE = 5;
+}
+
+// MergePreviewItem is one line of a merge preview.
+message MergePreviewItem {
+  MergeItemKind kind = 1;
+  // A policy, policy version, workflow item or category id.
+  string ref_id = 2;
+  // Such as a policy's "number - title".
+  string label = 3;
+  // Such as "owner" or "kept earliest ack".
+  string detail = 4;
+}
+
+// MergeCounts sums a merge by record type.
+message MergeCounts {
+  int32 policies_owned = 1;
+  int32 raci_grants = 2;
+  // Source-only acknowledgements moved to the target.
+  int32 acknowledgments_moved = 3;
+  // Acknowledged by both: the earliest kept, the source's dropped.
+  int32 acknowledgments_deduped = 4;
+  int32 workflow_items = 5;
+  int32 preferences = 6;
+}
+
+// MergeWarning flags a condition to weigh before a merge.
+message MergeWarning {
+  // SOURCE_IS_ROOT, SOURCE_IS_SITE_ADMIN, TARGET_DISABLED and the like.
+  string code = 1;
+  string message = 2;
+}
+
+// AccountMergePreview is what a merge would move.
+message AccountMergePreview {
+  string source_user_id = 1;
+  string target_user_id = 2;
+  MergeCounts counts = 3;
+  repeated MergePreviewItem items = 4;
+  repeated MergeWarning warnings = 5;
+  // True when the source is root or a site-admin.
+  bool requires_privileged_confirm = 6;
+}
+
+// MergeStatus is the outcome of a merge.
+enum MergeStatus {
+  MERGE_STATUS_UNSPECIFIED = 0;
+  // Every step completed.
+  MERGE_STATUS_COMPLETED = 1;
+  // Some steps failed; run it again with the same key to resume.
+  MERGE_STATUS_PARTIAL = 2;
+  // Nothing was applied.
+  MERGE_STATUS_FAILED = 3;
+}
+
+// MergeStepStatus is the outcome of one merge step.
+enum MergeStepStatus {
+  MERGE_STEP_STATUS_UNSPECIFIED = 0;
+  MERGE_STEP_STATUS_PENDING = 1;
+  MERGE_STEP_STATUS_COMPLETED = 2;
+  MERGE_STEP_STATUS_FAILED = 3;
+  // Not applicable, or deferred.
+  MERGE_STEP_STATUS_SKIPPED = 4;
+}
+
+// MergeStepResult is the outcome of one step of a merge.
+message MergeStepResult {
+  // core_reassign, ack_transfer, workflow_reassign, identity_prefs,
+  // session_revoke, audit_event or tombstone_source.
+  string step = 1;
+  MergeStepStatus status = 2;
+  string detail = 3;
+  // Set only when the step failed.
+  string error = 4;
+}
+
+// DeletionItemKind classifies one record a user delete affects. Nothing
+// moves in a delete: each record is a blocker, left orphaned, or removed.
+enum DeletionItemKind {
+  DELETION_ITEM_KIND_UNSPECIFIED = 0;
+  // An approval seat the account still holds; it blocks the delete.
+  DELETION_ITEM_KIND_PENDING_APPROVAL = 1;
+  // A policy left without an owner, to be reassigned.
+  DELETION_ITEM_KIND_OWNED_POLICY = 2;
+  // A user-subject category access rule the delete removes.
+  DELETION_ITEM_KIND_RACI_GRANT = 3;
+  // An identity access row the delete drops: a role, permission, group
+  // membership, identity provider group, per-policy override or break-glass
+  // grant.
+  DELETION_ITEM_KIND_ACCESS_ROW = 4;
+  // The account's local sign-in credential, revoked before the delete.
+  DELETION_ITEM_KIND_CREDENTIAL = 5;
+}
+
+// UserDeletionPreviewItem is one line of a delete preview.
+message UserDeletionPreviewItem {
+  DeletionItemKind kind = 1;
+  // A policy, workflow task, category, role or group id.
+  string ref_id = 2;
+  string label = 3;
+  string detail = 4;
+  // True when this row makes the delete refuse.
+  bool blocks_delete = 5;
+}
+
+// UserDeletionCounts sums a delete preview by class. A class that couldn't
+// be read is an error, never a zero.
+message UserDeletionCounts {
+  // Blocks the delete.
+  int32 pending_approvals = 1;
+  // Left without an owner.
+  int32 owned_policies = 2;
+  // Removed in core.
+  int32 raci_grants = 3;
+  int32 roles = 4;
+  int32 permissions = 5;
+  int32 group_memberships = 6;
+  int32 idp_groups = 7;
+  int32 policy_overrides = 8;
+  int32 break_glass_grants = 9;
+  // Kept by the delete: group-manager grants stay, pointing at the deleted
+  // account, until an admin clears them.
+  int32 managed_groups = 10;
+}
+
+// UserDeletionWarning flags a consequence of a delete.
+message UserDeletionWarning {
+  // DELETE_BLOCKED_PENDING_APPROVALS, DELETE_BLOCKED_ROOT_PROTECTED,
+  // POLICIES_ORPHANED, RACI_GRANTS_REMOVED, RETAINED_MANAGED_GROUPS,
+  // LAST_LOCAL_CREDENTIAL, NO_LOCAL_CREDENTIAL or ALREADY_DELETED.
+  string code = 1;
+  string message = 2;
+}
+
+// UserDeletionPreview is what a delete would do.
+message UserDeletionPreview {
+  string user_id = 1;
+  UserDeletionCounts counts = 2;
+  repeated UserDeletionPreviewItem items = 3;
+  repeated UserDeletionWarning warnings = 4;
+  // True when the delete would refuse now: the account holds pending
+  // approval seats, or it is the root account.
+  bool blocks_delete = 5;
+  // True when the account can sign in without its identity provider (a
+  // local account, a stored password or a passkey).
+  bool locally_authenticable = 6;
+}
+
+// Organization is an organisation's SSO connection and its domain's
+// verification state.
+message Organization {
+  string domain = 1;
+  string org_name = 2;
+  // "saml" or "oidc".
+  string protocol = 3;
+  string display_name = 4;
+  // The routing key the SSO broker knows the connection by.
+  string connection_alias = 5;
+  bool verified = 6;
+  bool test_passed = 7;
+  bool enabled = 8;
+  string connection_id = 9;
+  // When false, only an existing user may sign in through this connection;
+  // an unknown email is refused instead of getting a new account.
+  bool jit_enabled = 10;
+  // When true, the organisation's users may also sign in with a local
+  // password.
+  bool allow_local = 11;
+}
+
+// GroupMapping maps one asserted group claim value to a platform group.
+message GroupMapping {
+  string id = 1;
+  string connection_id = 2;
+  string idp_group_claim_value = 3;
+  // The platform group id. Names are unique only under one parent, so
+  // mappings use ids.
+  string target_group_id = 4;
+}
+
+// SPCertificate is one service-provider signing certificate.
+message SPCertificate {
+  string serial = 1;
+  string cert_pem = 2;
+  string sp_metadata_xml = 3;
+  // RFC 3339.
+  string not_after = 4;
+  // At most one certificate is active.
+  bool active = 5;
+}
