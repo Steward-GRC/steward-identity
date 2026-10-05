@@ -34,3 +34,28 @@ groups and is matched against the connection's group mappings.
 
 Coded errors carry a `google.rpc.ErrorInfo` with the domain `identity`; see
 [error-codes.md](error-codes.md).
+
+## Events
+
+| Exchange | Routing key | Body | When |
+| --- | --- | --- | --- |
+| `audit` | `audit.audit`, `audit.activity` | `steward.audit.v1.AuditEvent`, protobuf | every change and sign-in, written to the go-outbox table in the same transaction and relayed at least once |
+| `jobs` | `sso.lifecycle` | JSON `{event, vars}` | an SSO account provisioned, access granted, a break-glass sign-in |
+| `jobs` | `account.created` | JSON | every genuine account create |
+| `jobs` | `membership.changed` | JSON | a user left groups (obligations purges acknowledgements they no longer owe) |
+
+## Calling other services
+
+Identity never imports another service's Go module. `proto-refs.env` pins each callee at a commit
+on its `main`; `scripts/proto-generate.sh` fetches those protos into the git-ignored `.protos/` and
+generates stubs under `gen/go/thirdparty/`.
+
+| Callee | Pin | Used for |
+| --- | --- | --- |
+| steward-core | `STEWARD_CORE_REF` | merge (re-own policies), the delete checks (purge category rules) and the delete preview (owned policies, rules a delete would remove) |
+| steward-audit | `STEWARD_AUDIT_REF` | the `AuditEvent` message published to the `audit` exchange |
+| steward-workflow | not pinned yet | pending approvals (the delete refusal) and re-pointing approvals in a merge; until pinned these report unavailable and deletes and merges refuse |
+| steward-obligations | not pinned yet | moving acknowledgements in a merge; until pinned merges refuse |
+
+Every outbound connection carries the caller and the act-as admin (go-grpc-actor's client
+interceptors).

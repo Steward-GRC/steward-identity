@@ -155,6 +155,15 @@ func (c *Client) CreateIdentity(ctx context.Context, a Account, password string)
 	return id.Id, nil
 }
 
+// DeleteIdentity removes an identity, for rolling back a local account whose
+// row couldn't be written.
+func (c *Client) DeleteIdentity(ctx context.Context, identityID string) error {
+	if resp, err := c.api.DeleteIdentity(ctx, identityID).Execute(); err != nil && !isStatus(resp, http.StatusNotFound) {
+		return fmt.Errorf("delete identity: %w", callErr(resp, err))
+	}
+	return nil
+}
+
 // SetPassword replaces an identity's password, keeping its traits and state.
 func (c *Client) SetPassword(ctx context.Context, identityID, password string) error {
 	return c.update(ctx, identityID, func(b *ory.UpdateIdentityBody) {

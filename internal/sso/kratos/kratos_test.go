@@ -39,6 +39,7 @@ type fakeKratos struct {
 	created      map[string]any
 	updated      map[string]any
 	disabled     string
+	deleted      string
 	activeQuery  string
 	calls        []string
 }
@@ -160,6 +161,12 @@ func (f *fakeKratos) server(t *testing.T) *httptest.Server {
 			}
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"id":"` + f.identityID + `","schema_id":"default","schema_url":"http://kratos.example.org/schemas/default","state":"inactive","traits":{}}`))
+		case r.Method == http.MethodDelete:
+			f.record("delete")
+			f.mu.Lock()
+			f.deleted = strings.TrimPrefix(path, "/admin/identities/")
+			f.mu.Unlock()
+			w.WriteHeader(http.StatusNoContent)
 		case r.Method == http.MethodGet:
 			f.record("get")
 			w.Header().Set("Content-Type", "application/json")
@@ -360,4 +367,12 @@ func TestRevokeSessionDisablesOneSession(t *testing.T) {
 	revoked, err = c.RevokeSession(context.Background(), "unknown")
 	require.NoError(t, err, "an unknown session is not an error")
 	require.False(t, revoked)
+}
+
+func TestDeleteIdentityRemovesIt(t *testing.T) {
+	f := &fakeKratos{identityID: bobID}
+	srv := f.server(t)
+
+	require.NoError(t, kratos.New(srv.URL, 5*time.Second).DeleteIdentity(context.Background(), bobID))
+	require.Equal(t, bobID, f.deleted)
 }
