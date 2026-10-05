@@ -31,6 +31,7 @@ const (
 	CodeLocalAccountsUnavailable    = 5007
 	CodeUserHasPendingApprovals     = 5008
 	CodeUserDeleteChecksUnavailable = 5009
+	CodeActAsForbidden              = 5010
 )
 
 // Entries returns the registry entries.
@@ -65,6 +66,9 @@ func Entries() []apperr.Entry {
 		{Code: CodeUserDeleteChecksUnavailable, Symbol: "USER_DELETE_CHECKS_UNAVAILABLE", Category: apperr.CategoryFailedPrecondition,
 			Title: "delete user", Cause: "a mandatory delete or delete-preview step couldn't run; the step metadata names it",
 			UserSafe: true, Message: "A required safety check ({step}) couldn't be completed, so this account's deletion can't be assessed or carried out. Nothing was changed. Try again once that service is reachable, or disable the account instead to lock the user out now."},
+		{Code: CodeActAsForbidden, Symbol: "ACT_AS_FORBIDDEN", Category: apperr.CategoryPermissionDenied,
+			Title: "act-as", Cause: "an admin acting as another user tried a password, second-factor, delete, role or permission change",
+			UserSafe: true, Message: "This action isn't available while you're acting as another user. Stop acting as them first."},
 	}
 }
 
@@ -105,6 +109,7 @@ var (
 	errJitDisabled  = errors.New("identity: just-in-time accounts are off for this connection")
 	errLocalAccount = errors.New("identity: the sign-in service admin API isn't configured")
 	errPending      = errors.New("identity: the account holds pending approvals")
+	errActAs        = errors.New("identity: refused while acting as another user")
 )
 
 // SSOProviderUnreachable codes a failed call to the SSO broker; org names the
@@ -152,6 +157,9 @@ func UserHasPendingApprovals(count int, policies string) error {
 func UserDeleteChecksUnavailable(step string, cause error) error {
 	return apperr.WithMeta(apperr.Coded(CodeUserDeleteChecksUnavailable, cause), apperr.Meta("step", step))
 }
+
+// ActAsForbidden codes an action refused during act-as.
+func ActAsForbidden() error { return apperr.Coded(CodeActAsForbidden, errActAs) }
 
 type logSink struct{ l log.Logger }
 
