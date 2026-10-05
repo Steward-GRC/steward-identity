@@ -16,3 +16,4 @@ caller; every other code is sent as `Code N: Internal Error`.
 | 5007 | `LOCAL_ACCOUNTS_UNAVAILABLE` | local accounts | the sign-in service's admin API isn't configured, so local accounts and passwords can't be managed | yes |
 | 5008 | `USER_HAS_PENDING_APPROVALS` | delete user | the account still holds pending approval seats, which a delete would strand | yes |
 | 5009 | `USER_DELETE_CHECKS_UNAVAILABLE` | delete user | a mandatory delete or delete-preview step couldn't run; the step metadata names it | yes |
+| 5010 | `ACT_AS_FORBIDDEN` | act-as | an admin acting as another user tried a password, second-factor, delete, role or permission change | yes |
