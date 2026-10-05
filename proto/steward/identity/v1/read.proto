@@ -1,0 +1,569 @@
+// Copyright 2026 The Steward Authors
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package steward.identity.v1;
+
+import "steward/identity/v1/types.proto";
+
+option go_package = "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1;identityv1";
+
+// IdentityReadService answers who a user is (roles and groups) for every
+// internal service, and runs the self-service sign-in steps. Callers don't
+// cache its answers across requests.
+service IdentityReadService {
+  // ResolveClaims looks a user up by the sign-in service's subject and
+  // creates the account on first sight (just-in-time), unless the user's SSO
+  // connection turned that off.
+  rpc ResolveClaims(ResolveClaimsRequest) returns (ResolveClaimsResponse);
+  // GetUser fetches one user by id.
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  // GetUserByEmail finds one user by exact, case-insensitive email, across
+  // local and SSO accounts. It never creates one; NotFound when none matches.
+  rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
+  // JitProvisionByEmail finds a user by email like GetUserByEmail, and
+  // creates an SSO account when none exists. The gateway calls it on an SSO
+  // callback; any error must abort the sign-in.
+  rpc JitProvisionByEmail(JitProvisionByEmailRequest) returns (JitProvisionByEmailResponse);
+  // ListUsersInGroup lists a group's users, optionally with its descendants'.
+  rpc ListUsersInGroup(ListUsersInGroupRequest) returns (ListUsersInGroupResponse);
+  // GetGroup fetches one group by id.
+  rpc GetGroup(GetGroupRequest) returns (GetGroupResponse);
+  // ListGroupDescendants lists every descendant of a group, in topological
+  // order.
+  rpc ListGroupDescendants(ListGroupDescendantsRequest) returns (ListGroupDescendantsResponse);
+  // ListGroupAncestors lists a group's ancestors, the root last.
+  rpc ListGroupAncestors(ListGroupAncestorsRequest) returns (ListGroupAncestorsResponse);
+  // ResolveEmail returns a user's email by id.
+  rpc ResolveEmail(ResolveEmailRequest) returns (ResolveEmailResponse);
+  // ResolveFCMToken returns a user's push notification token by id.
+  rpc ResolveFCMToken(ResolveFCMTokenRequest) returns (ResolveFCMTokenResponse);
+  // ListUserGroups lists the groups a user is a direct member of, optionally
+  // with every descendant of them.
+  rpc ListUserGroups(ListUserGroupsRequest) returns (ListUserGroupsResponse);
+  // ListUsersByEmail searches emails by case-insensitive substring, sorted by
+  // email then id, a page at a time. Deleted accounts are left out unless
+  // include_deleted is set.
+  rpc ListUsersByEmail(ListUsersByEmailRequest) returns (ListUsersByEmailResponse);
+  // ListGroups lists the groups under parent_id (empty for the roots),
+  // optionally with all their descendants, sorted by name, a page at a time.
+  rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse);
+  // ListUsersByIdpGroups lists the users holding any of the named identity
+  // provider groups.
+  rpc ListUsersByIdpGroups(ListUsersByIdpGroupsRequest) returns (ListUsersByIdpGroupsResponse);
+  // CountUsersByIdpGroups counts the users holding any of the named identity
+  // provider groups.
+  rpc CountUsersByIdpGroups(CountUsersByIdpGroupsRequest) returns (CountUsersByIdpGroupsResponse);
+  // ListAllUsers lists every enabled user: the audience of "Everyone".
+  rpc ListAllUsers(ListAllUsersRequest) returns (ListAllUsersResponse);
+  // CountAllUsers counts every enabled user.
+  rpc CountAllUsers(CountAllUsersRequest) returns (CountAllUsersResponse);
+  // ListUserIdpGroups returns one user's identity provider group names.
+  rpc ListUserIdpGroups(ListUserIdpGroupsRequest) returns (ListUserIdpGroupsResponse);
+  // RevokeMySessions revokes every session of the calling user.
+  rpc RevokeMySessions(RevokeMySessionsRequest) returns (RevokeMySessionsResponse);
+  // GetSetupState reports whether first-run setup is still needed (no root
+  // admin exists).
+  rpc GetSetupState(GetSetupStateRequest) returns (GetSetupStateResponse);
+  // BootstrapRoot creates the first root admin with a local password. It
+  // succeeds, doing nothing, once a root admin exists.
+  rpc BootstrapRoot(BootstrapRootRequest) returns (BootstrapRootResponse);
+
+  // The sign-in steps below are unauthenticated. They guard themselves with
+  // the one-time codes they issue and check, and with per-user rate limits,
+  // and they only touch local accounts.
+
+  // GetAuthConfig returns the non-secret sign-in settings the UI needs before
+  // sign-in.
+  rpc GetAuthConfig(GetAuthConfigRequest) returns (GetAuthConfigResponse);
+  // RequestPasswordReset emails a password reset code to a local account.
+  // The answer is the same whether or not the account exists.
+  rpc RequestPasswordReset(RequestPasswordResetRequest) returns (RequestPasswordResetResponse);
+  // ResetPasswordWithCode checks a password reset code and sets the new
+  // password in the sign-in service.
+  rpc ResetPasswordWithCode(ResetPasswordWithCodeRequest) returns (ResetPasswordWithCodeResponse);
+  // RequestLoginOtp emails a sign-in code to a local account whose password
+  // the UI already checked. The answer is the same whether or not the
+  // account exists.
+  rpc RequestLoginOtp(RequestLoginOtpRequest) returns (RequestLoginOtpResponse);
+  // VerifyLoginOtp checks a sign-in code. It doesn't touch the session.
+  rpc VerifyLoginOtp(VerifyLoginOtpRequest) returns (VerifyLoginOtpResponse);
+  // MarkEmailVerified records that a user proved control of an address. The
+  // caller has already checked the signed link that carries both values.
+  // Repeating it succeeds with already_verified set. An address that no
+  // longer matches the account is refused.
+  rpc MarkEmailVerified(MarkEmailVerifiedRequest) returns (MarkEmailVerifiedResponse);
+
+  // Second factors, keyed by user id. Kinds: "totp" (an authenticator app),
+  // "email" (an emailed code) and "passkey" (WebAuthn; identity is the
+  // relying party).
+
+  // EnrollTotpBegin creates a pending authenticator secret and returns its
+  // otpauth URI. Calling it again replaces a pending secret; a confirmed one
+  // must be removed first.
+  rpc EnrollTotpBegin(EnrollTotpBeginRequest) returns (EnrollTotpBeginResponse);
+  // EnrollTotpConfirm checks a first code against the pending secret and
+  // activates it.
+  rpc EnrollTotpConfirm(EnrollTotpConfirmRequest) returns (EnrollTotpConfirmResponse);
+  // VerifyTotp checks a code against the confirmed secret, one period either
+  // way. ok is false for a wrong code and for no enrolment alike.
+  rpc VerifyTotp(VerifyTotpRequest) returns (VerifyTotpResponse);
+  // SendEmailOtp emails a single-use code for a purpose, valid for five
+  // minutes. ResourceExhausted inside the cooldown.
+  rpc SendEmailOtp(SendEmailOtpRequest) returns (SendEmailOtpResponse);
+  // VerifyEmailOtp checks an emailed code for a purpose. ok is false for
+  // wrong, expired, used and locked out alike.
+  rpc VerifyEmailOtp(VerifyEmailOtpRequest) returns (VerifyEmailOtpResponse);
+  // ListUserFactors lists the factor kinds the user can satisfy now.
+  rpc ListUserFactors(ListUserFactorsRequest) returns (ListUserFactorsResponse);
+  // RemoveFactor removes the user's factor of a kind: "totp", or "passkey"
+  // for every passkey. The email factor can't be removed.
+  rpc RemoveFactor(RemoveFactorRequest) returns (RemoveFactorResponse);
+  // WebauthnRegisterBegin starts registering a passkey. The options are the
+  // W3C creation options as JSON; existing credentials are excluded.
+  rpc WebauthnRegisterBegin(WebauthnRegisterBeginRequest) returns (WebauthnRegisterBeginResponse);
+  // WebauthnRegisterFinish checks the authenticator's answer and stores the
+  // credential's public key. The session is used up either way.
+  rpc WebauthnRegisterFinish(WebauthnRegisterFinishRequest) returns (WebauthnRegisterFinishResponse);
+  // WebauthnAssertBegin starts a passkey sign-in over the user's credentials.
+  // FailedPrecondition when the user has none.
+  rpc WebauthnAssertBegin(WebauthnAssertBeginRequest) returns (WebauthnAssertBeginResponse);
+  // WebauthnAssertFinish checks the assertion. ok is false for a failed check
+  // and for a sign count that went backwards (a possible cloned key) alike.
+  rpc WebauthnAssertFinish(WebauthnAssertFinishRequest) returns (WebauthnAssertFinishResponse);
+  // ListWebauthnCredentials lists the user's passkeys.
+  rpc ListWebauthnCredentials(ListWebauthnCredentialsRequest) returns (ListWebauthnCredentialsResponse);
+  // RemoveWebauthnCredential removes one passkey.
+  rpc RemoveWebauthnCredential(RemoveWebauthnCredentialRequest) returns (RemoveWebauthnCredentialResponse);
+  // RenameMFAMethod labels one factor: method_id "totp" or a passkey's
+  // credential id. An empty label clears it. The email factor can't be
+  // labelled.
+  rpc RenameMFAMethod(RenameMFAMethodRequest) returns (RenameMFAMethodResponse);
+
+  // Discover routes an identifier (an email, or a username that is an
+  // email's local part) to its domain's one sign-in method.
+  rpc Discover(DiscoverRequest) returns (DiscoverResponse);
+  // CheckBreakGlassEligibility reports whether an account may break glass:
+  // root or site-admin, with a local credential.
+  rpc CheckBreakGlassEligibility(CheckBreakGlassEligibilityRequest) returns (CheckBreakGlassEligibilityResponse);
+}
+
+message ResolveClaimsRequest {
+  // The sign-in service's subject for the user.
+  string external_subject = 1;
+  // The claims the sign-in carried. They fill an account on first sight and
+  // backfill empty fields later; they never overwrite a stored value.
+  string email = 2;
+  string preferred_username = 3;
+  string name = 4;
+  string first_name = 5;
+  string last_name = 6;
+  // The SSO connection the user signed in through; empty for a local
+  // sign-in. With it, idp_groups replaces the user's identity provider
+  // groups and is matched against the connection's group mappings.
+  string connection_alias = 7;
+  repeated string idp_groups = 8;
+}
+
+message ResolveClaimsResponse {
+  User user = 1;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message GetUserByEmailResponse {
+  User user = 1;
+}
+
+message JitProvisionByEmailRequest {
+  // Required: the key the account is found or created by.
+  string email = 1;
+  string first_name = 2;
+  string last_name = 3;
+  // The SSO connection; with it, idp_groups replaces the user's identity
+  // provider groups and is matched against the connection's group mappings.
+  string connection_alias = 4;
+  repeated string idp_groups = 5;
+}
+
+message JitProvisionByEmailResponse {
+  User user = 1;
+}
+
+message ListUsersInGroupRequest {
+  string group_id = 1;
+  bool include_descendants = 2;
+}
+
+message ListUsersInGroupResponse {
+  repeated User users = 1;
+}
+
+message GetGroupRequest {
+  string group_id = 1;
+}
+
+message GetGroupResponse {
+  Group group = 1;
+}
+
+message ListGroupDescendantsRequest {
+  string group_id = 1;
+}
+
+message ListGroupDescendantsResponse {
+  repeated Group groups = 1;
+}
+
+message ListGroupAncestorsRequest {
+  string group_id = 1;
+}
+
+message ListGroupAncestorsResponse {
+  repeated Group groups = 1;
+}
+
+message ResolveEmailRequest {
+  string user_id = 1;
+}
+
+message ResolveEmailResponse {
+  string email = 1;
+}
+
+message ResolveFCMTokenRequest {
+  string user_id = 1;
+}
+
+message ResolveFCMTokenResponse {
+  string fcm_token = 1;
+}
+
+message ListUserGroupsRequest {
+  string user_id = 1;
+  bool include_descendants = 2;
+}
+
+message ListUserGroupsResponse {
+  repeated Group groups = 1;
+}
+
+message ListUsersByEmailRequest {
+  // Case-insensitive substring; empty matches every user.
+  string email_substring = 1;
+  // 50 when unset; at most 200.
+  int32 limit = 2;
+  // The previous page's next_page_token; empty for the first page.
+  string page_token = 3;
+  // Also return deleted accounts, marked by deleted_at and
+  // merged_into_user_id. Only for an admin directory view, which shows them
+  // as closed: never for a picker, where a deleted account must not be
+  // offered as a target.
+  bool include_deleted = 4;
+}
+
+message ListUsersByEmailResponse {
+  repeated User users = 1;
+  // Empty on the last page.
+  string next_page_token = 2;
+}
+
+message ListGroupsRequest {
+  // Empty lists the root groups.
+  string parent_id = 1;
+  bool include_descendants = 2;
+  // 50 when unset; at most 200.
+  int32 limit = 3;
+  string page_token = 4;
+}
+
+message ListGroupsResponse {
+  repeated Group groups = 1;
+  string next_page_token = 2;
+}
+
+message ListUsersByIdpGroupsRequest {
+  repeated string idp_group_names = 1;
+}
+
+message ListUsersByIdpGroupsResponse {
+  repeated User users = 1;
+}
+
+message CountUsersByIdpGroupsRequest {
+  repeated string idp_group_names = 1;
+}
+
+message CountUsersByIdpGroupsResponse {
+  int32 count = 1;
+}
+
+message ListAllUsersRequest {}
+
+message ListAllUsersResponse {
+  repeated User users = 1;
+}
+
+message CountAllUsersRequest {}
+
+message CountAllUsersResponse {
+  int32 count = 1;
+}
+
+message ListUserIdpGroupsRequest {
+  string user_id = 1;
+}
+
+message ListUserIdpGroupsResponse {
+  repeated string idp_groups = 1;
+}
+
+message RevokeMySessionsRequest {}
+
+message RevokeMySessionsResponse {
+  int32 revoked = 1;
+}
+
+message GetSetupStateRequest {}
+
+message GetSetupStateResponse {
+  bool needs_setup = 1;
+}
+
+message BootstrapRootRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string name = 4;
+}
+
+message BootstrapRootResponse {
+  // Unset when a root admin already existed.
+  User user = 1;
+}
+
+message GetAuthConfigRequest {}
+
+message GetAuthConfigResponse {
+  // Whether local sign-in needs an emailed second code. When false the UI
+  // asks for none.
+  bool login_2fa_enabled = 1;
+  // Whether at least one SSO domain is usable now: verified, its connection
+  // enabled and its test passed. One global value, naming no organisation.
+  bool sso_available = 2;
+}
+
+message RequestPasswordResetRequest {
+  string email = 1;
+}
+
+message RequestPasswordResetResponse {}
+
+message ResetPasswordWithCodeRequest {
+  string email = 1;
+  string code = 2;
+  string new_password = 3;
+}
+
+message ResetPasswordWithCodeResponse {}
+
+message RequestLoginOtpRequest {
+  // Either identifies the account.
+  string username = 1;
+  string email = 2;
+}
+
+message RequestLoginOtpResponse {}
+
+message VerifyLoginOtpRequest {
+  string username = 1;
+  string email = 2;
+  string code = 3;
+}
+
+message VerifyLoginOtpResponse {
+  // True when the code was valid, unexpired, unused and within the attempt
+  // limit.
+  bool verified = 1;
+}
+
+message MarkEmailVerifiedRequest {
+  string user_id = 1;
+  string email = 2;
+}
+
+message MarkEmailVerifiedResponse {
+  // True when the address was already verified before this call.
+  bool already_verified = 1;
+}
+
+message EnrollTotpBeginRequest {
+  string user_id = 1;
+}
+
+message EnrollTotpBeginResponse {
+  // The otpauth://totp/ URI the UI shows as a QR code. It holds the whole
+  // secret: show it once, never store it.
+  string otpauth_uri = 1;
+  // The secret's last four characters, for the confirmation text.
+  string secret_masked = 2;
+}
+
+message EnrollTotpConfirmRequest {
+  string user_id = 1;
+  string code = 2;
+}
+
+message EnrollTotpConfirmResponse {}
+
+message VerifyTotpRequest {
+  string user_id = 1;
+  string code = 2;
+}
+
+message VerifyTotpResponse {
+  bool ok = 1;
+}
+
+message SendEmailOtpRequest {
+  string user_id = 1;
+  // Scopes the code, such as "login" or "enroll"; the check must name the
+  // same purpose.
+  string purpose = 2;
+}
+
+message SendEmailOtpResponse {}
+
+message VerifyEmailOtpRequest {
+  string user_id = 1;
+  string code = 2;
+  string purpose = 3;
+}
+
+message VerifyEmailOtpResponse {
+  // The code is used up when it passes.
+  bool ok = 1;
+}
+
+message ListUserFactorsRequest {
+  string user_id = 1;
+}
+
+message ListUserFactorsResponse {
+  repeated UserFactor factors = 1;
+}
+
+message RemoveFactorRequest {
+  string user_id = 1;
+  string kind = 2;
+}
+
+message RemoveFactorResponse {}
+
+message RenameMFAMethodRequest {
+  string user_id = 1;
+  // "totp", or a passkey's credential id.
+  string method_id = 2;
+  // Empty clears the label.
+  string label = 3;
+}
+
+message RenameMFAMethodResponse {}
+
+message WebauthnRegisterBeginRequest {
+  string user_id = 1;
+}
+
+message WebauthnRegisterBeginResponse {
+  // PublicKeyCredentialCreationOptions as JSON, for
+  // navigator.credentials.create().
+  string options_json = 1;
+  // The single-use server session the finish call presents; it lasts about
+  // five minutes.
+  string session_id = 2;
+}
+
+message WebauthnRegisterFinishRequest {
+  string user_id = 1;
+  string session_id = 2;
+  // The browser's attestation response as JSON.
+  string credential_json = 3;
+  // A name for the credential, such as "Security key".
+  string label = 4;
+}
+
+message WebauthnRegisterFinishResponse {}
+
+message WebauthnAssertBeginRequest {
+  string user_id = 1;
+}
+
+message WebauthnAssertBeginResponse {
+  // PublicKeyCredentialRequestOptions as JSON, for
+  // navigator.credentials.get().
+  string options_json = 1;
+  string session_id = 2;
+}
+
+message WebauthnAssertFinishRequest {
+  string user_id = 1;
+  string session_id = 2;
+  // The browser's assertion response as JSON.
+  string credential_json = 3;
+}
+
+message WebauthnAssertFinishResponse {
+  bool ok = 1;
+}
+
+message ListWebauthnCredentialsRequest {
+  string user_id = 1;
+}
+
+message ListWebauthnCredentialsResponse {
+  repeated WebauthnCredential credentials = 1;
+}
+
+message RemoveWebauthnCredentialRequest {
+  string user_id = 1;
+  string credential_id = 2;
+}
+
+message RemoveWebauthnCredentialResponse {}
+
+message DiscoverRequest {
+  string identifier = 1;
+}
+
+message DiscoverResponse {
+  // "local" or "sso".
+  string method = 1;
+  // The SSO connection's routing key when method is "sso".
+  string connection_alias = 2;
+  // A launch URL for a connection that only supports IdP-initiated sign-in;
+  // the gateway sends the browser there instead of starting one itself.
+  string idp_initiated_sso_url = 3;
+  // The organisation also allows local password sign-in, so the sign-in
+  // page may offer the password form while method is "sso".
+  bool allow_local = 4;
+}
+
+message CheckBreakGlassEligibilityRequest {
+  string email = 1;
+}
+
+message CheckBreakGlassEligibilityResponse {
+  bool eligible = 1;
+  string reason = 2;
+}

@@ -1,0 +1,449 @@
+// Copyright 2026 The Steward Authors
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package steward.identity.v1;
+
+import "steward/identity/v1/types.proto";
+
+option go_package = "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1;identityv1";
+
+// IdentityAdminService changes identity state. It serves the admin CLI over
+// mTLS and site-admins through the gateway; everyone else gets
+// PermissionDenied. The calls marked self-service act on the calling user
+// and are open to any signed-in user.
+service IdentityAdminService {
+  // EnableUser re-enables a user.
+  rpc EnableUser(EnableUserRequest) returns (EnableUserResponse);
+  // DisableUser disables a user: every request of theirs fails until they're
+  // enabled again.
+  rpc DisableUser(DisableUserRequest) returns (DisableUserResponse);
+  // PreviewUserDeletion is a read-only dry run of DeleteUser: what it would
+  // block on, leave orphaned and remove. It fails closed, naming the step,
+  // when any class can't be read.
+  rpc PreviewUserDeletion(PreviewUserDeletionRequest) returns (PreviewUserDeletionResponse);
+  // DeleteUser deletes a user: it disables the account, revokes its
+  // sessions and its local credential, removes its category access rules in
+  // core and drops its identity access rows. Policies it owns stay, without
+  // an owner, for reassignment. The row is kept so history still names it.
+  // The root admin can't be deleted, and an account holding pending
+  // approvals is refused.
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  // PreviewAccountMerge is a read-only dry run of MergeAccounts: exactly
+  // what would move from the source to the target, with warnings.
+  rpc PreviewAccountMerge(PreviewAccountMergeRequest) returns (PreviewAccountMergeResponse);
+  // MergeAccounts moves the source account's policies, access rules,
+  // acknowledgements, pending workflow items and preferences to the target,
+  // revokes the source's sessions, records one audit event naming both and
+  // deletes the source, marked as merged into the target. Every step can be
+  // resumed: run it again with the same idempotency key after a partial
+  // failure. A root or site-admin source needs confirm_privileged.
+  rpc MergeAccounts(MergeAccountsRequest) returns (MergeAccountsResponse);
+  // GrantRole adds a role to a user.
+  rpc GrantRole(GrantRoleRequest) returns (GrantRoleResponse);
+  // RevokeRole removes a role from a user.
+  rpc RevokeRole(RevokeRoleRequest) returns (RevokeRoleResponse);
+  // CreateGroup creates a group, optionally under a parent.
+  rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse);
+  // RenameGroup renames a group; its id stays.
+  rpc RenameGroup(RenameGroupRequest) returns (RenameGroupResponse);
+  // DeleteGroup deletes a group with no members and no subgroups.
+  rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse);
+  // AddUserToGroup adds a membership.
+  rpc AddUserToGroup(AddUserToGroupRequest) returns (AddUserToGroupResponse);
+  // RemoveUserFromGroup removes a membership.
+  rpc RemoveUserFromGroup(RemoveUserFromGroupRequest) returns (RemoveUserFromGroupResponse);
+  // GrantGroupManager lets a user manage one group's manual memberships
+  // without site-admin. It doesn't let them create or rename groups, or pass
+  // the grant on.
+  rpc GrantGroupManager(GrantGroupManagerRequest) returns (GrantGroupManagerResponse);
+  // RevokeGroupManager removes a group-manager grant.
+  rpc RevokeGroupManager(RevokeGroupManagerRequest) returns (RevokeGroupManagerResponse);
+  // SetGroupParent moves a group, or makes it a root group when
+  // new_parent_id is empty. Cycles are refused.
+  rpc SetGroupParent(SetGroupParentRequest) returns (SetGroupParentResponse);
+  // BootstrapInitialAdmin creates the first admin, only while none exists.
+  rpc BootstrapInitialAdmin(BootstrapInitialAdminRequest) returns (BootstrapInitialAdminResponse);
+  // SetUserPolicyOverride sets a per-policy override; OVERRIDE_EFFECT_UNSPECIFIED
+  // clears it.
+  rpc SetUserPolicyOverride(SetUserPolicyOverrideRequest) returns (SetUserPolicyOverrideResponse);
+  // RequestStepUpOtp emails a step-up code to the calling admin, to confirm
+  // a high-risk action such as TransferRoot.
+  rpc RequestStepUpOtp(RequestStepUpOtpRequest) returns (RequestStepUpOtpResponse);
+  // TransferRoot moves the root admin to another user, who also gets
+  // site-admin and admin. The calling admin's step-up code is checked first.
+  rpc TransferRoot(TransferRootRequest) returns (TransferRootResponse);
+  // RevokeSession revokes one session.
+  rpc RevokeSession(RevokeSessionRequest) returns (RevokeSessionResponse);
+  // RevokeUserSessions revokes every session of a user.
+  rpc RevokeUserSessions(RevokeUserSessionsRequest) returns (RevokeUserSessionsResponse);
+  // ListUserSessions lists a user's sessions.
+  rpc ListUserSessions(ListUserSessionsRequest) returns (ListUserSessionsResponse);
+  // GrantPermission grants an individual permission (policy.read_sensitive).
+  // Root only.
+  rpc GrantPermission(GrantPermissionRequest) returns (GrantPermissionResponse);
+  // RevokePermission removes an individual permission. Root only.
+  rpc RevokePermission(RevokePermissionRequest) returns (RevokePermissionResponse);
+  // BreakGlassReveal records a time-boxed, audited break-glass reveal of one
+  // policy for the calling site-admin. A reason is required.
+  rpc BreakGlassReveal(BreakGlassRevealRequest) returns (BreakGlassRevealResponse);
+  // ActiveBreakGlass lists the policies the calling user holds an unexpired
+  // break-glass grant for.
+  rpc ActiveBreakGlass(ActiveBreakGlassRequest) returns (ActiveBreakGlassResponse);
+  // CreateLocalUser creates a local account with a password in the sign-in
+  // service.
+  rpc CreateLocalUser(CreateLocalUserRequest) returns (CreateLocalUserResponse);
+  // ResetUserPassword sets a local account's password.
+  rpc ResetUserPassword(ResetUserPasswordRequest) returns (ResetUserPasswordResponse);
+  // UpdateUserProfile changes another user's name and email.
+  rpc UpdateUserProfile(UpdateUserProfileRequest) returns (UpdateUserProfileResponse);
+  // CompleteOnboarding finishes the calling user's first-run onboarding.
+  // Self-service. accept_terms must be true.
+  rpc CompleteOnboarding(CompleteOnboardingRequest) returns (CompleteOnboardingResponse);
+  // UpdateMyProfile changes the calling user's own name, time zone and
+  // locale. Self-service; the display name is derived from the parts.
+  rpc UpdateMyProfile(UpdateMyProfileRequest) returns (UpdateMyProfileResponse);
+  // AdminListUserFactors lists a user's second factors, one per passkey,
+  // each with the id the calls below take.
+  rpc AdminListUserFactors(AdminListUserFactorsRequest) returns (AdminListUserFactorsResponse);
+  // AdminRemoveUserFactor resets one of a user's factors so they can enrol
+  // again: "totp" or a passkey's credential id. The email factor can't be
+  // removed.
+  rpc AdminRemoveUserFactor(AdminRemoveUserFactorRequest) returns (AdminRemoveUserFactorResponse);
+  // AdminRenameUserFactor labels one of a user's factors. An empty label
+  // clears it.
+  rpc AdminRenameUserFactor(AdminRenameUserFactorRequest) returns (AdminRenameUserFactorResponse);
+}
+
+message EnableUserRequest {
+  string user_id = 1;
+}
+
+message EnableUserResponse {
+  User user = 1;
+}
+
+message DisableUserRequest {
+  string user_id = 1;
+}
+
+message DisableUserResponse {
+  User user = 1;
+}
+
+message PreviewUserDeletionRequest {
+  string user_id = 1;
+}
+
+message PreviewUserDeletionResponse {
+  UserDeletionPreview preview = 1;
+}
+
+message DeleteUserRequest {
+  string user_id = 1;
+}
+
+message DeleteUserResponse {
+  // The user after the delete: disabled and deleted.
+  User user = 1;
+  int32 revoked_sessions = 2;
+}
+
+message PreviewAccountMergeRequest {
+  string source_user_id = 1;
+  string target_user_id = 2;
+}
+
+message PreviewAccountMergeResponse {
+  AccountMergePreview preview = 1;
+}
+
+message MergeAccountsRequest {
+  string source_user_id = 1;
+  string target_user_id = 2;
+  // Required when the source is root or a site-admin.
+  bool confirm_privileged = 3;
+  // Derived from the two accounts when empty.
+  string idempotency_key = 4;
+}
+
+message MergeAccountsResponse {
+  string merge_operation_id = 1;
+  MergeStatus status = 2;
+  MergeCounts counts = 3;
+  repeated MergeStepResult steps = 4;
+}
+
+message GrantRoleRequest {
+  string user_id = 1;
+  string role = 2;
+  // Required for author and approver; empty for global roles.
+  string category = 3;
+}
+
+message GrantRoleResponse {
+  User user = 1;
+}
+
+message RevokeRoleRequest {
+  string user_id = 1;
+  string role = 2;
+  string category = 3;
+}
+
+message RevokeRoleResponse {
+  User user = 1;
+}
+
+message CreateGroupRequest {
+  string name = 1;
+  // Empty for a root group.
+  string parent_id = 2;
+  map<string, string> metadata = 3;
+}
+
+message CreateGroupResponse {
+  Group group = 1;
+}
+
+message RenameGroupRequest {
+  string group_id = 1;
+  string new_name = 2;
+}
+
+message RenameGroupResponse {
+  Group group = 1;
+}
+
+message DeleteGroupRequest {
+  string group_id = 1;
+}
+
+message DeleteGroupResponse {
+  string group_id = 1;
+}
+
+message AddUserToGroupRequest {
+  string user_id = 1;
+  string group_id = 2;
+}
+
+message AddUserToGroupResponse {
+  string user_id = 1;
+  string group_id = 2;
+}
+
+message RemoveUserFromGroupRequest {
+  string user_id = 1;
+  string group_id = 2;
+}
+
+message RemoveUserFromGroupResponse {
+  string user_id = 1;
+  string group_id = 2;
+}
+
+message GrantGroupManagerRequest {
+  string user_id = 1;
+  string group_id = 2;
+}
+
+message GrantGroupManagerResponse {
+  User user = 1;
+}
+
+message RevokeGroupManagerRequest {
+  string user_id = 1;
+  string group_id = 2;
+}
+
+message RevokeGroupManagerResponse {
+  User user = 1;
+}
+
+message SetGroupParentRequest {
+  string group_id = 1;
+  // Empty makes it a root group.
+  string new_parent_id = 2;
+}
+
+message SetGroupParentResponse {
+  Group group = 1;
+}
+
+message BootstrapInitialAdminRequest {
+  string external_subject = 1;
+  string email = 2;
+}
+
+message BootstrapInitialAdminResponse {
+  User user = 1;
+  // False when an admin already existed.
+  bool created = 2;
+}
+
+message SetUserPolicyOverrideRequest {
+  string user_id = 1;
+  string policy_number = 2;
+  OverrideEffect effect = 3;
+}
+
+message SetUserPolicyOverrideResponse {
+  User user = 1;
+}
+
+message RequestStepUpOtpRequest {}
+
+message RequestStepUpOtpResponse {}
+
+message TransferRootRequest {
+  string to_user_id = 1;
+  // The calling admin's step-up code.
+  string otp = 2;
+}
+
+message TransferRootResponse {
+  User user = 1;
+}
+
+message RevokeSessionRequest {
+  string session_id = 1;
+  // Recorded in the audit event.
+  string reason = 2;
+}
+
+message RevokeSessionResponse {
+  int32 revoked = 1;
+}
+
+message RevokeUserSessionsRequest {
+  string user_id = 1;
+  string reason = 2;
+}
+
+message RevokeUserSessionsResponse {
+  int32 revoked = 1;
+}
+
+message ListUserSessionsRequest {
+  string user_id = 1;
+}
+
+message ListUserSessionsResponse {
+  repeated Session sessions = 1;
+}
+
+message GrantPermissionRequest {
+  string user_id = 1;
+  string permission = 2;
+}
+
+message GrantPermissionResponse {
+  User user = 1;
+}
+
+message RevokePermissionRequest {
+  string user_id = 1;
+  string permission = 2;
+}
+
+message RevokePermissionResponse {
+  User user = 1;
+}
+
+message BreakGlassRevealRequest {
+  string policy_number = 1;
+  string reason = 2;
+}
+
+message BreakGlassRevealResponse {
+  // RFC 3339 expiry.
+  string granted_until = 1;
+}
+
+message ActiveBreakGlassRequest {}
+
+message ActiveBreakGlassResponse {
+  repeated string policy_numbers = 1;
+}
+
+message CreateLocalUserRequest {
+  string username = 1;
+  string email = 2;
+  string name = 3;
+  string password = 4;
+}
+
+message CreateLocalUserResponse {
+  User user = 1;
+}
+
+message ResetUserPasswordRequest {
+  string user_id = 1;
+  string new_password = 2;
+}
+
+message ResetUserPasswordResponse {}
+
+message UpdateUserProfileRequest {
+  string user_id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message UpdateUserProfileResponse {
+  User user = 1;
+}
+
+message CompleteOnboardingRequest {
+  // Each optional field, when set, replaces the stored value; username must
+  // be unique.
+  optional string name = 1;
+  bool accept_terms = 2;
+  optional string username = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string email = 6;
+}
+
+message CompleteOnboardingResponse {
+  User user = 1;
+}
+
+message UpdateMyProfileRequest {
+  // Each field, when set, replaces the stored value, trimmed. timezone is an
+  // IANA name and locale a BCP 47 tag.
+  optional string first_name = 1;
+  optional string last_name = 2;
+  optional string timezone = 3;
+  optional string locale = 4;
+}
+
+message UpdateMyProfileResponse {
+  User user = 1;
+}
+
+message AdminListUserFactorsRequest {
+  string user_id = 1;
+}
+
+message AdminListUserFactorsResponse {
+  repeated UserFactor factors = 1;
+}
+
+message AdminRemoveUserFactorRequest {
+  string user_id = 1;
+  // "totp", or a passkey's credential id.
+  string method_id = 2;
+}
+
+message AdminRemoveUserFactorResponse {}
+
+message AdminRenameUserFactorRequest {
+  string user_id = 1;
+  string method_id = 2;
+  string label = 3;
+}
+
+message AdminRenameUserFactorResponse {}
