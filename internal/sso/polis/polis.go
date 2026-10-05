@@ -59,7 +59,7 @@ const (
 	ConfigKeyPolisClientID = "polisClientId"
 	// ConfigKeyPolisClientSecretRef names the secret-store key the client
 	// secret lives under; the reference itself holds no secret.
-	ConfigKeyPolisClientSecretRef = "polisClientSecretRef"
+	ConfigKeyPolisClientSecretRef = "polisClientSecretRef" // #nosec G101 -- a config key name
 	ConfigKeyPolisTenant          = "polisTenant"
 	ConfigKeyPolisProduct         = "polisProduct"
 )

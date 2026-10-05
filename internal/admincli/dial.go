@@ -104,7 +104,7 @@ func loadTLSConfig(opt rootCommandOptions) (*tls.Config, error) {
 	if caFile == "" {
 		caFile = filepath.Join(dir, caFileName)
 	}
-	caBytes, err := os.ReadFile(caFile) //nolint:gosec // the path is operator configuration
+	caBytes, err := os.ReadFile(caFile) // #nosec G304 -- the path is operator configuration
 	if err != nil {
 		return nil, fmt.Errorf("read CA %s: %w", caFile, err)
 	}

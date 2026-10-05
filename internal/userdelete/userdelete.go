@@ -129,7 +129,7 @@ import (
 // operator is told which backend to look at.
 const (
 	StepApprovalCheck     = "approval_check"
-	StepCredentialRevoke  = "credential_revoke"
+	StepCredentialRevoke  = "credential_revoke" // #nosec G101 -- a step name
 	StepCategoryRulePurge = "category_rule_purge"
 )
 

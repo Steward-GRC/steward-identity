@@ -25,7 +25,7 @@ func mustCipher(t *testing.T, keyStr string) *secrets.Cipher {
 
 func TestSealOpenRoundTrip(t *testing.T) {
 	c := mustCipher(t, testKeyHex)
-	for _, plain := range []string{"JBSWY3DPEHPK3PXP", "", "unicode ✓ secret"} {
+	for _, plain := range []string{"JBSWY3DPEHPK3PXP", "", "unicode é secret"} {
 		sealed, err := c.Seal(plain)
 		if err != nil {
 			t.Fatalf("Seal(%q): %v", plain, err)

@@ -54,7 +54,7 @@ import (
 // step label whether the delete or its preview could not run.
 const (
 	StepOwnedPolicies    = "owned_policies"
-	StepCredentialLookup = "credential_lookup"
+	StepCredentialLookup = "credential_lookup" // #nosec G101 -- a step name
 )
 
 // Item kinds, mirroring merge.Kind* but deliberately NOT the same set: a delete
@@ -75,8 +75,8 @@ const (
 	WarnPoliciesOrphaned        = "POLICIES_ORPHANED"
 	WarnRaciGrantsRemoved       = "RACI_GRANTS_REMOVED"
 	WarnRetainedManagedGroups   = "RETAINED_MANAGED_GROUPS"
-	WarnLastLocalCredential     = "LAST_LOCAL_CREDENTIAL"
-	WarnNoLocalCredential       = "NO_LOCAL_CREDENTIAL"
+	WarnLastLocalCredential     = "LAST_LOCAL_CREDENTIAL" // #nosec G101 -- a warning code
+	WarnNoLocalCredential       = "NO_LOCAL_CREDENTIAL"   // #nosec G101 -- a warning code
 	WarnAlreadyDeleted          = "ALREADY_DELETED"
 )
 
@@ -336,7 +336,7 @@ func Preview(ctx context.Context, steps PreviewSteps, acct Account) (*DeletionPr
 		return nil, &StepUnavailableError{Step: StepCredentialLookup, Err: err}
 	}
 	out.LocallyAuthenticable = acct.LocalAccount || acct.Passkeys > 0 || cred.Found
-	credDetail := "no credential in the credential store — this account signs in via the IdP only"
+	credDetail := "no credential in the credential store — this account signs in via the IdP only" // #nosec G101 -- display text
 	if cred.Found {
 		credDetail = "credential present (state " + cred.State + ") — revoked before the account is deleted"
 	}
