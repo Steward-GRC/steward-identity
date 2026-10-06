@@ -14,15 +14,19 @@ import (
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
 )
 
-// TestGRPCHandlers_EveryRPCImplemented guards *AdminHandler and *ReadHandler
-// against an RPC left to the embedded Unimplemented*Server stub: it compiles
-// (the embed satisfies the interface) but answers codes.Unimplemented at
-// runtime, which a `var _ Server = (*Handler)(nil)` assertion doesn't catch.
+// TestGRPCHandlers_EveryRPCImplemented guards every gRPC service
+// cmd/server/main.go registers — *AdminHandler, *ReadHandler and
+// *SSOAdminHandler — against an RPC left to the embedded
+// Unimplemented*Server stub: it compiles (the embed satisfies the interface)
+// but answers codes.Unimplemented at runtime, which a
+// `var _ Server = (*Handler)(nil)` assertion doesn't catch.
 //
-// It calls every unary RPC on a zero handler and fails only when a call
-// returns codes.Unimplemented. A zero handler has nil dependencies, so an
-// implemented method panics the moment it runs real code; that panic is
-// recovered and counts as implemented. New RPCs are covered automatically.
+// Each handler is built through its public NewXxxHandler constructor, the
+// same one main.go calls, rather than a bare struct literal, so the guard
+// tracks the real construction path. The constructors take nil dependencies
+// here, so an implemented method panics the moment it runs real code; that
+// panic is recovered and counts as implemented. New RPCs are covered
+// automatically.
 func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
 	// Deferred RPCs, keyed "Service.Method", each with a reason. None today.
 	knownDeferred := map[string]string{}
@@ -36,14 +40,20 @@ func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
 		{
 			service:     "IdentityAdminService",
 			iface:       reflect.TypeFor[identityv1.IdentityAdminServiceServer](),
-			srv:         reflect.ValueOf(identityv1.IdentityAdminServiceServer(&AdminHandler{})),
+			srv:         reflect.ValueOf(identityv1.IdentityAdminServiceServer(NewAdminHandler(nil, nil))),
 			minExpected: 15,
 		},
 		{
 			service:     "IdentityReadService",
 			iface:       reflect.TypeFor[identityv1.IdentityReadServiceServer](),
-			srv:         reflect.ValueOf(identityv1.IdentityReadServiceServer(&ReadHandler{})),
+			srv:         reflect.ValueOf(identityv1.IdentityReadServiceServer(NewReadHandler(nil))),
 			minExpected: 15,
+		},
+		{
+			service:     "IdentitySSOAdminService",
+			iface:       reflect.TypeFor[identityv1.IdentitySSOAdminServiceServer](),
+			srv:         reflect.ValueOf(identityv1.IdentitySSOAdminServiceServer(NewSSOAdminHandler(nil, nil, nil))),
+			minExpected: 17,
 		},
 	}
 
