@@ -54,6 +54,7 @@ func sessionsToProto(userID string, sessions []kratos.Session) []*identityv1.Ses
 			ExpiresAt:       rfc3339(s.ExpiresAt),
 			Active:          s.Active,
 			UserAgent:       s.UserAgent,
+			ClientIp:        s.ClientIP,
 		})
 	}
 	return out

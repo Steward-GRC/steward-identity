@@ -320,7 +320,9 @@ func TestUpdateProfileReplacesEmailAndName(t *testing.T) {
 	require.Nil(t, f.updated["credentials"], "a profile update never touches the password")
 }
 
-func TestListSessionsMapsTheSessionsAndDropsTheIP(t *testing.T) {
+// The session surface used to drop the device IP Kratos records; it now
+// reads it the same way it already read the user agent (steward-web#27).
+func TestListSessionsMapsTheSessionsAndTheirIP(t *testing.T) {
 	f := &fakeKratos{knownEmail: bobEmail, identityID: bobID}
 	srv := f.server(t)
 
@@ -330,9 +332,11 @@ func TestListSessionsMapsTheSessionsAndDropsTheIP(t *testing.T) {
 	require.Equal(t, "5f0c1d2e-0000-4000-8000-000000000001", ss[0].ID)
 	require.True(t, ss[0].Active)
 	require.Equal(t, "Example Browser/1.0", ss[0].UserAgent)
+	require.Equal(t, "192.0.2.10", ss[0].ClientIP)
 	require.Equal(t, time.Date(2030, 1, 3, 3, 4, 5, 0, time.UTC), ss[0].ExpiresAt.UTC())
 	require.False(t, ss[1].Active)
 	require.Empty(t, ss[1].UserAgent)
+	require.Empty(t, ss[1].ClientIP)
 }
 
 func TestListSessionsFailureIsAnError(t *testing.T) {

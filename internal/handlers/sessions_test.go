@@ -78,7 +78,7 @@ func TestListUserSessionsReadsKratos(t *testing.T) {
 	}
 	active := 0
 	for _, ss := range resp.Sessions {
-		if ss.UserId != u.ID.String() || ss.UserAgent != "Example Browser/1.0" {
+		if ss.UserId != u.ID.String() || ss.UserAgent != "Example Browser/1.0" || ss.ClientIp != "203.0.113.7" {
 			t.Fatalf("session: %+v", ss)
 		}
 		if ss.Active {
