@@ -296,3 +296,12 @@ CREATE TABLE group_managers (
   PRIMARY KEY (user_id, group_id)
 );
 CREATE INDEX group_managers_group_id_idx ON group_managers (group_id);
+
+-- The sign-in service keeps no last-use time on a session, so identity records
+-- one per sign-in session id, bumped (throttled) on each authenticated request.
+CREATE TABLE session_activity (
+  session_id   UUID        PRIMARY KEY,
+  user_id      UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX session_activity_user_id_idx ON session_activity (user_id);

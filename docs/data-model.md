@@ -16,13 +16,15 @@ the first release the baseline stays the only migration.
 | `otp_codes`, `user_email_otp`, `user_totp`, `user_webauthn_credentials`, `webauthn_sessions` | one-time codes (hashed), the encrypted authenticator secret, passkey public keys and ceremony state |
 | `idp_connections`, `sso_domains`, `domain_verification`, `idp_group_mappings`, `sp_certificates` | SSO connections, their domains and verification, group mappings and the public signing certificates (private keys live in Kubernetes Secrets) |
 | `merge_operations`, `merge_operation_steps` | account merges and their resumable steps |
+| `session_activity` | the last time each Kratos session was used, keyed by its session id (Kratos keeps no such time) |
 
 `idp_connections.connection_alias` is the routing key the SSO broker (Ory Polis) knows a
 connection by. A domain's sign-in method is `local` or `sso`.
 
 ## Not in this database
 
-- **Sessions** live in Ory Kratos; identity lists and revokes them through the Kratos API.
+- **Sessions** live in Ory Kratos; identity lists and revokes them through the Kratos API. Only
+  their last-use time is kept here, in `session_activity`.
 - **Audit events** are written by go-outbox, in the same transaction as the change they record,
   to its own table `audit_outbox` (created by `Outbox.Migrate` at start-up, not by the baseline).
   The relay publishes each as a `steward.audit.v1.AuditEvent` to the `audit` exchange with the

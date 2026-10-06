@@ -42,6 +42,7 @@ with every problem listed; values never appear in the errors.
 | `TOTP_ENC_KEY` | empty | 32 bytes, hex or base64: encrypts stored authenticator secrets. Keep it with the database backups. |
 | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_ORIGINS`, `WEBAUTHN_RP_NAME`, `WEBAUTHN_USER_VERIFICATION` | `localhost`, `http://localhost:5173`, `Steward`, `preferred` | The passkey relying party. |
 | `BREAK_GLASS_DURATION` | `15m` | How long a break-glass reveal lasts. |
+| `SESSION_LAST_SEEN_THROTTLE` | `1m` | How often a sign-in session's last-seen time moves while it is in use. |
 
 ## SSO connections
 

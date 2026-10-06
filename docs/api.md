@@ -23,7 +23,12 @@ own outbound calls forward both.
 Sign-in is Ory only. Ory Kratos holds local accounts, passwords and sessions: `CreateLocalUser`,
 `ResetUserPassword`, `BootstrapRoot` and `ResetPasswordWithCode` write to Kratos, and
 `ListUserSessions`, `RevokeSession`, `RevokeUserSessions` and `RevokeMySessions` read and revoke
-Kratos sessions. Ory Polis brokers SAML and OIDC: an organisation's connection is created in Polis,
+Kratos sessions. Kratos keeps no last-use time, so identity records one itself: when the gateway
+calls `GetUser` for a signed-in request it passes the Kratos session id as `session_id`, and
+identity stores that session as seen, at most once per `SESSION_LAST_SEEN_THROTTLE` per replica (a
+conditional update keeps replicas from writing more often). `ListUserSessions` returns it as
+`Session.last_seen_at` (RFC 3339; empty for a session never seen). A malformed `session_id` is
+`InvalidArgument`; a failed last-seen write is logged and the lookup still answers. Ory Polis brokers SAML and OIDC: an organisation's connection is created in Polis,
 and its `connection_alias` is the routing key the gateway signs users in through.
 
 `ResolveClaims` takes the subject the sign-in service issued (`external_subject`) and the sign-in's

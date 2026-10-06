@@ -118,6 +118,9 @@ message Session {
   // The IP address of the device that last used the session; empty when
   // Kratos recorded none for it.
   string client_ip = 8;
+  // RFC 3339 time the session was last used for an authenticated request, to
+  // within the throttle window; empty when it was never seen.
+  string last_seen_at = 9;
 }
 
 // UserFactor is one second factor a user can satisfy.

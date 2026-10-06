@@ -141,7 +141,8 @@ func run(ctx context.Context, logger log.Logger) error {
 
 	mailer := email.New(goemail.New(emailsmtp.NewSMTPTransport(emailsmtp.LoadConfig()), goemail.WithMiddleware(goemail.Validate())), emailsmtp.LoadConfig().From)
 	auth := &handlers.AdminAuth{AdminCLIID: cfg.AdminCLIID, Roles: handlers.StoreRoles{Store: s}}
-	readH := handlers.NewReadHandler(s).WithSSOEventPublisher(ssoEvents).WithAccountCreatedPublisher(jobsPub)
+	readH := handlers.NewReadHandler(s).WithSSOEventPublisher(ssoEvents).WithAccountCreatedPublisher(jobsPub).
+		WithLastSeenThrottle(cfg.SessionLastSeenThrottle)
 	readH.WithOTP(mailer, zl, cfg.Login2FAEnabled, cfg.OTPDevEcho)
 	var totpCipher *secrets.Cipher
 	if cfg.TotpEncKey != "" {

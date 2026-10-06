@@ -147,3 +147,19 @@ func TestNoSecretInTheError(t *testing.T) {
 	_, err := Load(env(m))
 	require.False(t, strings.Contains(err.Error(), dsn), "settings values never appear in errors")
 }
+
+func TestLoadSessionLastSeenThrottle(t *testing.T) {
+	c, err := Load(env(base()))
+	require.NoError(t, err)
+	require.Equal(t, time.Minute, c.SessionLastSeenThrottle)
+
+	m := base()
+	m["SESSION_LAST_SEEN_THROTTLE"] = "5m"
+	c, err = Load(env(m))
+	require.NoError(t, err)
+	require.Equal(t, 5*time.Minute, c.SessionLastSeenThrottle)
+
+	m["SESSION_LAST_SEEN_THROTTLE"] = "0s"
+	_, err = Load(env(m))
+	require.ErrorContains(t, err, "SESSION_LAST_SEEN_THROTTLE")
+}
