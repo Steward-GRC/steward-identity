@@ -25,9 +25,48 @@ with every problem listed; values never appear in the errors.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `GRPC_TLS_CERT_FILE`, `GRPC_TLS_KEY_FILE`, `GRPC_TLS_CLIENT_CA_FILE` | empty | Serve mTLS (TLS 1.3, client certificates required). Set all three or none. |
-| `IDENTITY_TRUSTED_CALLERS` | empty | Comma-separated SPIFFE IDs whose forwarded actor (go-grpc-actor) is believed. Needs mTLS. Empty ignores every forwarded actor, so admin calls through the gateway are refused. |
-| `IDENTITY_ADMIN_CLI_ID` | empty | The SPIFFE ID of the `identity-admin` CLI's client certificate. Needs mTLS. Empty gives the CLI no access. |
+| `WORKLOAD_AUTH` | enabled | `disabled` turns caller authentication off, for local runs only. Nothing else turns it off, and it can't be combined with `WORKLOAD_OIDC_*`. |
+| `WORKLOAD_OIDC_ISSUER` | required unless disabled | The cluster's service-account token issuer, an `https` URL that must equal the token's `iss`. |
+| `WORKLOAD_OIDC_JWKS_URL` | discovered | The issuer's key set, when it isn't at the `jwks_uri` of `<issuer>/.well-known/openid-configuration`. `https` only. |
+| `WORKLOAD_OIDC_CA_FILE` | system roots | Extra PEM CA trusted for the discovery and key set fetch (the namespace's `kube-root-ca.crt`). |
+| `WORKLOAD_OIDC_BEARER_FILE` | empty | A token sent on the discovery and key set fetch, re-read on every fetch: a second projected token with the API server's default audience, not the `steward` caller token. |
+| `WORKLOAD_AUDIENCE` | `steward` | The audience a caller's token must carry. |
+| `WORKLOAD_ALLOWED_SERVICEACCOUNTS` | required unless disabled | Comma list of `<namespace>/<serviceaccount>` that may call identity at all: the gateway, workflow, obligations, reporting, collab and identity itself (for `identity-admin`). |
+| `WORKLOAD_TOKEN_FILE` | `/var/run/secrets/steward/token` while authentication is on | Identity's own projected token (audience `steward`), sent to core on every call and re-read each time. An unreadable file stops the boot. |
+| `GRPC_TLS_CERT_FILE`, `GRPC_TLS_KEY_FILE`, `GRPC_TLS_CLIENT_CA_FILE` | empty | Serve mTLS (TLS 1.3, client certificates required). Set all three or none. Transport only: it grants no caller any trust. |
+| `IDENTITY_ADMIN_CLI_ID` | empty | The SPIFFE ID of the `identity-admin` CLI's client certificate. Needs mTLS. Empty gives the CLI no access to the admin services. |
+
+## Service-to-service authentication
+
+Every call except `grpc.health.v1` and server reflection must carry the calling service's projected
+service-account token (audience `steward`) as `authorization: Bearer <token>`. Identity verifies it
+against the issuer's key set (signature, issuer, audience, expiry), maps `<namespace>/steward-<name>`
+to the caller `<name>`, and checks the per-method allow-list in `internal/server/callers.go`:
+
+| Caller | Methods | Access |
+| --- | --- | --- |
+| `gateway` | the sign-in steps and the read, admin and SSO admin methods it serves | on behalf of the signed-in user |
+| `workflow`, `reporting`, `collab` | `GetUser` | as itself |
+| `obligations` | `GetUser`, `ListAllUsers`, `ResolveEmail`, `ResolveFCMToken` | as itself |
+| `identity` (`identity-admin` in the identity pod) | the CLI's read and admin methods | as itself; the admin methods also need the CLI certificate (`IDENTITY_ADMIN_CLI_ID`) |
+
+A method no caller uses is refused to everyone.
+
+- **Refusals:** a missing or rejected token (wrong issuer or audience, expired, or a service account
+  outside `WORKLOAD_ALLOWED_SERVICEACCOUNTS`) is `Unauthenticated`; a verified caller the method
+  doesn't list is `PermissionDenied`. Every refusal is logged and audited as `rpc.denied`, with the
+  caller (or `unauthenticated`) as the actor, never a user the call claimed.
+- **Act-as:** a forwarded actor (go-grpc-actor) is believed only from a caller with on-behalf access.
+  A caller that acts as itself has its forwarded actor dropped.
+- **Fail closed:** while no key set has loaded (the issuer unreachable or refusing the fetch), every
+  call that needs a token is refused with `Unavailable`, and readiness reports `jwks` as a failing
+  required dependency.
+- **Off switch:** with `WORKLOAD_AUTH=disabled` identity logs a warning at start-up and every five
+  minutes, trusts no forwarded actor, and readiness reports `workloadauth` degraded. With neither
+  `WORKLOAD_OIDC_ISSUER` nor `WORKLOAD_AUTH=disabled`, identity doesn't start.
+- `internal/workloadauth` is a byte-identical copy of steward-core's, pinned by `STEWARD_CORE_REF` in
+  `proto-refs.env` and compared in CI by `scripts/workloadauth-check.sh`; change it in steward-core
+  first.
 
 ## Sign-in
 

@@ -17,6 +17,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -58,12 +59,17 @@ import (
 	"github.com/Steward-GRC/steward-identity/internal/sso/spkeys"
 	"github.com/Steward-GRC/steward-identity/internal/store"
 	"github.com/Steward-GRC/steward-identity/internal/userdelete"
+	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 const serviceName = "identity"
 
 // auditExchange is the topic exchange steward-audit consumes from.
 const auditExchange = "audit"
+
+// jwksRecheck is how long a good key-set check is kept before readiness
+// fetches the key set again.
+const jwksRecheck = 30 * time.Second
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -179,7 +185,7 @@ func run(ctx context.Context, logger log.Logger) error {
 
 	var core merge.CoreClient
 	if cfg.CoreGRPCAddr != "" {
-		cc, err := dial(cfg.CoreGRPCAddr, cfg.TLS)
+		cc, err := dial(cfg.CoreGRPCAddr, cfg.TLS, cfg.TokenFile)
 		if err != nil {
 			return fmt.Errorf("dial core: %w", err)
 		}
@@ -214,8 +220,25 @@ func run(ctx context.Context, logger log.Logger) error {
 		}
 		ssoH = ssoH.WithSPCert(sp)
 	}
-	if len(cfg.TrustedCallers) == 0 {
-		logger.Warn("IDENTITY_TRUSTED_CALLERS is not set: forwarded actors are ignored, so admin calls through the gateway are refused")
+	var callerAuth *server.Auth
+	if cfg.WorkloadAuthEnabled {
+		v, err := workloadauth.NewVerifier(cfg.WorkloadAuth, logger)
+		if err != nil {
+			return fmt.Errorf("workload auth: %w", err)
+		}
+		go v.Run(ctx)
+		deps.JWKS = readiness.RecheckEvery(v.Refresh, jwksRecheck, time.Now)
+		callerAuth = &server.Auth{Verifier: v, Policy: server.CallerPolicy(), Options: []workloadauth.Option{
+			workloadauth.WithDenyHook(server.AuditDenial(s, logger)),
+		}}
+		logger.Info("service-to-service authentication on",
+			log.F("issuer", cfg.WorkloadAuth.Issuer), log.F("audience", cfg.WorkloadAuth.Audience),
+			log.F("jwks_override", cfg.WorkloadAuth.JWKSURL != ""), log.F("ca_file", cfg.WorkloadAuth.CAFile != ""),
+			log.F("bearer_file", cfg.WorkloadAuth.BearerFile != ""),
+			log.F("allowed_serviceaccounts", strings.Join(cfg.WorkloadAuth.AllowedServiceAccounts, ",")))
+	} else {
+		deps.WorkloadAuthDisabled = true
+		go workloadauth.WarnDisabled(ctx, logger, workloadauth.DisabledWarnInterval)
 	}
 
 	go every(ctx, cfg.DomainRecheckInterval, func() {
@@ -256,7 +279,7 @@ func run(ctx context.Context, logger log.Logger) error {
 	}()
 	opts := server.Options{
 		CertFile: cfg.TLS.CertFile, KeyFile: cfg.TLS.KeyFile, ClientCAFile: cfg.TLS.ClientCAFile,
-		TrustedCallers: cfg.TrustedCallers, Checker: checker,
+		Auth: callerAuth, Checker: checker,
 	}
 	err = server.Serve(ctx, lis, logger, opts, func(g *grpc.Server) {
 		identityv1.RegisterIdentityReadServiceServer(g, readH)
@@ -267,10 +290,12 @@ func run(ctx context.Context, logger log.Logger) error {
 	return errors.Join(err, <-probesDone, <-relayDone)
 }
 
-// dial connects to another Steward service. Every call carries the caller
-// and the act-as admin; with TLS configured the connection uses the same
-// certificate as a client certificate.
-func dial(addr string, t config.TLS) (*grpc.ClientConn, error) {
+// dial connects to another Steward service. Every call carries identity's
+// projected token (read from tokenFile on every call; none while
+// WORKLOAD_AUTH=disabled), the caller and the act-as admin; with TLS
+// configured the connection uses the same certificate as a client
+// certificate. A token file that can't be read now stops the boot.
+func dial(addr string, t config.TLS, tokenFile string) (*grpc.ClientConn, error) {
 	creds := insecure.NewCredentials()
 	if t.CertFile != "" {
 		cert, err := tls.LoadX509KeyPair(t.CertFile, t.KeyFile)
@@ -287,10 +312,23 @@ func dial(addr string, t config.TLS) (*grpc.ClientConn, error) {
 		}
 		creds = credentials.NewTLS(&tls.Config{Certificates: []tls.Certificate{cert}, RootCAs: pool, MinVersion: tls.VersionTLS13})
 	}
-	return grpc.NewClient(addr, grpc.WithTransportCredentials(creds),
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(creds),
 		grpc.WithStatsHandler(gootel.GRPCClientStatsHandler()),
 		grpc.WithChainUnaryInterceptor(grpcactor.UnaryClientInterceptor()),
-		grpc.WithChainStreamInterceptor(grpcactor.StreamClientInterceptor()))
+		grpc.WithChainStreamInterceptor(grpcactor.StreamClientInterceptor())}
+	token, ok, err := workloadauth.DialOptionFromEnv(func(k string) string {
+		if k == workloadauth.EnvTokenFile {
+			return tokenFile
+		}
+		return ""
+	})
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		opts = append(opts, token)
+	}
+	return grpc.NewClient(addr, opts...)
 }
 
 func every(ctx context.Context, d time.Duration, f func()) {

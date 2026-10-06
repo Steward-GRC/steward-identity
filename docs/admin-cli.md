@@ -31,9 +31,12 @@ An email argument must match exactly one user. Groups are addressed by id only.
 | `IDENTITY_ADMIN_CERT_DIR` | `/var/run/identity-admin-cert` | Holds `tls.crt`, `tls.key` and `ca.crt` |
 | `IDENTITY_ADMIN_CA_FILE` | `<cert dir>/ca.crt` | The CA the server certificate must chain to |
 | `IDENTITY_INSECURE` | unset | `1` dials without TLS, for local development only |
+| `WORKLOAD_TOKEN_FILE` | unset | The identity pod's projected token, sent on every call; identity's caller authentication needs it. Unset sends none (local runs with `WORKLOAD_AUTH=disabled`) |
 
 ## Identity and audit
 
+- The CLI sends the identity pod's workload token, so identity admits it as the caller `identity`,
+  acting as itself, on the CLI's methods only.
 - The CLI presents its client certificate over TLS 1.3. The server lets a call use the admin
   services when the verified client certificate's SPIFFE ID equals `IDENTITY_ADMIN_CLI_ID`; with
   that setting empty, the CLI has no admin access.

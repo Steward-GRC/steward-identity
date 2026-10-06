@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 // TLS is the server certificate and the CA client certificates must chain
@@ -64,8 +66,13 @@ type Config struct {
 	IdpGroupsCacheTTL time.Duration
 
 	TLS TLS
-	// TrustedCallers are the SPIFFE IDs whose forwarded actor is believed.
-	TrustedCallers []string
+	// WorkloadAuth verifies the callers' workload tokens; WorkloadAuthEnabled
+	// is false only with WORKLOAD_AUTH=disabled.
+	WorkloadAuth        workloadauth.Config
+	WorkloadAuthEnabled bool
+	// TokenFile is identity's own projected token, sent on its calls to core.
+	// Empty while authentication is off.
+	TokenFile string
 	// AdminCLIID is the SPIFFE ID of the admin CLI's client certificate; a
 	// call from it may use the admin services.
 	AdminCLIID string
@@ -139,7 +146,6 @@ func Load(getenv func(string) string) (Config, error) {
 		IdpGroupsCacheTTL: duration("IDP_GROUPS_CACHE_TTL", "1m"),
 		TLS: TLS{CertFile: getenv("GRPC_TLS_CERT_FILE"), KeyFile: getenv("GRPC_TLS_KEY_FILE"),
 			ClientCAFile: getenv("GRPC_TLS_CLIENT_CA_FILE")},
-		TrustedCallers:          list(getenv("IDENTITY_TRUSTED_CALLERS")),
 		AdminCLIID:              strings.TrimSpace(getenv("IDENTITY_ADMIN_CLI_ID")),
 		BreakGlassDuration:      duration("BREAK_GLASS_DURATION", "15m"),
 		SessionLastSeenThrottle: duration("SESSION_LAST_SEEN_THROTTLE", "1m"),
@@ -171,11 +177,15 @@ func Load(getenv func(string) string) (Config, error) {
 	if tlsSet && (c.TLS.CertFile == "" || c.TLS.KeyFile == "" || c.TLS.ClientCAFile == "") {
 		errs = append(errs, errors.New("GRPC_TLS_CERT_FILE, GRPC_TLS_KEY_FILE and GRPC_TLS_CLIENT_CA_FILE are set together"))
 	}
-	if len(c.TrustedCallers) > 0 && !tlsSet {
-		errs = append(errs, errors.New("IDENTITY_TRUSTED_CALLERS needs GRPC_TLS_* with client certificates"))
-	}
 	if c.AdminCLIID != "" && !tlsSet {
 		errs = append(errs, errors.New("IDENTITY_ADMIN_CLI_ID needs GRPC_TLS_* with client certificates"))
+	}
+	var err error
+	if c.WorkloadAuth, c.WorkloadAuthEnabled, err = workloadauth.ServerConfigFromEnv(getenv); err != nil {
+		errs = append(errs, err)
+	}
+	if c.WorkloadAuthEnabled {
+		c.TokenFile = or(workloadauth.EnvTokenFile, workloadauth.DefaultTokenFile)
 	}
 	return c, errors.Join(errs...)
 }
