@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/Bugs5382/go-log"
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
@@ -49,6 +50,8 @@ type ReadHandler struct {
 	// acctCreatedPub publishes account.created on every genuine account
 	// create; nil skips it.
 	acctCreatedPub accountCreatedPublisher
+	// lastSeen throttles the session last-seen writes GetUser makes.
+	lastSeen *seenThrottle
 }
 
 // WithSignIn wires the Kratos admin API.
@@ -71,7 +74,7 @@ func (h *ReadHandler) WithSSOEventPublisher(p ssoEventPublisher) *ReadHandler {
 
 // NewReadHandler returns an IdentityReadService on s.
 func NewReadHandler(s *store.Store) *ReadHandler {
-	return &ReadHandler{store: s}
+	return &ReadHandler{store: s, lastSeen: newSeenThrottle(DefaultLastSeenThrottle, time.Now)}
 }
 
 // ResolveClaims looks a user up by the sign-in service's subject and creates
@@ -237,9 +240,18 @@ func (h *ReadHandler) GetUser(ctx context.Context, req *identityv1.GetUserReques
 	if err != nil {
 		return nil, err
 	}
+	var sessionID uuid.UUID
+	if req.GetSessionId() != "" {
+		if sessionID, err = parseUUID(req.GetSessionId(), "session_id"); err != nil {
+			return nil, err
+		}
+	}
 	u, err := h.store.GetUser(ctx, id)
 	if err != nil {
 		return nil, statusFromStoreErr(err)
+	}
+	if sessionID != uuid.Nil {
+		h.touchSession(ctx, sessionID, u.ID)
 	}
 	return &identityv1.GetUserResponse{User: userToProto(u)}, nil
 }

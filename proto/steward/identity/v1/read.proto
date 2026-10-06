@@ -17,7 +17,8 @@ service IdentityReadService {
   // creates the account on first sight (just-in-time), unless the user's SSO
   // connection turned that off.
   rpc ResolveClaims(ResolveClaimsRequest) returns (ResolveClaimsResponse);
-  // GetUser fetches one user by id.
+  // GetUser fetches one user by id. With a session_id it also records that
+  // sign-in session as just used (see Session.last_seen_at).
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
   // GetUserByEmail finds one user by exact, case-insensitive email, across
   // local and SSO accounts. It never creates one; NotFound when none matches.
@@ -172,6 +173,10 @@ message ResolveClaimsResponse {
 
 message GetUserRequest {
   string user_id = 1;
+  // The sign-in session the request runs on, when it comes from a signed-in
+  // browser. Identity records it as seen, at most once per throttle window
+  // (SESSION_LAST_SEEN_THROTTLE). Empty records nothing.
+  string session_id = 2;
 }
 
 message GetUserResponse {

@@ -811,7 +811,10 @@ type Session struct {
 	UserAgent string `protobuf:"bytes,7,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
 	// The IP address of the device that last used the session; empty when
 	// Kratos recorded none for it.
-	ClientIp      string `protobuf:"bytes,8,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`
+	ClientIp string `protobuf:"bytes,8,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`
+	// RFC 3339 time the session was last used for an authenticated request, to
+	// within the throttle window; empty when it was never seen.
+	LastSeenAt    string `protobuf:"bytes,9,opt,name=last_seen_at,json=lastSeenAt,proto3" json:"last_seen_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -898,6 +901,13 @@ func (x *Session) GetUserAgent() string {
 func (x *Session) GetClientIp() string {
 	if x != nil {
 		return x.ClientIp
+	}
+	return ""
+}
+
+func (x *Session) GetLastSeenAt() string {
+	if x != nil {
+		return x.LastSeenAt
 	}
 	return ""
 }
@@ -2107,7 +2117,7 @@ const file_steward_identity_v1_types_proto_rawDesc = "" +
 	"\bcategory\x18\x02 \x01(\tR\bcategory\"r\n" +
 	"\x0ePolicyOverride\x12#\n" +
 	"\rpolicy_number\x18\x01 \x01(\tR\fpolicyNumber\x12;\n" +
-	"\x06effect\x18\x02 \x01(\x0e2#.steward.identity.v1.OverrideEffectR\x06effect\"\xfc\x01\n" +
+	"\x06effect\x18\x02 \x01(\x0e2#.steward.identity.v1.OverrideEffectR\x06effect\"\x9e\x02\n" +
 	"\aSession\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
@@ -2119,7 +2129,9 @@ const file_steward_identity_v1_types_proto_rawDesc = "" +
 	"\x06active\x18\x06 \x01(\bR\x06active\x12\x1d\n" +
 	"\n" +
 	"user_agent\x18\a \x01(\tR\tuserAgent\x12\x1b\n" +
-	"\tclient_ip\x18\b \x01(\tR\bclientIp\"g\n" +
+	"\tclient_ip\x18\b \x01(\tR\bclientIp\x12 \n" +
+	"\flast_seen_at\x18\t \x01(\tR\n" +
+	"lastSeenAt\"g\n" +
 	"\n" +
 	"UserFactor\x12\x12\n" +
 	"\x04kind\x18\x01 \x01(\tR\x04kind\x12\x1f\n" +

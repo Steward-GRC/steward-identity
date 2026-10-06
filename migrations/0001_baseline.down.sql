@@ -1,6 +1,7 @@
 -- Copyright 2026 The Steward Authors
 -- SPDX-License-Identifier: Apache-2.0
 
+DROP TABLE IF EXISTS session_activity;
 DROP TABLE IF EXISTS group_managers;
 DROP TABLE IF EXISTS merge_operation_steps;
 DROP TABLE IF EXISTS merge_operations;

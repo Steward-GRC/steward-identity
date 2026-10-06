@@ -43,9 +43,10 @@ func revokeReasonOr(r, def string) string {
 }
 
 // sessionsToProto maps Kratos sessions to the wire form for one user.
-func sessionsToProto(userID string, sessions []kratos.Session) []*identityv1.Session {
+func sessionsToProto(userID string, sessions []kratos.Session, lastSeen map[uuid.UUID]time.Time) []*identityv1.Session {
 	out := make([]*identityv1.Session, 0, len(sessions))
 	for _, s := range sessions {
+		sid, _ := uuid.Parse(s.ID)
 		out = append(out, &identityv1.Session{
 			SessionId:       s.ID,
 			UserId:          userID,
@@ -55,6 +56,7 @@ func sessionsToProto(userID string, sessions []kratos.Session) []*identityv1.Ses
 			Active:          s.Active,
 			UserAgent:       s.UserAgent,
 			ClientIp:        s.ClientIP,
+			LastSeenAt:      rfc3339(lastSeen[sid]),
 		})
 	}
 	return out
@@ -448,7 +450,17 @@ func (h *AdminHandler) ListUserSessions(ctx context.Context, req *identityv1.Lis
 	if err != nil {
 		return nil, errcodes.Error(ctx, errcodes.SessionsUnavailable(err))
 	}
-	return &identityv1.ListUserSessionsResponse{Sessions: sessionsToProto(id.String(), sessions)}, nil
+	ids := make([]uuid.UUID, 0, len(sessions))
+	for _, s := range sessions {
+		if sid, err := uuid.Parse(s.ID); err == nil {
+			ids = append(ids, sid)
+		}
+	}
+	lastSeen, err := h.store.SessionsLastSeen(ctx, ids)
+	if err != nil {
+		return nil, statusFromStoreErr(err)
+	}
+	return &identityv1.ListUserSessionsResponse{Sessions: sessionsToProto(id.String(), sessions, lastSeen)}, nil
 }
 
 // RevokeAccountSessions ends every Kratos session of an account and records

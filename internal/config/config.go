@@ -71,6 +71,9 @@ type Config struct {
 	AdminCLIID string
 
 	BreakGlassDuration time.Duration
+	// SessionLastSeenThrottle is how often a sign-in session's last-seen
+	// time moves while it is in use.
+	SessionLastSeenThrottle time.Duration
 
 	// KratosAdminURL is the Kratos admin API. Empty turns local accounts and
 	// session management off (they answer with coded "unavailable" errors).
@@ -136,11 +139,12 @@ func Load(getenv func(string) string) (Config, error) {
 		IdpGroupsCacheTTL: duration("IDP_GROUPS_CACHE_TTL", "1m"),
 		TLS: TLS{CertFile: getenv("GRPC_TLS_CERT_FILE"), KeyFile: getenv("GRPC_TLS_KEY_FILE"),
 			ClientCAFile: getenv("GRPC_TLS_CLIENT_CA_FILE")},
-		TrustedCallers:     list(getenv("IDENTITY_TRUSTED_CALLERS")),
-		AdminCLIID:         strings.TrimSpace(getenv("IDENTITY_ADMIN_CLI_ID")),
-		BreakGlassDuration: duration("BREAK_GLASS_DURATION", "15m"),
-		KratosAdminURL:     getenv("KRATOS_ADMIN_URL"),
-		KratosSchemaID:     or("KRATOS_SCHEMA_ID", "default"),
+		TrustedCallers:          list(getenv("IDENTITY_TRUSTED_CALLERS")),
+		AdminCLIID:              strings.TrimSpace(getenv("IDENTITY_ADMIN_CLI_ID")),
+		BreakGlassDuration:      duration("BREAK_GLASS_DURATION", "15m"),
+		SessionLastSeenThrottle: duration("SESSION_LAST_SEEN_THROTTLE", "1m"),
+		KratosAdminURL:          getenv("KRATOS_ADMIN_URL"),
+		KratosSchemaID:          or("KRATOS_SCHEMA_ID", "default"),
 		Polis: Polis{AdminURL: getenv("POLIS_ADMIN_URL"), APIKey: getenv("POLIS_API_KEY"),
 			Product: or("POLIS_PRODUCT", "steward"), GatewayBaseURL: or("GATEWAY_BASE_URL", "http://localhost:5173")},
 		Login2FAEnabled: boolean("LOGIN_2FA_ENABLED"),
