@@ -202,7 +202,7 @@ func passwordCredentials(password string) *ory.IdentityWithCredentials {
 	}}
 }
 
-// Session is one Kratos session. The client IP Kratos records is never read.
+// Session is one Kratos session.
 type Session struct {
 	ID              string
 	IdentityID      string
@@ -211,6 +211,7 @@ type Session struct {
 	ExpiresAt       time.Time
 	Active          bool
 	UserAgent       string
+	ClientIP        string
 }
 
 // ListSessions lists an identity's sessions, active and ended.
@@ -268,6 +269,7 @@ func toSession(identityID string, s ory.Session) Session {
 	}
 	if n := len(s.Devices); n > 0 {
 		out.UserAgent = s.Devices[n-1].GetUserAgent()
+		out.ClientIP = s.Devices[n-1].GetIpAddress()
 	}
 	return out
 }

@@ -197,7 +197,7 @@ func (f *fakeKratos) addSession(identityID string, active bool) string {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	id := uuid.NewString()
-	f.sessions[identityID] = append(f.sessions[identityID], kratos.Session{ID: id, IdentityID: identityID, Active: active, UserAgent: "Example Browser/1.0"})
+	f.sessions[identityID] = append(f.sessions[identityID], kratos.Session{ID: id, IdentityID: identityID, Active: active, UserAgent: "Example Browser/1.0", ClientIP: "203.0.113.7"})
 	return id
 }
 
