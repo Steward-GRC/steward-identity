@@ -17,6 +17,7 @@ the first release the baseline stays the only migration.
 | `idp_connections`, `sso_domains`, `domain_verification`, `idp_group_mappings`, `sp_certificates` | SSO connections, their domains and verification, group mappings and the public signing certificates (private keys live in Kubernetes Secrets) |
 | `merge_operations`, `merge_operation_steps` | account merges and their resumable steps |
 | `session_activity` | the last time each Kratos session was used, keyed by its session id (Kratos keeps no such time) |
+| `hard_reset_requests` | two-person hard reset requests: module, reason, both root admins, the deadlines and the state; one open request per module |
 
 `idp_connections.connection_alias` is the routing key the SSO broker (Ory Polis) knows a
 connection by. A domain's sign-in method is `local` or `sso`. `idp_connections.secret_ref` names

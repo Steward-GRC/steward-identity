@@ -29,7 +29,7 @@ const (
 	OTPPurposePasswordReset = "password_reset"
 	OTPPurposeLogin2FA      = "login_2fa"
 	// OTPPurposeStepUp gates high-risk authenticated admin actions (e.g.
-	// TransferRoot) with an emailed one-time code the backend verifies for the
+	// GrantRoot and RevokeRoot) with an emailed one-time code the backend verifies for the
 	// acting admin before executing.
 	OTPPurposeStepUp = "step_up"
 )

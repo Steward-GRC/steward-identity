@@ -41,7 +41,7 @@ type User struct {
 	OnboardingComplete bool
 	FCMToken           string
 	Enabled            bool
-	IsRoot             bool         // the protected root site-admin; at most one exists
+	IsRoot             bool         // a root admin; there may be several, never none once bootstrapped
 	LocalAccount       bool         // has a local password, managed in Steward rather than by an identity provider
 	Roles              []string     // global roles only (scope_category='')
 	ScopedRoles        []ScopedRole // author/approver with their category

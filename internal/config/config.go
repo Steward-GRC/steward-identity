@@ -84,6 +84,10 @@ type Config struct {
 	// SessionLastSeenThrottle is how often a sign-in session's last-seen
 	// time moves while it is in use.
 	SessionLastSeenThrottle time.Duration
+	// HardResetRequestTTL is how long a hard reset request waits for a second
+	// root admin; HardResetApprovalTTL is how long an approval stays usable.
+	HardResetRequestTTL  time.Duration
+	HardResetApprovalTTL time.Duration
 
 	// KratosAdminURL is the Kratos admin API. Empty turns local accounts and
 	// session management off (they answer with coded "unavailable" errors).
@@ -158,6 +162,8 @@ func Load(getenv func(string) string) (Config, error) {
 		AdminCLIID:              strings.TrimSpace(getenv("IDENTITY_ADMIN_CLI_ID")),
 		BreakGlassDuration:      duration("BREAK_GLASS_DURATION", "15m"),
 		SessionLastSeenThrottle: duration("SESSION_LAST_SEEN_THROTTLE", "1m"),
+		HardResetRequestTTL:     duration("HARD_RESET_REQUEST_TTL", "24h"),
+		HardResetApprovalTTL:    duration("HARD_RESET_APPROVAL_TTL", "1h"),
 		KratosAdminURL:          getenv("KRATOS_ADMIN_URL"),
 		KratosSchemaID:          or("KRATOS_SCHEMA_ID", "default"),
 		Polis: Polis{AdminURL: getenv("POLIS_ADMIN_URL"), APIKey: getenv("POLIS_API_KEY"),

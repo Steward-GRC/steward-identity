@@ -33,6 +33,15 @@ var (
 	// Sync-owned memberships are read-only to group-managers; only a site-admin
 	// may change them. Handlers map this to PermissionDenied.
 	ErrSyncOwned = errors.New("membership is IdP-synced and read-only to group managers")
+	// ErrRootRequired: only a root admin may take part in a hard reset.
+	ErrRootRequired = errors.New("a root admin is required")
+	// ErrSelfApproval: a hard reset's requester can't approve it.
+	ErrSelfApproval = errors.New("the requester can't approve their own hard reset")
+	// ErrNotRequester: only a hard reset's requester can cancel it.
+	ErrNotRequester = errors.New("only the requester can cancel a hard reset")
+	// ErrHardResetState: the request is not pending, approved, unexpired or
+	// for that module, as the step needs.
+	ErrHardResetState = errors.New("the hard reset request doesn't allow this")
 )
 
 // Membership provenance values stored in group_membership.source.

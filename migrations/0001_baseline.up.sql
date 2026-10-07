@@ -28,8 +28,8 @@ CREATE TABLE users (
 );
 
 CREATE INDEX users_email_idx ON users (lower(email));
--- At most one root admin.
-CREATE UNIQUE INDEX users_single_root_idx ON users (is_root) WHERE is_root;
+-- Several root admins may exist; identity keeps at least one.
+CREATE INDEX users_root_idx ON users (id) WHERE is_root;
 CREATE UNIQUE INDEX users_lower_username_uniq ON users (lower(username)) WHERE username IS NOT NULL;
 -- Local accounts are created with an empty subject until their first sign-in
 -- links one, so only non-empty subjects are unique.
@@ -310,3 +310,27 @@ CREATE TABLE session_activity (
   last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX session_activity_user_id_idx ON session_activity (user_id);
+
+-- Two-person hard resets of a module: one root admin requests, a different one
+-- approves, and the module's service redeems the approval once. A request past
+-- its deadline is marked expired the next time the table is touched.
+CREATE TABLE hard_reset_requests (
+  id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  module              TEXT        NOT NULL,
+  reason              TEXT        NOT NULL,
+  state               TEXT        NOT NULL DEFAULT 'pending'
+                        CHECK (state IN ('pending','approved','cancelled','consumed','expired')),
+  requested_by        UUID        NOT NULL REFERENCES users(id),
+  requested_at        TIMESTAMPTZ NOT NULL,
+  expires_at          TIMESTAMPTZ NOT NULL,
+  approved_by         UUID        REFERENCES users(id),
+  approved_at         TIMESTAMPTZ,
+  approval_expires_at TIMESTAMPTZ,
+  cancelled_at        TIMESTAMPTZ,
+  consumed_at         TIMESTAMPTZ,
+  consumed_by         TEXT        NOT NULL DEFAULT '',
+  CHECK (approved_by IS NULL OR approved_by <> requested_by)
+);
+-- One open request per module.
+CREATE UNIQUE INDEX hard_reset_requests_open_idx ON hard_reset_requests (module)
+  WHERE state IN ('pending','approved');

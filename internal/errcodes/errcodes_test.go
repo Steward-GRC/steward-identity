@@ -34,7 +34,7 @@ func TestSSOProviderUnreachableRoundTrip(t *testing.T) {
 func TestRootRequiredInterpolatesThePermission(t *testing.T) {
 	st := status.Convert(errcodes.Error(context.Background(), errcodes.RootRequired("policy.read_sensitive")))
 	require.Equal(t, codes.PermissionDenied, st.Code())
-	require.Equal(t, "Only the root administrator can grant the policy.read_sensitive permission.", st.Message())
+	require.Equal(t, "Only a root administrator can grant the policy.read_sensitive permission.", st.Message())
 }
 
 func TestPendingApprovalsCarriesCountAndPolicies(t *testing.T) {

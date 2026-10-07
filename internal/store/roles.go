@@ -87,8 +87,8 @@ func (s *Store) RevokeRole(ctx context.Context, userID uuid.UUID, role, category
 	if err := validateRoleScope(role, category); err != nil {
 		return User{}, err
 	}
-	// The root account must keep its global site-admin role; stripping
-	// it would lock it out. Transfer root first to demote it.
+	// A root admin must keep the global site-admin role; stripping it would
+	// lock them out. Revoke root first.
 	if category == "" && role == "site-admin" {
 		root, err := s.isRoot(ctx, userID)
 		if err != nil {
@@ -146,6 +146,9 @@ func (s *Store) BootstrapAdmin(ctx context.Context, externalSub, email string,
 	existing := false
 	if err := s.db.RunInTx(ctx, func(tx pgx.Tx) error {
 		existing = false
+		if err := lockRootSet(ctx, tx); err != nil {
+			return err
+		}
 		// The EXISTS probe and the row fetch below MUST use the same predicate: if
 		// the probe counted a tombstoned admin the fetch would then find no row and
 		// bootstrap would fail with "load existing admin: no rows" instead of
@@ -260,52 +263,90 @@ func (s *Store) isRoot(ctx context.Context, id uuid.UUID) (bool, error) {
 	return root, nil
 }
 
-// TransferRoot atomically moves the protected root flag to toUserID: it clears
-// is_root on the current root (if any), sets it on the target, ensures the
-// target is enabled, and grants the target site-admin (lockout-safe).
+// rootSetLock is the transaction-scoped advisory lock every change to the set
+// of root admins takes, so the "no root yet" and "last root" checks can't race.
+const rootSetLock = 7_314_201_611
+
+func lockRootSet(ctx context.Context, tx pgx.Tx) error {
+	if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock($1)`, int64(rootSetLock)); err != nil {
+		return fmt.Errorf("lock root admins: %w", err)
+	}
+	return nil
+}
+
+// GrantRoot makes a user a root admin as well: it sets is_root, ensures the
+// account is enabled and grants the global site-admin role (lockout-safe).
+// Granting it again is a no-op that still answers with the user.
 //
-// The target MUST be a LIVE account. This is the concrete instance
-// of the hypothetical every other tombstone-blind query's safety rested on —
-// "if any future path re-enables an account". TransferRoot ALREADY does: it sets
-// enabled = true unconditionally. Transferring root onto a tombstoned row would
-// therefore manufacture the enabled-tombstone state that the enabled=false
-// coincidence assumes cannot exist, AND make the protected root account a
-// deleted one, which nothing can then undo because root cannot be re-deleted or
-// re-transferred away from a row the guards no longer resolve. A tombstoned
-// target returns ErrNotFound.
-// Returns the updated target user. The partial unique index requires the clear
-// to happen before the set, so both run in one transaction.
-func (s *Store) TransferRoot(ctx context.Context, toUserID uuid.UUID, actor *uuid.UUID, actorExternal string) (User, error) {
-	var exists bool
+// The target MUST be a LIVE account. GrantRoot sets enabled = true
+// unconditionally; granting root to a tombstoned row would manufacture the
+// enabled tombstone that every tombstone-blind query relies on not existing,
+// and make a root admin a deleted account, which nothing could then undo
+// because a root can't be deleted. A tombstoned target returns ErrNotFound.
+func (s *Store) GrantRoot(ctx context.Context, userID uuid.UUID, actor *uuid.UUID, actorExternal string) (User, error) {
 	if err := s.db.RunInTx(ctx, func(tx pgx.Tx) error {
+		if err := lockRootSet(ctx, tx); err != nil {
+			return err
+		}
+		var exists, already bool
 		if err := tx.QueryRow(ctx,
-			`SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND deleted_at IS NULL)`,
-			toUserID).Scan(&exists); err != nil {
+			`SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND deleted_at IS NULL),
+			        EXISTS(SELECT 1 FROM users WHERE id = $1 AND is_root)`,
+			userID).Scan(&exists, &already); err != nil {
 			return fmt.Errorf("target exists check: %w", err)
 		}
 		if !exists {
 			return ErrNotFound
 		}
-
-		if _, err := tx.Exec(ctx,
-			`UPDATE users SET is_root = false, updated_at = now() WHERE is_root`); err != nil {
-			return fmt.Errorf("clear current root: %w", err)
+		if already {
+			return nil
 		}
 		if _, err := tx.Exec(ctx,
-			`UPDATE users SET is_root = true, enabled = true, updated_at = now() WHERE id = $1`, toUserID); err != nil {
-			return fmt.Errorf("set new root: %w", err)
+			`UPDATE users SET is_root = true, enabled = true, updated_at = now() WHERE id = $1`, userID); err != nil {
+			return fmt.Errorf("set root: %w", err)
 		}
 		if _, err := tx.Exec(ctx,
 			`INSERT INTO user_roles (user_id, role, scope_category) VALUES ($1, 'site-admin', '')
-			   ON CONFLICT DO NOTHING`, toUserID); err != nil {
+			   ON CONFLICT DO NOTHING`, userID); err != nil {
 			return fmt.Errorf("grant site-admin: %w", err)
 		}
-		if err := s.emitAuditTx(ctx, tx, "root.transferred", actor, actorExternal, &toUserID, nil, map[string]any{}); err != nil {
-			return err
-		}
-		return nil
+		return s.emitAuditTx(ctx, tx, "root.granted", actor, actorExternal, &userID, nil, map[string]any{})
 	}); err != nil {
 		return User{}, err
 	}
-	return s.GetUser(ctx, toUserID)
+	return s.GetUser(ctx, userID)
+}
+
+// RevokeRoot takes the root role from a user, who keeps site-admin. The last
+// root admin can't lose it (ErrRootProtected); a user who isn't root is
+// ErrInvalid. Concurrent revokes are serialised, so at least one root always
+// remains.
+func (s *Store) RevokeRoot(ctx context.Context, userID uuid.UUID, actor *uuid.UUID, actorExternal string) (User, error) {
+	if err := s.db.RunInTx(ctx, func(tx pgx.Tx) error {
+		if err := lockRootSet(ctx, tx); err != nil {
+			return err
+		}
+		var isRoot bool
+		var roots int
+		if err := tx.QueryRow(ctx,
+			`SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND is_root),
+			        (SELECT count(*) FROM users WHERE is_root)`,
+			userID).Scan(&isRoot, &roots); err != nil {
+			return fmt.Errorf("root count: %w", err)
+		}
+		if !isRoot {
+			return fmt.Errorf("%w: the user isn't a root admin", ErrInvalid)
+		}
+		if roots <= 1 {
+			return fmt.Errorf("%w: cannot revoke root from the last root admin", ErrRootProtected)
+		}
+		if _, err := tx.Exec(ctx,
+			`UPDATE users SET is_root = false, updated_at = now() WHERE id = $1`, userID); err != nil {
+			return fmt.Errorf("clear root: %w", err)
+		}
+		return s.emitAuditTx(ctx, tx, "root.revoked", actor, actorExternal, &userID, nil, map[string]any{})
+	}); err != nil {
+		return User{}, err
+	}
+	return s.GetUser(ctx, userID)
 }

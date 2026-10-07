@@ -65,6 +65,8 @@ var gatewayMethods = []string{
 	identityv1.IdentityReadService_WebauthnRegisterFinish_FullMethodName,
 	identityv1.IdentityAdminService_ActiveBreakGlass_FullMethodName,
 	identityv1.IdentityAdminService_AddUserToGroup_FullMethodName,
+	identityv1.IdentityAdminService_ApproveHardReset_FullMethodName,
+	identityv1.IdentityAdminService_CancelHardReset_FullMethodName,
 	identityv1.IdentityAdminService_AdminListUserFactors_FullMethodName,
 	identityv1.IdentityAdminService_AdminRemoveUserFactor_FullMethodName,
 	identityv1.IdentityAdminService_AdminRenameUserFactor_FullMethodName,
@@ -77,18 +79,21 @@ var gatewayMethods = []string{
 	identityv1.IdentityAdminService_EnableUser_FullMethodName,
 	identityv1.IdentityAdminService_GrantGroupManager_FullMethodName,
 	identityv1.IdentityAdminService_GrantRole_FullMethodName,
+	identityv1.IdentityAdminService_GrantRoot_FullMethodName,
+	identityv1.IdentityAdminService_ListHardResetRequests_FullMethodName,
 	identityv1.IdentityAdminService_ListUserSessions_FullMethodName,
 	identityv1.IdentityAdminService_MergeAccounts_FullMethodName,
 	identityv1.IdentityAdminService_PreviewAccountMerge_FullMethodName,
 	identityv1.IdentityAdminService_PreviewUserDeletion_FullMethodName,
 	identityv1.IdentityAdminService_RemoveUserFromGroup_FullMethodName,
+	identityv1.IdentityAdminService_RequestHardReset_FullMethodName,
 	identityv1.IdentityAdminService_RequestStepUpOtp_FullMethodName,
 	identityv1.IdentityAdminService_ResetUserPassword_FullMethodName,
 	identityv1.IdentityAdminService_RevokeGroupManager_FullMethodName,
 	identityv1.IdentityAdminService_RevokeRole_FullMethodName,
+	identityv1.IdentityAdminService_RevokeRoot_FullMethodName,
 	identityv1.IdentityAdminService_RevokeUserSessions_FullMethodName,
 	identityv1.IdentityAdminService_SetUserPolicyOverride_FullMethodName,
-	identityv1.IdentityAdminService_TransferRoot_FullMethodName,
 	identityv1.IdentityAdminService_UpdateMyProfile_FullMethodName,
 	identityv1.IdentityAdminService_UpdateUserProfile_FullMethodName,
 	identityv1.IdentitySSOAdminService_ActivateOrganization_FullMethodName,
@@ -114,7 +119,11 @@ var gatewayMethods = []string{
 // The internal callers act as themselves: each reads what its own job needs
 // about a user it names in the request, never by forwarding an actor.
 var (
-	userReader         = []string{identityv1.IdentityReadService_GetUser_FullMethodName}
+	userReader       = []string{identityv1.IdentityReadService_GetUser_FullMethodName}
+	reportingMethods = []string{
+		identityv1.IdentityReadService_GetUser_FullMethodName,
+		identityv1.IdentityAdminService_ConsumeHardReset_FullMethodName,
+	}
 	obligationsMethods = []string{
 		identityv1.IdentityReadService_GetUser_FullMethodName,
 		identityv1.IdentityReadService_ListAllUsers_FullMethodName,
@@ -156,7 +165,7 @@ func CallerPolicy() workloadauth.Policy {
 	}
 	grant(CallerGateway, workloadauth.OnBehalf, gatewayMethods)
 	grant(CallerWorkflow, workloadauth.Self, userReader)
-	grant(CallerReporting, workloadauth.Self, userReader)
+	grant(CallerReporting, workloadauth.Self, reportingMethods)
 	grant(CallerCollab, workloadauth.Self, userReader)
 	grant(CallerObligations, workloadauth.Self, obligationsMethods)
 	grant(CallerAdminCLI, workloadauth.Self, adminCLIMethods)

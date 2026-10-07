@@ -75,10 +75,14 @@ type AdminHandler struct {
 	// sessions. Nil answers the coded "unavailable" errors.
 	accounts localAccounts
 
-	// otp wires the step-up email-OTP flow (RequestStepUpOtp + TransferRoot
-	// verification). Nil when unwired; RequestStepUpOtp then returns Unavailable
-	// and TransferRoot rejects every code (fail-closed).
+	// otp wires the step-up email-OTP flow (RequestStepUpOtp + GrantRoot and
+	// RevokeRoot verification). Nil when unwired; RequestStepUpOtp then returns
+	// Unavailable and GrantRoot and RevokeRoot reject every code (fail-closed).
 	otp *otpDeps
+
+	// hardReset holds the two hard reset windows and the clock. Zero windows
+	// fall back to the defaults (24h, 1h).
+	hardReset hardResetConfig
 
 	// BreakGlassDurationMin is the break-glass reveal window in minutes; when 0
 	// defaultBreakGlassDurationMin (15) is used. Wired from config by main.
@@ -917,7 +921,8 @@ func (h *AdminHandler) SetUserPolicyOverride(ctx context.Context, req *identityv
 
 // RequestStepUpOtp mints a step_up OTP for the CALLING admin (actor bound from
 // forwarded claims — never from input) and emails it to that actor's own
-// address. It arms the server-verified confirmation required by TransferRoot.
+// address. It arms the server-verified confirmation GrantRoot and RevokeRoot
+// require.
 // The response is content-free (anti-enumeration), mirroring RequestLoginOtp;
 // every real failure is logged server-side only. Only the gateway (claims) path
 // can arm this — the admin CLI path has no platform user id to email.
@@ -951,42 +956,74 @@ func (h *AdminHandler) RequestStepUpOtp(ctx context.Context, _ *identityv1.Reque
 		lg.Info("DEV: one-time code (OTP_DEV_ECHO)", log.F("purpose", store.OTPPurposeStepUp), log.F("email", u.Email), log.F("otp_code", code))
 	}
 	if h.otp.sender != nil && u.Email != "" {
-		body := "Use this code to confirm transferring root of Steward:\n\n    " + code +
+		body := "Use this code to confirm a change to Steward's root admins:\n\n    " + code +
 			"\n\nThis code expires in 10 minutes. If you did not request it, ignore this email."
-		if err := h.otp.sender.Send(ctx, u.Email, "Your confirmation code for transferring root", body); err != nil {
+		if err := h.otp.sender.Send(ctx, u.Email, "Your confirmation code for a root admin change", body); err != nil {
 			lg.Warn("step-up otp email send failed", log.F("email", u.Email), log.F("error", errText(err)))
 		}
 	}
 	return &identityv1.RequestStepUpOtpResponse{}, nil
 }
 
-// TransferRoot moves the protected root site-admin to another user (#19),
-// granting the target site-admin + admin and clearing the old root. It is
-// gated by a step_up OTP: the code in req.otp is VERIFIED for the acting admin
-// (single-use) BEFORE any transfer. A missing/invalid/expired code returns
-// InvalidArgument and performs no transfer (fail-closed).
-func (h *AdminHandler) TransferRoot(ctx context.Context, req *identityv1.TransferRootRequest) (*identityv1.TransferRootResponse, error) {
-	actor, err := h.auth.Authorize(ctx)
+// GrantRoot makes another user a root admin as well, granting them
+// site-admin. Only a root admin may, never during act-as, and only after the
+// calling admin's step_up OTP in req.otp is verified (single-use): a missing,
+// invalid or expired code returns InvalidArgument and changes nothing.
+func (h *AdminHandler) GrantRoot(ctx context.Context, req *identityv1.GrantRootRequest) (*identityv1.GrantRootResponse, error) {
+	actor, id, err := h.authorizeRootChange(ctx, req.GetUserId(), req.GetOtp())
 	if err != nil {
 		return nil, err
 	}
-	if err := refuseWhileActingAs(ctx); err != nil {
-		return nil, err
-	}
-	id, err := parseUUID(req.GetToUserId(), "to_user_id")
-	if err != nil {
-		return nil, err
-	}
-	// Server-side step-up check: verify the emailed confirmation code for the
-	// ACTING admin before doing anything. The client cannot skip this.
-	if err := h.verifyStepUp(ctx, actor, req.GetOtp()); err != nil {
-		return nil, err
-	}
-	u, err := h.store.TransferRoot(ctx, id, actorUUIDPtr(actor), actor.ActorExternal)
+	u, err := h.store.GrantRoot(ctx, id, actorUUIDPtr(actor), actor.ActorExternal)
 	if err != nil {
 		return nil, statusFromStoreErr(err)
 	}
-	return &identityv1.TransferRootResponse{User: userToProto(u)}, nil
+	lg := logger.Ctx(ctx)
+	lg.Info("root admin granted", log.F("user_id", id.String()))
+	return &identityv1.GrantRootResponse{User: userToProto(u)}, nil
+}
+
+// RevokeRoot takes the root role from a user, who keeps site-admin. The last
+// root admin keeps it (FailedPrecondition). Same checks as GrantRoot.
+func (h *AdminHandler) RevokeRoot(ctx context.Context, req *identityv1.RevokeRootRequest) (*identityv1.RevokeRootResponse, error) {
+	actor, id, err := h.authorizeRootChange(ctx, req.GetUserId(), req.GetOtp())
+	if err != nil {
+		return nil, err
+	}
+	u, err := h.store.RevokeRoot(ctx, id, actorUUIDPtr(actor), actor.ActorExternal)
+	if err != nil {
+		return nil, statusFromStoreErr(err)
+	}
+	lg := logger.Ctx(ctx)
+	lg.Info("root admin revoked", log.F("user_id", id.String()))
+	return &identityv1.RevokeRootResponse{User: userToProto(u)}, nil
+}
+
+// authorizeRootChange runs the checks every change to the root admins needs:
+// a site-admin caller, no act-as, a root admin, then the step-up code.
+func (h *AdminHandler) authorizeRootChange(ctx context.Context, userID, otp string) (adminActor, uuid.UUID, error) {
+	actor, err := h.auth.Authorize(ctx)
+	if err != nil {
+		return adminActor{}, uuid.Nil, err
+	}
+	if err := refuseWhileActingAs(ctx); err != nil {
+		return adminActor{}, uuid.Nil, err
+	}
+	id, err := parseUUID(userID, "user_id")
+	if err != nil {
+		return adminActor{}, uuid.Nil, err
+	}
+	isRoot, err := h.store.IsRootActor(ctx, actorUUIDPtr(actor))
+	if err != nil {
+		return adminActor{}, uuid.Nil, statusFromStoreErr(err)
+	}
+	if !isRoot {
+		return adminActor{}, uuid.Nil, errcodes.Error(ctx, errcodes.RootRequired("root"))
+	}
+	if err := h.verifyStepUp(ctx, actor, otp); err != nil {
+		return adminActor{}, uuid.Nil, err
+	}
+	return actor, id, nil
 }
 
 // verifyStepUp consumes a step_up OTP for the acting admin. It fails closed:
