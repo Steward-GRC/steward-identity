@@ -13,7 +13,11 @@ has its own request and response message, and `buf lint` runs the plain `STANDAR
 
 ## Callers and the actor
 
-The caller's identity travels in the go-grpc-actor metadata, never in a request field. During
+Every call except health and reflection carries the calling service's workload token, and each
+method admits only the callers listed in
+[service-to-service authentication](configuration.md#service-to-service-authentication). The
+user's identity travels in the go-grpc-actor metadata, never in a request field, and is believed
+only from a caller with on-behalf access (the gateway). During
 act-as the actor carries the target as the subject and the real admin as the impersonator;
 identity's audit events credit the admin and keep the target as `impersonated_user_id`, and its
 own outbound calls forward both.
@@ -62,5 +66,5 @@ generates stubs under `gen/go/thirdparty/`.
 | steward-workflow | not pinned yet | pending approvals (the delete refusal) and re-pointing approvals in a merge; until pinned these report unavailable and deletes and merges refuse |
 | steward-obligations | not pinned yet | moving acknowledgements in a merge; until pinned merges refuse |
 
-Every outbound connection carries the caller and the act-as admin (go-grpc-actor's client
-interceptors).
+Every outbound connection carries identity's own workload token (`WORKLOAD_TOKEN_FILE`) and the
+caller and the act-as admin (go-grpc-actor's client interceptors).

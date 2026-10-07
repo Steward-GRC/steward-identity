@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 func env(m map[string]string) func(string) string {
@@ -18,7 +20,10 @@ func env(m map[string]string) func(string) string {
 const dsn = "postgres://identity@db.example.org/identity"
 
 func base() map[string]string {
-	return map[string]string{"DATABASE_DSN": dsn, "RABBITMQ_URL": "amqp://mq.example.org"}
+	return map[string]string{
+		"DATABASE_DSN": dsn, "RABBITMQ_URL": "amqp://mq.example.org",
+		"WORKLOAD_OIDC_ISSUER": "https://issuer.example.org", "WORKLOAD_ALLOWED_SERVICEACCOUNTS": "steward/steward-gateway",
+	}
 }
 
 func TestLoadDefaults(t *testing.T) {
@@ -31,7 +36,9 @@ func TestLoadDefaults(t *testing.T) {
 	require.Equal(t, dsn, c.MigrateDSN)
 	require.Empty(t, c.RedisAddr, "the cache is off unless configured")
 	require.Equal(t, time.Minute, c.IdpGroupsCacheTTL)
-	require.Empty(t, c.TrustedCallers, "no caller is trusted to forward an actor by default")
+	require.True(t, c.WorkloadAuthEnabled, "service-to-service authentication is on unless explicitly disabled")
+	require.Equal(t, "steward", c.WorkloadAuth.Audience)
+	require.Equal(t, workloadauth.DefaultTokenFile, c.TokenFile, "identity sends its own token on its calls to core")
 	require.Empty(t, c.AdminCLIID, "the admin CLI has no access by default")
 	require.Equal(t, 15*time.Minute, c.BreakGlassDuration)
 	require.Empty(t, c.KratosAdminURL, "local accounts and sessions are off unless Kratos is configured")
@@ -60,10 +67,13 @@ func TestLoadReadsEverySetting(t *testing.T) {
 		"OTEL_EXPORTER_OTLP_ENDPOINT": "otel.example.org:4317",
 		"REDIS_ADDR":                  "cache.example.org:6379", "REDIS_PASSWORD": "pw", "IDP_GROUPS_CACHE_TTL": "2m",
 		"GRPC_TLS_CERT_FILE": "/tls/tls.crt", "GRPC_TLS_KEY_FILE": "/tls/tls.key", "GRPC_TLS_CLIENT_CA_FILE": "/tls/ca.crt",
-		"IDENTITY_TRUSTED_CALLERS": "spiffe://example.org/ns/steward/sa/gateway, spiffe://example.org/ns/steward/sa/workflow",
-		"IDENTITY_ADMIN_CLI_ID":    "spiffe://example.org/ns/steward/sa/identity-admin",
-		"BREAK_GLASS_DURATION":     "30m",
-		"KRATOS_ADMIN_URL":         "http://kratos.example.org:4434", "KRATOS_SCHEMA_ID": "staff",
+		"WORKLOAD_OIDC_JWKS_URL": "https://issuer.example.org/openid/v1/jwks", "WORKLOAD_OIDC_CA_FILE": "/oidc/ca.crt",
+		"WORKLOAD_OIDC_BEARER_FILE": "/oidc/token", "WORKLOAD_AUDIENCE": "steward",
+		"WORKLOAD_ALLOWED_SERVICEACCOUNTS": "steward/steward-gateway, steward/steward-workflow",
+		"WORKLOAD_TOKEN_FILE":              "/run/token",
+		"IDENTITY_ADMIN_CLI_ID":            "spiffe://example.org/ns/steward/sa/identity-admin",
+		"BREAK_GLASS_DURATION":             "30m",
+		"KRATOS_ADMIN_URL":                 "http://kratos.example.org:4434", "KRATOS_SCHEMA_ID": "staff",
 		"POLIS_ADMIN_URL": "http://polis.example.org:5225", "POLIS_API_KEY": "key", "POLIS_PRODUCT": "acme",
 		"GATEWAY_BASE_URL":  "https://policies.example.org",
 		"LOGIN_2FA_ENABLED": "true", "OTP_DEV_ECHO": "true", "TOTP_ENC_KEY": "k",
@@ -84,7 +94,11 @@ func TestLoadReadsEverySetting(t *testing.T) {
 	require.Equal(t, "cache.example.org:6379", c.RedisAddr)
 	require.Equal(t, 2*time.Minute, c.IdpGroupsCacheTTL)
 	require.Equal(t, TLS{CertFile: "/tls/tls.crt", KeyFile: "/tls/tls.key", ClientCAFile: "/tls/ca.crt"}, c.TLS)
-	require.Equal(t, []string{"spiffe://example.org/ns/steward/sa/gateway", "spiffe://example.org/ns/steward/sa/workflow"}, c.TrustedCallers)
+	require.Equal(t, workloadauth.Config{
+		Issuer: "https://issuer.example.org", JWKSURL: "https://issuer.example.org/openid/v1/jwks", CAFile: "/oidc/ca.crt",
+		BearerFile: "/oidc/token", Audience: "steward", AllowedServiceAccounts: []string{"steward/steward-gateway", "steward/steward-workflow"},
+	}, c.WorkloadAuth)
+	require.Equal(t, "/run/token", c.TokenFile)
 	require.Equal(t, "spiffe://example.org/ns/steward/sa/identity-admin", c.AdminCLIID)
 	require.Equal(t, 30*time.Minute, c.BreakGlassDuration)
 	require.Equal(t, "http://kratos.example.org:4434", c.KratosAdminURL)
@@ -110,11 +124,14 @@ func TestLoadNeedsTheDatabaseAndTheBroker(t *testing.T) {
 
 func TestLoadRejectsBadValues(t *testing.T) {
 	for k, v := range map[string]string{
-		"IDP_GROUPS_CACHE_TTL":    "soon",
-		"BREAK_GLASS_DURATION":    "0s",
-		"DOMAIN_RECHECK_INTERVAL": "-1h",
-		"LOGIN_2FA_ENABLED":       "maybe",
-		"SP_CERT_TTL_DAYS":        "x",
+		"IDP_GROUPS_CACHE_TTL":             "soon",
+		"BREAK_GLASS_DURATION":             "0s",
+		"DOMAIN_RECHECK_INTERVAL":          "-1h",
+		"LOGIN_2FA_ENABLED":                "maybe",
+		"SP_CERT_TTL_DAYS":                 "x",
+		"WORKLOAD_AUTH":                    "off",
+		"WORKLOAD_OIDC_ISSUER":             "http://issuer.example.org",
+		"WORKLOAD_ALLOWED_SERVICEACCOUNTS": "steward-gateway",
 	} {
 		m := base()
 		m[k] = v
@@ -124,16 +141,33 @@ func TestLoadRejectsBadValues(t *testing.T) {
 	}
 }
 
-func TestTLSIsAllOrNothingAndTrustNeedsIt(t *testing.T) {
+func TestLoadFailsClosedWithoutWorkloadAuth(t *testing.T) {
+	m := base()
+	delete(m, "WORKLOAD_OIDC_ISSUER")
+	_, err := Load(env(m))
+	require.ErrorIs(t, err, workloadauth.ErrNotConfigured, "no issuer and no explicit off switch stops the boot")
+}
+
+func TestLoadTurnsWorkloadAuthOffOnlyWhenDisabled(t *testing.T) {
+	m := base()
+	delete(m, "WORKLOAD_OIDC_ISSUER")
+	delete(m, "WORKLOAD_ALLOWED_SERVICEACCOUNTS")
+	m["WORKLOAD_AUTH"] = "disabled"
+	c, err := Load(env(m))
+	require.NoError(t, err)
+	require.False(t, c.WorkloadAuthEnabled)
+	require.Empty(t, c.TokenFile, "with authentication off identity sends no token")
+
+	m["WORKLOAD_OIDC_ISSUER"] = "https://issuer.example.org"
+	_, err = Load(env(m))
+	require.Error(t, err, "disabled together with an issuer is a contradiction that stops the boot")
+}
+
+func TestTLSIsAllOrNothingAndTheCLINeedsIt(t *testing.T) {
 	m := base()
 	m["GRPC_TLS_CERT_FILE"] = "/tls/tls.crt"
 	_, err := Load(env(m))
 	require.ErrorContains(t, err, "set together")
-
-	m = base()
-	m["IDENTITY_TRUSTED_CALLERS"] = "spiffe://example.org/ns/steward/sa/gateway"
-	_, err = Load(env(m))
-	require.ErrorContains(t, err, "IDENTITY_TRUSTED_CALLERS needs GRPC_TLS_*")
 
 	m = base()
 	m["IDENTITY_ADMIN_CLI_ID"] = "spiffe://example.org/ns/steward/sa/identity-admin"

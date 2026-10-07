@@ -63,17 +63,21 @@ in the Kubernetes Secret.
 ## Act-as
 
 The gateway forwards the signed-in user and, during act-as, the real admin (go-grpc-actor). Identity
-believes them only from a caller in `IDENTITY_TRUSTED_CALLERS` over mTLS, checks admin rights
+believes them only from a verified caller with on-behalf access (the gateway, see
+[service-to-service authentication](configuration.md#service-to-service-authentication)), checks admin rights
 against its own roles for the subject, credits the admin in every audit event, and forwards both on
-its calls to core. Password and second-factor changes, deletes, and role and permission changes are
+its calls to core, which also carry identity's own token. Password and second-factor changes, deletes, and role and permission changes are
 refused during act-as with `ACT_AS_FORBIDDEN`.
 
 ## Common problems
 
 | Symptom | Look at |
 | --- | --- |
-| Every admin call through the gateway is `ADMIN_AUTHZ_REQUIRED` | The gateway isn't a trusted caller (mTLS and `IDENTITY_TRUSTED_CALLERS`), or the subject lacks `site-admin`. |
-| `identity-admin` is refused | The CLI certificate's SPIFFE ID must equal `IDENTITY_ADMIN_CLI_ID`, and `AUDIT_USER` must be set. |
+| Every admin call through the gateway is `ADMIN_AUTHZ_REQUIRED` | The subject lacks `site-admin`. |
+| `Unavailable: workload verifier unavailable`, `/readyz` 503 with `jwks` down | No issuer key set has loaded. Check `WORKLOAD_OIDC_ISSUER`, the CA file and the bearer file: the API server answers 401 to a bearer with the `steward` audience, so the bearer must be the second projected token. |
+| `Unauthenticated: no workload token` or `workload token rejected` | The caller sent no token, or one with the wrong audience, issuer or expiry, or from a service account outside `WORKLOAD_ALLOWED_SERVICEACCOUNTS`. Check the caller's `WORKLOAD_TOKEN_FILE` mount and identity's allow-list. |
+| `PermissionDenied: caller not allowed on this method` | A verified caller isn't listed for the method; the refusal is audited as `rpc.denied`. |
+| `identity-admin` is refused | The CLI certificate's SPIFFE ID must equal `IDENTITY_ADMIN_CLI_ID`, `AUDIT_USER` must be set, and `WORKLOAD_TOKEN_FILE` must name the pod's projected token. |
 | `USER_DELETE_CHECKS_UNAVAILABLE` naming `approval_check` | Expected until steward-workflow is pinned: deletes stay refused rather than strand approvals. Disable the account to lock the user out. |
 | Merge answers that a service isn't configured | Expected until steward-workflow and steward-obligations are pinned. |
 | `SESSIONS_UNAVAILABLE` or `SESSION_REVOKE_UNAVAILABLE` | `KRATOS_ADMIN_URL` and `steward-depstate-kratos`. Nothing was revoked. |

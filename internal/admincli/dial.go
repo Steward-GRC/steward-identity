@@ -19,6 +19,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
+	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 // AdminDialer returns an IdentityAdminService client and its cleanup.
@@ -66,11 +67,21 @@ func dialIdentity(opt rootCommandOptions) (*grpc.ClientConn, error) {
 	if err != nil {
 		return nil, err
 	}
-	conn, err := grpc.NewClient(addr,
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(creds),
 		grpc.WithStatsHandler(gootel.GRPCClientStatsHandler()),
 		grpc.WithChainUnaryInterceptor(grpcactor.UnaryClientInterceptor()),
-	)
+	}
+	// In the identity pod WORKLOAD_TOKEN_FILE names the pod's projected token,
+	// which identity's caller authentication needs on every call.
+	token, ok, err := workloadauth.DialOptionFromEnv(opt.envLookup)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		opts = append(opts, token)
+	}
+	conn, err := grpc.NewClient(addr, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("dial %s: %w", addr, err)
 	}
