@@ -33,8 +33,16 @@ type AddOrganizationRequest struct {
 	DisplayName string `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	// The connection's non-secret settings.
 	Config map[string]string `protobuf:"bytes,5,rep,name=config,proto3" json:"config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// A reference to the secret the connection needs, never the secret.
-	SecretRef     string `protobuf:"bytes,6,opt,name=secret_ref,json=secretRef,proto3" json:"secret_ref,omitempty"`
+	// The name of a key an operator created beforehand in the Polis secrets
+	// Kubernetes Secret, holding the OIDC client secret. It must exist; it is
+	// checked before anything is sent to Polis. Leave it empty when
+	// client_secret is set. SAML takes neither.
+	SecretRef string `protobuf:"bytes,6,opt,name=secret_ref,json=secretRef,proto3" json:"secret_ref,omitempty"`
+	// The OIDC client secret itself, write-only: identity stores it in the
+	// Polis secrets Kubernetes Secret and keeps only the key's name. It is never
+	// stored in the database, returned or logged. Leave it empty when
+	// secret_ref is set.
+	ClientSecret  string `protobuf:"bytes,7,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -107,6 +115,13 @@ func (x *AddOrganizationRequest) GetConfig() map[string]string {
 func (x *AddOrganizationRequest) GetSecretRef() string {
 	if x != nil {
 		return x.SecretRef
+	}
+	return ""
+}
+
+func (x *AddOrganizationRequest) GetClientSecret() string {
+	if x != nil {
+		return x.ClientSecret
 	}
 	return ""
 }
@@ -324,13 +339,18 @@ func (x *GetOrganizationResponse) GetOrganization() *Organization {
 }
 
 type UpdateIdPConnectionRequest struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	Domain    string                 `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
-	Config    map[string]string      `protobuf:"bytes,2,rep,name=config,proto3" json:"config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	SecretRef string                 `protobuf:"bytes,3,opt,name=secret_ref,json=secretRef,proto3" json:"secret_ref,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Domain string                 `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
+	Config map[string]string      `protobuf:"bytes,2,rep,name=config,proto3" json:"config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Replaces an OIDC connection's client secret with a pre-created key, as in
+	// AddOrganizationRequest.secret_ref. Empty keeps the current secret.
+	SecretRef string `protobuf:"bytes,3,opt,name=secret_ref,json=secretRef,proto3" json:"secret_ref,omitempty"`
 	// The organisation's sign-in toggles; an unset one keeps its value.
-	JitEnabled    *bool `protobuf:"varint,4,opt,name=jit_enabled,json=jitEnabled,proto3,oneof" json:"jit_enabled,omitempty"`
-	AllowLocal    *bool `protobuf:"varint,5,opt,name=allow_local,json=allowLocal,proto3,oneof" json:"allow_local,omitempty"`
+	JitEnabled *bool `protobuf:"varint,4,opt,name=jit_enabled,json=jitEnabled,proto3,oneof" json:"jit_enabled,omitempty"`
+	AllowLocal *bool `protobuf:"varint,5,opt,name=allow_local,json=allowLocal,proto3,oneof" json:"allow_local,omitempty"`
+	// Replaces an OIDC connection's client secret, write-only, as in
+	// AddOrganizationRequest.client_secret. Empty keeps the current secret.
+	ClientSecret  string `protobuf:"bytes,6,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -400,6 +420,13 @@ func (x *UpdateIdPConnectionRequest) GetAllowLocal() bool {
 	return false
 }
 
+func (x *UpdateIdPConnectionRequest) GetClientSecret() string {
+	if x != nil {
+		return x.ClientSecret
+	}
+	return ""
+}
+
 type UpdateIdPConnectionResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Organization  *Organization          `protobuf:"bytes,1,opt,name=organization,proto3" json:"organization,omitempty"`
@@ -449,9 +476,12 @@ type ChangeOrgProtocolRequest struct {
 	Domain string                 `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
 	// "saml" or "oidc".
 	Protocol string `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`
-	// The new protocol's settings and secret reference replace the old ones.
+	// The new protocol's settings and secret replace the old ones. OIDC takes
+	// exactly one of secret_ref and client_secret, as in AddOrganizationRequest;
+	// SAML takes neither.
 	Config        map[string]string `protobuf:"bytes,3,rep,name=config,proto3" json:"config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	SecretRef     string            `protobuf:"bytes,4,opt,name=secret_ref,json=secretRef,proto3" json:"secret_ref,omitempty"`
+	ClientSecret  string            `protobuf:"bytes,5,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -510,6 +540,13 @@ func (x *ChangeOrgProtocolRequest) GetConfig() map[string]string {
 func (x *ChangeOrgProtocolRequest) GetSecretRef() string {
 	if x != nil {
 		return x.SecretRef
+	}
+	return ""
+}
+
+func (x *ChangeOrgProtocolRequest) GetClientSecret() string {
+	if x != nil {
+		return x.ClientSecret
 	}
 	return ""
 }
@@ -1754,7 +1791,7 @@ var File_steward_identity_v1_sso_admin_proto protoreflect.FileDescriptor
 
 const file_steward_identity_v1_sso_admin_proto_rawDesc = "" +
 	"\n" +
-	"#steward/identity/v1/sso_admin.proto\x12\x13steward.identity.v1\x1a\x1fsteward/identity/v1/types.proto\"\xb5\x02\n" +
+	"#steward/identity/v1/sso_admin.proto\x12\x13steward.identity.v1\x1a\x1fsteward/identity/v1/types.proto\"\xda\x02\n" +
 	"\x16AddOrganizationRequest\x12\x19\n" +
 	"\borg_name\x18\x01 \x01(\tR\aorgName\x12\x16\n" +
 	"\x06domain\x18\x02 \x01(\tR\x06domain\x12\x1a\n" +
@@ -1762,7 +1799,8 @@ const file_steward_identity_v1_sso_admin_proto_rawDesc = "" +
 	"\fdisplay_name\x18\x04 \x01(\tR\vdisplayName\x12O\n" +
 	"\x06config\x18\x05 \x03(\v27.steward.identity.v1.AddOrganizationRequest.ConfigEntryR\x06config\x12\x1d\n" +
 	"\n" +
-	"secret_ref\x18\x06 \x01(\tR\tsecretRef\x1a9\n" +
+	"secret_ref\x18\x06 \x01(\tR\tsecretRef\x12#\n" +
+	"\rclient_secret\x18\a \x01(\tR\fclientSecret\x1a9\n" +
 	"\vConfigEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"`\n" +
@@ -1774,7 +1812,7 @@ const file_steward_identity_v1_sso_admin_proto_rawDesc = "" +
 	"\x16GetOrganizationRequest\x12\x16\n" +
 	"\x06domain\x18\x01 \x01(\tR\x06domain\"`\n" +
 	"\x17GetOrganizationResponse\x12E\n" +
-	"\forganization\x18\x01 \x01(\v2!.steward.identity.v1.OrganizationR\forganization\"\xcf\x02\n" +
+	"\forganization\x18\x01 \x01(\v2!.steward.identity.v1.OrganizationR\forganization\"\xf4\x02\n" +
 	"\x1aUpdateIdPConnectionRequest\x12\x16\n" +
 	"\x06domain\x18\x01 \x01(\tR\x06domain\x12S\n" +
 	"\x06config\x18\x02 \x03(\v2;.steward.identity.v1.UpdateIdPConnectionRequest.ConfigEntryR\x06config\x12\x1d\n" +
@@ -1783,20 +1821,22 @@ const file_steward_identity_v1_sso_admin_proto_rawDesc = "" +
 	"\vjit_enabled\x18\x04 \x01(\bH\x00R\n" +
 	"jitEnabled\x88\x01\x01\x12$\n" +
 	"\vallow_local\x18\x05 \x01(\bH\x01R\n" +
-	"allowLocal\x88\x01\x01\x1a9\n" +
+	"allowLocal\x88\x01\x01\x12#\n" +
+	"\rclient_secret\x18\x06 \x01(\tR\fclientSecret\x1a9\n" +
 	"\vConfigEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
 	"\f_jit_enabledB\x0e\n" +
 	"\f_allow_local\"d\n" +
 	"\x1bUpdateIdPConnectionResponse\x12E\n" +
-	"\forganization\x18\x01 \x01(\v2!.steward.identity.v1.OrganizationR\forganization\"\xfb\x01\n" +
+	"\forganization\x18\x01 \x01(\v2!.steward.identity.v1.OrganizationR\forganization\"\xa0\x02\n" +
 	"\x18ChangeOrgProtocolRequest\x12\x16\n" +
 	"\x06domain\x18\x01 \x01(\tR\x06domain\x12\x1a\n" +
 	"\bprotocol\x18\x02 \x01(\tR\bprotocol\x12Q\n" +
 	"\x06config\x18\x03 \x03(\v29.steward.identity.v1.ChangeOrgProtocolRequest.ConfigEntryR\x06config\x12\x1d\n" +
 	"\n" +
-	"secret_ref\x18\x04 \x01(\tR\tsecretRef\x1a9\n" +
+	"secret_ref\x18\x04 \x01(\tR\tsecretRef\x12#\n" +
+	"\rclient_secret\x18\x05 \x01(\tR\fclientSecret\x1a9\n" +
 	"\vConfigEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"b\n" +

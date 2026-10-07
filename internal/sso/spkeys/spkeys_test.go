@@ -39,7 +39,31 @@ func TestK8sStore_GetMissingKey(t *testing.T) {
 	cs := fake.NewClientset(seedSecret("id-ns", "identity-sp-cert"))
 	st := spkeys.NewK8sStore(cs, "id-ns", "identity-sp-cert")
 	_, err := st.GetKey(context.Background(), "absent")
+	require.ErrorIs(t, err, spkeys.ErrKeyNotFound)
+}
+
+func TestK8sStore_MissingSecretIsNotKeyNotFound(t *testing.T) {
+	st := spkeys.NewK8sStore(fake.NewClientset(), "id-ns", "identity-sp-cert")
+	_, err := st.GetKey(context.Background(), "any")
 	require.Error(t, err)
+	require.NotErrorIs(t, err, spkeys.ErrKeyNotFound, "a missing Secret must not read as a missing key")
+}
+
+func TestK8sStore_DeleteKey(t *testing.T) {
+	cs := fake.NewClientset(seedSecret("id-ns", "identity-sp-cert"))
+	st := spkeys.NewK8sStore(cs, "id-ns", "identity-sp-cert")
+	ctx := context.Background()
+	require.NoError(t, st.PutKey(ctx, "a", []byte("1")))
+	require.NoError(t, st.PutKey(ctx, "b", []byte("2")))
+
+	require.NoError(t, st.DeleteKey(ctx, "a"))
+	require.NoError(t, st.DeleteKey(ctx, "never-there"))
+
+	_, err := st.GetKey(ctx, "a")
+	require.ErrorIs(t, err, spkeys.ErrKeyNotFound)
+	got, err := st.GetKey(ctx, "b")
+	require.NoError(t, err)
+	require.Equal(t, []byte("2"), got)
 }
 
 // TestK8sStore_OverlappingKeysCoexist proves the graceful-rotation invariant at

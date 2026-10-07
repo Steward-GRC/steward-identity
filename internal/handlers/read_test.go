@@ -83,8 +83,14 @@ func newTestStore(t *testing.T) *store.Store {
 	if err := ob.Migrate(ctx, db); err != nil {
 		t.Fatalf("outbox migrate: %v", err)
 	}
-	return store.New(db, ob)
+	st := store.New(db, ob)
+	testDSNs.Store(st, testDSN)
+	return st
 }
+
+// testDSNs maps each Store newTestStore returned to its database, so a test
+// can read every row back raw (dumpDatabase).
+var testDSNs sync.Map
 
 var (
 	containerOnce sync.Once

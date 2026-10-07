@@ -141,8 +141,8 @@ func (p *Client) buildCreateForm(tenant string, spec ConnectionSpec) (url.Values
 		if clientID := spec.Config["clientId"]; clientID != "" {
 			form.Set("oidcClientId", clientID)
 		}
-		if spec.SecretRef != "" {
-			form.Set("oidcClientSecret", spec.SecretRef)
+		if spec.ClientSecret != "" {
+			form.Set("oidcClientSecret", spec.ClientSecret)
 		}
 	default: // saml
 		if raw := spec.Config["rawMetadata"]; strings.TrimSpace(raw) != "" {
@@ -162,6 +162,31 @@ func (p *Client) buildCreateForm(tenant string, spec ConnectionSpec) (url.Values
 		}
 	}
 	return form, nil
+}
+
+// UpdateOIDCSecret replaces an OIDC connection's client secret. Polis
+// addresses the connection by the client id and secret it issued, with tenant
+// and product.
+func (p *Client) UpdateOIDCSecret(ctx context.Context, ref ConnectionRef, clientSecret string) error {
+	if ref.ClientID == "" || ref.ClientSecret == "" {
+		return fmt.Errorf("polis: the connection's client id and secret are required to update it")
+	}
+	tenant := ref.Tenant
+	if tenant == "" {
+		tenant = strings.ToLower(strings.TrimSpace(ref.Domain))
+	}
+	product := ref.Product
+	if product == "" {
+		product = p.product
+	}
+	form := url.Values{}
+	form.Set("clientID", ref.ClientID)
+	form.Set("clientSecret", ref.ClientSecret)
+	form.Set("tenant", tenant)
+	form.Set("product", product)
+	form.Set("oidcClientSecret", clientSecret)
+	_, err := p.do(ctx, http.MethodPatch, nil, strings.NewReader(form.Encode()), "application/x-www-form-urlencoded")
+	return err
 }
 
 // DeleteConnection removes a connection by its client id and secret, or by

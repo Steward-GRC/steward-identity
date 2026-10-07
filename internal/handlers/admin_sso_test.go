@@ -34,15 +34,15 @@ func ssoAdminAuth() *handlers.AdminAuth {
 func TestAddOrganization_HappyPath(t *testing.T) {
 	s := newTestStore(t)
 	f := newPolisFake(t)
-	h := handlers.NewSSOAdminHandler(s, f.provisioner(), ssoAdminAuth())
+	h := handlers.NewSSOAdminHandler(s, f.provisioner(), ssoAdminAuth()).WithPolisSecrets(newFakeSecretStore())
 
 	resp, err := h.AddOrganization(adminCtx(uuid.NewString()), &identityv1.AddOrganizationRequest{
-		OrgName:     "Partner Organisation",
-		Domain:      "partner.example.net",
-		Protocol:    "oidc",
-		DisplayName: "Partner Organisation SSO",
-		Config:      map[string]string{"issuer": "https://idp.partner.example.net", "clientId": "policy"},
-		SecretRef:   "sso/partner/oidc-secret",
+		OrgName:      "Partner Organisation",
+		Domain:       "partner.example.net",
+		Protocol:     "oidc",
+		DisplayName:  "Partner Organisation SSO",
+		Config:       map[string]string{"issuer": "https://idp.partner.example.net", "clientId": "policy"},
+		ClientSecret: "partner-oidc-secret",
 	})
 	if err != nil {
 		t.Fatalf("AddOrganization: %v", err)

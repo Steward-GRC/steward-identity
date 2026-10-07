@@ -230,20 +230,32 @@ func run(ctx context.Context, logger log.Logger) error {
 	ssoH := handlers.NewSSOAdminHandler(s, polis.New(polis.Config{
 		BaseURL: cfg.Polis.AdminURL, APIKey: cfg.Polis.APIKey, Product: cfg.Polis.Product, GatewayBaseURL: cfg.Polis.GatewayBaseURL,
 	}), auth).WithSSOEventPublisher(ssoEvents).WithVerifyTXTPrefix(cfg.VerifyTXTPrefix)
-	if cfg.SPCert.Namespace == "" {
-		logger.Warn("SP_CERT_NAMESPACE is not set: SAML signing certificates are off")
+	var cs kubernetes.Interface
+	if cfg.SPCert.Namespace == "" && cfg.SPCert.PolisSecretNamespace == "" {
+		logger.Warn("SP_CERT_NAMESPACE and POLIS_SECRET_NAMESPACE are not set: SAML signing certificates and stored OIDC client secrets are off")
 	} else if rc, err := rest.InClusterConfig(); err != nil {
-		logger.Warn("no in-cluster config: SAML signing certificates are off", log.F("error", err.Error()))
-	} else if cs, err := kubernetes.NewForConfig(rc); err != nil {
-		logger.Warn("kubernetes client: SAML signing certificates are off", log.F("error", err.Error()))
+		logger.Warn("no in-cluster config: SAML signing certificates and stored OIDC client secrets are off", log.F("error", err.Error()))
+	} else if c, err := kubernetes.NewForConfig(rc); err != nil {
+		logger.Warn("kubernetes client: SAML signing certificates and stored OIDC client secrets are off", log.F("error", err.Error()))
 	} else {
-		ssoH = ssoH.WithPolisSecrets(spkeys.NewK8sStore(cs, cfg.SPCert.Namespace, cfg.SPCert.PolisSecretName))
+		cs = c
+	}
+	if cs != nil && cfg.SPCert.PolisSecretNamespace != "" {
+		ssoH = ssoH.WithPolisSecrets(spkeys.NewK8sStore(cs, cfg.SPCert.PolisSecretNamespace, cfg.SPCert.PolisSecretName))
+		logger.Info("polis secrets store on", log.F("namespace", cfg.SPCert.PolisSecretNamespace), log.F("secret", cfg.SPCert.PolisSecretName))
+	}
+	if cs != nil && cfg.SPCert.Namespace == "" {
+		logger.Warn("SP_CERT_NAMESPACE is not set: SAML signing certificates are off")
+	} else if cs != nil {
 		sp := handlers.NewSPCertService(spkeys.NewK8sStore(cs, cfg.SPCert.Namespace, cfg.SPCert.SecretName), s,
 			time.Duration(cfg.SPCert.TTLDays)*24*time.Hour, time.Duration(cfg.SPCert.OverlapHours)*time.Hour)
 		if err := sp.EnsureInitial(ctx); err != nil {
 			logger.Warn("SAML signing certificate not ready", log.F("error", err.Error()))
 		}
 		ssoH = ssoH.WithSPCert(sp)
+	}
+	if _, err := ssoH.ClearUnresolvableSecretRefs(ctx); err != nil {
+		logger.Warn("sso: secret reference sweep did not finish; it runs again at the next start", log.F("error", err.Error()))
 	}
 	var callerAuth *server.Auth
 	if cfg.WorkloadAuthEnabled {

@@ -1805,9 +1805,14 @@ type Organization struct {
 	JitEnabled bool `protobuf:"varint,10,opt,name=jit_enabled,json=jitEnabled,proto3" json:"jit_enabled,omitempty"`
 	// When true, the organisation's users may also sign in with a local
 	// password.
-	AllowLocal    bool `protobuf:"varint,11,opt,name=allow_local,json=allowLocal,proto3" json:"allow_local,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	AllowLocal bool `protobuf:"varint,11,opt,name=allow_local,json=allowLocal,proto3" json:"allow_local,omitempty"`
+	// True when the stored client secret reference was cleared because it
+	// wasn't a key reference (an older row that held the secret itself). An
+	// admin must enter the client secret again; sign-in through Polis keeps
+	// working meanwhile.
+	SecretReentryRequired bool `protobuf:"varint,12,opt,name=secret_reentry_required,json=secretReentryRequired,proto3" json:"secret_reentry_required,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *Organization) Reset() {
@@ -1913,6 +1918,13 @@ func (x *Organization) GetJitEnabled() bool {
 func (x *Organization) GetAllowLocal() bool {
 	if x != nil {
 		return x.AllowLocal
+	}
+	return false
+}
+
+func (x *Organization) GetSecretReentryRequired() bool {
+	if x != nil {
+		return x.SecretReentryRequired
 	}
 	return false
 }
@@ -2206,7 +2218,7 @@ const file_steward_identity_v1_types_proto_rawDesc = "" +
 	"\x05items\x18\x03 \x03(\v2,.steward.identity.v1.UserDeletionPreviewItemR\x05items\x12D\n" +
 	"\bwarnings\x18\x04 \x03(\v2(.steward.identity.v1.UserDeletionWarningR\bwarnings\x12#\n" +
 	"\rblocks_delete\x18\x05 \x01(\bR\fblocksDelete\x123\n" +
-	"\x15locally_authenticable\x18\x06 \x01(\bR\x14locallyAuthenticable\"\xe9\x02\n" +
+	"\x15locally_authenticable\x18\x06 \x01(\bR\x14locallyAuthenticable\"\xa1\x03\n" +
 	"\fOrganization\x12\x16\n" +
 	"\x06domain\x18\x01 \x01(\tR\x06domain\x12\x19\n" +
 	"\borg_name\x18\x02 \x01(\tR\aorgName\x12\x1a\n" +
@@ -2222,7 +2234,8 @@ const file_steward_identity_v1_types_proto_rawDesc = "" +
 	" \x01(\bR\n" +
 	"jitEnabled\x12\x1f\n" +
 	"\vallow_local\x18\v \x01(\bR\n" +
-	"allowLocal\"\x9e\x01\n" +
+	"allowLocal\x126\n" +
+	"\x17secret_reentry_required\x18\f \x01(\bR\x15secretReentryRequired\"\x9e\x01\n" +
 	"\fGroupMapping\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
 	"\rconnection_id\x18\x02 \x01(\tR\fconnectionId\x121\n" +

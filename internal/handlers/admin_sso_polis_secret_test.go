@@ -15,6 +15,7 @@ import (
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
 	"github.com/Steward-GRC/steward-identity/internal/handlers"
 	"github.com/Steward-GRC/steward-identity/internal/sso/polis"
+	"github.com/Steward-GRC/steward-identity/internal/sso/spkeys"
 )
 
 // fakeSecretStore is an in-memory spkeys.Store: the out-of-band secret store,
@@ -49,9 +50,29 @@ func (f *fakeSecretStore) GetKey(_ context.Context, k string) ([]byte, error) {
 	}
 	v, ok := f.data[k]
 	if !ok {
-		return nil, fmt.Errorf("no key %q", k)
+		return nil, fmt.Errorf("no key %q: %w", k, spkeys.ErrKeyNotFound)
 	}
 	return v, nil
+}
+
+func (f *fakeSecretStore) DeleteKey(_ context.Context, k string) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.err != nil {
+		return f.err
+	}
+	delete(f.data, k)
+	return nil
+}
+
+func (f *fakeSecretStore) keys() []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	out := make([]string, 0, len(f.data))
+	for k := range f.data {
+		out = append(out, k)
+	}
+	return out
 }
 
 // addPolisOrg onboards one SAML org through the Polis provisioner and returns

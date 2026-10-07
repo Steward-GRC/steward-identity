@@ -30,6 +30,7 @@ type polisFake struct {
 	srv *httptest.Server
 
 	createForm  map[string]string
+	patchForm   map[string]string
 	deleteQuery map[string]string
 	failCreate  bool
 }
@@ -51,6 +52,11 @@ func newPolisFake(t *testing.T) *polisFake {
 			}
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = io.WriteString(w, `{"clientID":"CID-abc","clientSecret":"CSEC-xyz"}`)
+		case http.MethodPatch:
+			body, _ := io.ReadAll(r.Body)
+			vals, _ := url.ParseQuery(string(body))
+			f.patchForm = flatten(vals)
+			w.WriteHeader(http.StatusNoContent)
 		case http.MethodDelete:
 			f.deleteQuery = flatten(r.URL.Query())
 			w.WriteHeader(http.StatusOK)
@@ -225,7 +231,7 @@ func TestAddOrganization_PolisFailureDoesNotHalfCreate(t *testing.T) {
 func TestChangeOrgProtocol_PolisRecreatesByTenantAndClientID(t *testing.T) {
 	s := newTestStore(t)
 	f := newPolisFake(t)
-	h := handlers.NewSSOAdminHandler(s, f.provisioner(), ssoAdminAuth())
+	h := handlers.NewSSOAdminHandler(s, f.provisioner(), ssoAdminAuth()).WithPolisSecrets(newFakeSecretStore())
 
 	added, err := h.AddOrganization(adminCtx(uuid.NewString()), &identityv1.AddOrganizationRequest{
 		OrgName:  "SwitchCo",
@@ -242,10 +248,10 @@ func TestChangeOrgProtocol_PolisRecreatesByTenantAndClientID(t *testing.T) {
 	require.NotEmpty(t, alias)
 
 	resp, err := h.ChangeOrgProtocol(adminCtx(uuid.NewString()), &identityv1.ChangeOrgProtocolRequest{
-		Domain:    "switchco.example.net",
-		Protocol:  "oidc",
-		Config:    map[string]string{"issuer": "https://idp.switch.example.net", "clientId": "policy"},
-		SecretRef: "sso/switchco/oidc-secret",
+		Domain:       "switchco.example.net",
+		Protocol:     "oidc",
+		Config:       map[string]string{"issuer": "https://idp.switch.example.net", "clientId": "policy"},
+		ClientSecret: "switchco-oidc-secret",
 	})
 	require.NoError(t, err)
 
