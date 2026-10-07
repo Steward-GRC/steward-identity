@@ -46,6 +46,8 @@ import (
 
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
 	corev1 "github.com/Steward-GRC/steward-identity/gen/go/thirdparty/core/v1"
+	obligationsv1 "github.com/Steward-GRC/steward-identity/gen/go/thirdparty/obligations/v1"
+	workflowv1 "github.com/Steward-GRC/steward-identity/gen/go/thirdparty/workflow/v1"
 	"github.com/Steward-GRC/steward-identity/internal/cache"
 	"github.com/Steward-GRC/steward-identity/internal/config"
 	"github.com/Steward-GRC/steward-identity/internal/email"
@@ -197,10 +199,33 @@ func run(ctx context.Context, logger log.Logger) error {
 	} else {
 		logger.Warn("CORE_GRPC_ADDR is not set: deletes and merges are refused")
 	}
-	// Workflow and obligations aren't pinned yet: until they are, the
-	// approval check and the acknowledgement and workflow merge steps report
-	// unavailable, so deletes and merges refuse rather than strand records.
-	adminH.WithMerge(merge.New(s, core, nil, nil, sessions))
+	// An unset callee leaves its client nil: the approval check and the merge
+	// steps that need it report unavailable, so deletes and merges refuse
+	// rather than strand records.
+	var workflow merge.WorkflowClient
+	if cfg.WorkflowGRPCAddr != "" {
+		cc, err := dial(cfg.WorkflowGRPCAddr, cfg.TLS, cfg.TokenFile)
+		if err != nil {
+			return fmt.Errorf("dial workflow: %w", err)
+		}
+		defer func() { _ = cc.Close() }()
+		adminH.WithApprovalLister(userdelete.NewGRPCApprovalLister(workflowv1.NewWorkflowServiceClient(cc)))
+		workflow = merge.NewGRPCWorkflow(workflowv1.NewWorkflowServiceClient(cc))
+	} else {
+		logger.Warn("WORKFLOW_GRPC_ADDR is not set: deletes and merges are refused")
+	}
+	var acks merge.AckClient
+	if cfg.ObligationsGRPCAddr != "" {
+		cc, err := dial(cfg.ObligationsGRPCAddr, cfg.TLS, cfg.TokenFile)
+		if err != nil {
+			return fmt.Errorf("dial obligations: %w", err)
+		}
+		defer func() { _ = cc.Close() }()
+		acks = merge.NewGRPCAck(obligationsv1.NewAckServiceClient(cc))
+	} else {
+		logger.Warn("OBLIGATIONS_GRPC_ADDR is not set: merges are refused")
+	}
+	adminH.WithMerge(merge.New(s, core, acks, workflow, sessions))
 
 	ssoH := handlers.NewSSOAdminHandler(s, polis.New(polis.Config{
 		BaseURL: cfg.Polis.AdminURL, APIKey: cfg.Polis.APIKey, Product: cfg.Polis.Product, GatewayBaseURL: cfg.Polis.GatewayBaseURL,

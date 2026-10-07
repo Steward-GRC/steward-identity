@@ -7,6 +7,8 @@ import (
 	"context"
 
 	corev1 "github.com/Steward-GRC/steward-identity/gen/go/thirdparty/core/v1"
+	obligationsv1 "github.com/Steward-GRC/steward-identity/gen/go/thirdparty/obligations/v1"
+	workflowv1 "github.com/Steward-GRC/steward-identity/gen/go/thirdparty/workflow/v1"
 )
 
 // grpcCore adapts the generated core PolicyServiceClient to CoreClient.
@@ -77,4 +79,65 @@ func (g *grpcCore) ReassignUserPolicies(ctx context.Context, fromUserID, toUserI
 		return nil, 0, 0, err
 	}
 	return resp.GetReassignedPolicyIds(), int(resp.GetReassignedOwnerCount()), int(resp.GetReassignedAuthorGrants()), nil
+}
+
+// grpcAck adapts the generated obligations AckServiceClient to AckClient.
+type grpcAck struct {
+	c obligationsv1.AckServiceClient
+}
+
+// NewGRPCAck wraps an obligations AckServiceClient as an AckClient.
+func NewGRPCAck(c obligationsv1.AckServiceClient) AckClient { return &grpcAck{c: c} }
+
+var ackResolutions = map[obligationsv1.AckTransferResolution]string{
+	obligationsv1.AckTransferResolution_ACK_TRANSFER_RESOLUTION_MOVED:         "moved",
+	obligationsv1.AckTransferResolution_ACK_TRANSFER_RESOLUTION_KEPT_EARLIEST: "kept_earliest",
+	obligationsv1.AckTransferResolution_ACK_TRANSFER_RESOLUTION_TARGET_KEPT:   "target_kept",
+}
+
+func (g *grpcAck) TransferAcknowledgments(ctx context.Context, sourceUserID, targetUserID, actorUserID string, dryRun bool, mergeOperationID string) (int, int, []AckItem, error) {
+	resp, err := g.c.TransferAcknowledgments(ctx, &obligationsv1.TransferAcknowledgmentsRequest{
+		SourceUserId:     sourceUserID,
+		TargetUserId:     targetUserID,
+		ActorUserId:      actorUserID,
+		DryRun:           dryRun,
+		MergeOperationId: mergeOperationID,
+	})
+	if err != nil {
+		return 0, 0, nil, err
+	}
+	items := make([]AckItem, 0, len(resp.GetItems()))
+	for _, it := range resp.GetItems() {
+		item := AckItem{PolicyVersionID: it.GetPolicyVersionId(), Resolution: ackResolutions[it.GetResolution()]}
+		if it.GetSourceAckedAt() != nil {
+			item.SourceAckedAt = it.GetSourceAckedAt().AsTime()
+		}
+		if it.GetTargetAckedAt() != nil {
+			item.TargetAckedAt = it.GetTargetAckedAt().AsTime()
+		}
+		items = append(items, item)
+	}
+	return int(resp.GetMoved()), int(resp.GetDeduped()), items, nil
+}
+
+// grpcWorkflow adapts the generated WorkflowServiceClient to WorkflowClient.
+type grpcWorkflow struct {
+	c workflowv1.WorkflowServiceClient
+}
+
+// NewGRPCWorkflow wraps a WorkflowServiceClient as a WorkflowClient.
+func NewGRPCWorkflow(c workflowv1.WorkflowServiceClient) WorkflowClient { return &grpcWorkflow{c: c} }
+
+func (g *grpcWorkflow) ReassignUserWorkflowItems(ctx context.Context, fromUserID, toUserID, actorUserID string, dryRun bool, mergeOperationID string) (int, int, int, error) {
+	resp, err := g.c.ReassignUserWorkflowItems(ctx, &workflowv1.ReassignUserWorkflowItemsRequest{
+		FromUserId:       fromUserID,
+		ToUserId:         toUserID,
+		ActorUserId:      actorUserID,
+		DryRun:           dryRun,
+		MergeOperationId: mergeOperationID,
+	})
+	if err != nil {
+		return 0, 0, 0, err
+	}
+	return int(resp.GetAssignmentsReassigned()), int(resp.GetAssignmentsDeduped()), int(resp.GetRunsReassigned()), nil
 }

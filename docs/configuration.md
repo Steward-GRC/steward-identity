@@ -98,6 +98,8 @@ A method no caller uses is refused to everyone.
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `CORE_GRPC_ADDR` | empty | steward-core, for merge and the delete checks. Empty makes those checks fail closed with `USER_DELETE_CHECKS_UNAVAILABLE`. |
+| `WORKFLOW_GRPC_ADDR` | empty | steward-workflow, for the delete's approval check and re-pointing approvals in a merge. Empty makes both fail closed. |
+| `OBLIGATIONS_GRPC_ADDR` | empty | steward-obligations, for moving acknowledgements in a merge. Empty makes merges fail closed. |
 | `REDIS_ADDR`, `REDIS_PASSWORD` | empty | Valkey or Redis for the identity provider group cache. Off when unset. |
 | `IDP_GROUPS_CACHE_TTL` | `1m` | How long a user's cached groups are kept. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_TLS`, `SMTP_TLS_INSECURE` | go-email's local defaults | The relay one-time codes go through. |
