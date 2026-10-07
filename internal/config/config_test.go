@@ -58,6 +58,8 @@ func TestLoadDefaults(t *testing.T) {
 	require.Equal(t, 365, c.SPCert.TTLDays)
 	require.Equal(t, 48, c.SPCert.OverlapHours)
 	require.Empty(t, c.CoreGRPCAddr, "the core checks fail closed until core is configured")
+	require.Empty(t, c.WorkflowGRPCAddr, "the approval check and the merge fail closed until workflow is configured")
+	require.Empty(t, c.ObligationsGRPCAddr, "the merge fails closed until obligations is configured")
 }
 
 func TestLoadReadsEverySetting(t *testing.T) {
@@ -81,7 +83,8 @@ func TestLoadReadsEverySetting(t *testing.T) {
 		"WEBAUTHN_RP_NAME": "Example", "WEBAUTHN_USER_VERIFICATION": "required",
 		"VERIFY_TXT_PREFIX": "example-verify", "DOMAIN_RECHECK_INTERVAL": "1h",
 		"SP_CERT_SECRET_NAME": "sp", "SP_CERT_NAMESPACE": "steward", "POLIS_SECRET_NAME": "ps", "SP_CERT_TTL_DAYS": "30", "SP_CERT_OVERLAP_HOURS": "12",
-		"CORE_GRPC_ADDR": "core.example.org:9090",
+		"CORE_GRPC_ADDR": "core.example.org:9090", "WORKFLOW_GRPC_ADDR": "workflow.example.org:9090",
+		"OBLIGATIONS_GRPC_ADDR": "obligations.example.org:9090",
 	} {
 		m[k] = v
 	}
@@ -113,6 +116,8 @@ func TestLoadReadsEverySetting(t *testing.T) {
 	require.Equal(t, time.Hour, c.DomainRecheckInterval)
 	require.Equal(t, SPCert{SecretName: "sp", Namespace: "steward", PolisSecretName: "ps", TTLDays: 30, OverlapHours: 12}, c.SPCert)
 	require.Equal(t, "core.example.org:9090", c.CoreGRPCAddr)
+	require.Equal(t, "workflow.example.org:9090", c.WorkflowGRPCAddr)
+	require.Equal(t, "obligations.example.org:9090", c.ObligationsGRPCAddr)
 }
 
 func TestLoadNeedsTheDatabaseAndTheBroker(t *testing.T) {

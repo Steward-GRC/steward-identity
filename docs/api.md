@@ -63,8 +63,11 @@ generates stubs under `gen/go/thirdparty/`.
 | --- | --- | --- |
 | steward-core | `STEWARD_CORE_REF` | merge (re-own policies), the delete checks (purge category rules) and the delete preview (owned policies, rules a delete would remove) |
 | steward-audit | `STEWARD_AUDIT_REF` | the `AuditEvent` message published to the `audit` exchange |
-| steward-workflow | not pinned yet | pending approvals (the delete refusal) and re-pointing approvals in a merge; until pinned these report unavailable and deletes and merges refuse |
-| steward-obligations | not pinned yet | moving acknowledgements in a merge; until pinned merges refuse |
+| steward-workflow | `STEWARD_WORKFLOW_REF` | pending approvals (the delete refusal and the delete preview, `ListPendingTasks`) and re-pointing approvals in a merge (`ReassignUserWorkflowItems`) |
+| steward-obligations | `STEWARD_OBLIGATIONS_REF` | moving acknowledgements in a merge and its preview (`TransferAcknowledgments`) |
+
+A callee whose address isn't set is treated as unavailable: the delete checks answer
+`USER_DELETE_CHECKS_UNAVAILABLE` and merges refuse, rather than strand records.
 
 Every outbound connection carries identity's own workload token (`WORKLOAD_TOKEN_FILE`) and the
 caller and the act-as admin (go-grpc-actor's client interceptors).

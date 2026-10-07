@@ -101,6 +101,12 @@ type Config struct {
 	// CoreGRPCAddr is steward-core, for merge and the delete checks. Empty
 	// makes those checks fail closed.
 	CoreGRPCAddr string
+	// WorkflowGRPCAddr is steward-workflow, for the delete's approval check
+	// and re-pointing approvals in a merge. Empty makes both fail closed.
+	WorkflowGRPCAddr string
+	// ObligationsGRPCAddr is steward-obligations, for moving acknowledgements
+	// in a merge. Empty makes the merge fail closed.
+	ObligationsGRPCAddr string
 }
 
 // Load reads the settings through getenv (os.Getenv in production).
@@ -163,7 +169,9 @@ func Load(getenv func(string) string) (Config, error) {
 		SPCert: SPCert{SecretName: or("SP_CERT_SECRET_NAME", "identity-sp-cert"), Namespace: or("SP_CERT_NAMESPACE", getenv("POD_NAMESPACE")),
 			PolisSecretName: or("POLIS_SECRET_NAME", "identity-polis-secrets"),
 			TTLDays:         integer("SP_CERT_TTL_DAYS", 365), OverlapHours: integer("SP_CERT_OVERLAP_HOURS", 48)},
-		CoreGRPCAddr: getenv("CORE_GRPC_ADDR"),
+		CoreGRPCAddr:        getenv("CORE_GRPC_ADDR"),
+		WorkflowGRPCAddr:    getenv("WORKFLOW_GRPC_ADDR"),
+		ObligationsGRPCAddr: getenv("OBLIGATIONS_GRPC_ADDR"),
 	}
 	c.MigrateDSN = or("MIGRATE_DSN", c.DatabaseDSN)
 

@@ -3,8 +3,8 @@
 # proto-refs.env. The callee protos are fetched into .protos/ (git-ignored) and
 # never committed; only the generated stubs are.
 #
-# STEWARD_AUDIT_PROTO_DIR and STEWARD_CORE_PROTO_DIR point at a local proto/
-# directory instead, for trying an unmerged proto change.
+# STEWARD_AUDIT_PROTO_DIR, STEWARD_CORE_PROTO_DIR, STEWARD_OBLIGATIONS_PROTO_DIR
+# and STEWARD_WORKFLOW_PROTO_DIR point at a local proto/ directory instead, for trying an unmerged proto change.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -39,6 +39,8 @@ fetch() {
 
 fetch steward-audit "$STEWARD_AUDIT_REF" "${STEWARD_AUDIT_PROTO_DIR:-}" steward/audit
 fetch steward-core "$STEWARD_CORE_REF" "${STEWARD_CORE_PROTO_DIR:-}" steward/core
+fetch steward-obligations "$STEWARD_OBLIGATIONS_REF" "${STEWARD_OBLIGATIONS_PROTO_DIR:-}" steward/obligations
+fetch steward-workflow "$STEWARD_WORKFLOW_REF" "${STEWARD_WORKFLOW_PROTO_DIR:-}" steward/workflow
 
 cd "$root"
 buf generate

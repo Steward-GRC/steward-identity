@@ -78,8 +78,8 @@ refused during act-as with `ACT_AS_FORBIDDEN`.
 | `Unauthenticated: no workload token` or `workload token rejected` | The caller sent no token, or one with the wrong audience, issuer or expiry, or from a service account outside `WORKLOAD_ALLOWED_SERVICEACCOUNTS`. Check the caller's `WORKLOAD_TOKEN_FILE` mount and identity's allow-list. |
 | `PermissionDenied: caller not allowed on this method` | A verified caller isn't listed for the method; the refusal is audited as `rpc.denied`. |
 | `identity-admin` is refused | The CLI certificate's SPIFFE ID must equal `IDENTITY_ADMIN_CLI_ID`, `AUDIT_USER` must be set, and `WORKLOAD_TOKEN_FILE` must name the pod's projected token. |
-| `USER_DELETE_CHECKS_UNAVAILABLE` naming `approval_check` | Expected until steward-workflow is pinned: deletes stay refused rather than strand approvals. Disable the account to lock the user out. |
-| Merge answers that a service isn't configured | Expected until steward-workflow and steward-obligations are pinned. |
+| `USER_DELETE_CHECKS_UNAVAILABLE` naming `approval_check` | `WORKFLOW_GRPC_ADDR` is unset or steward-workflow didn't answer: deletes stay refused rather than strand approvals. Disable the account to lock the user out. |
+| Merge answers that a service isn't configured | `WORKFLOW_GRPC_ADDR` or `OBLIGATIONS_GRPC_ADDR` is unset. |
 | `SESSIONS_UNAVAILABLE` or `SESSION_REVOKE_UNAVAILABLE` | `KRATOS_ADMIN_URL` and `steward-depstate-kratos`. Nothing was revoked. |
 | `SSO_PROVIDER_UNREACHABLE` | `POLIS_ADMIN_URL`, `POLIS_API_KEY` and `steward-depstate-polis`; the log line with the same trace id has the cause. |
 | No events reach audit | `steward-depstate-rabbitmq`, then the `audit` exchange and its binding; rows waiting in `audit_outbox` with status `pending` or `dead`. |

@@ -6,6 +6,8 @@ modules:
   - path: proto
   - path: .protos/steward-audit
   - path: .protos/steward-core
+  - path: .protos/steward-obligations
+  - path: .protos/steward-workflow
 lint:
   use: [STANDARD]
 breaking:
