@@ -140,9 +140,9 @@ func (s *Store) GetIdPConnection(ctx context.Context, id uuid.UUID) (IdPConnecti
 	var c IdPConnection
 	var rawConfig []byte
 	err := s.pool.QueryRow(ctx,
-		`SELECT id, org_name, protocol, connection_alias, display_name, config, secret_ref, enabled, jit_enabled, allow_local, test_passed_at, created_at, updated_at
+		`SELECT id, org_name, protocol, connection_alias, display_name, config, secret_ref, secret_reentry_required, enabled, jit_enabled, allow_local, test_passed_at, created_at, updated_at
 		 FROM idp_connections WHERE id = $1`, id).
-		Scan(&c.ID, &c.OrgName, &c.Protocol, &c.ConnectionAlias, &c.DisplayName, &rawConfig, &c.SecretRef, &c.Enabled, &c.JitEnabled, &c.AllowLocal, &c.TestPassedAt, &c.CreatedAt, &c.UpdatedAt)
+		Scan(&c.ID, &c.OrgName, &c.Protocol, &c.ConnectionAlias, &c.DisplayName, &rawConfig, &c.SecretRef, &c.SecretReentryRequired, &c.Enabled, &c.JitEnabled, &c.AllowLocal, &c.TestPassedAt, &c.CreatedAt, &c.UpdatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return IdPConnection{}, ErrNotFound
 	}
@@ -165,9 +165,9 @@ func (s *Store) GetIdPConnectionByAlias(ctx context.Context, alias string) (IdPC
 	var c IdPConnection
 	var rawConfig []byte
 	err := s.pool.QueryRow(ctx,
-		`SELECT id, org_name, protocol, connection_alias, display_name, config, secret_ref, enabled, jit_enabled, allow_local, test_passed_at, created_at, updated_at
+		`SELECT id, org_name, protocol, connection_alias, display_name, config, secret_ref, secret_reentry_required, enabled, jit_enabled, allow_local, test_passed_at, created_at, updated_at
 		 FROM idp_connections WHERE connection_alias = $1`, alias).
-		Scan(&c.ID, &c.OrgName, &c.Protocol, &c.ConnectionAlias, &c.DisplayName, &rawConfig, &c.SecretRef, &c.Enabled, &c.JitEnabled, &c.AllowLocal, &c.TestPassedAt, &c.CreatedAt, &c.UpdatedAt)
+		Scan(&c.ID, &c.OrgName, &c.Protocol, &c.ConnectionAlias, &c.DisplayName, &rawConfig, &c.SecretRef, &c.SecretReentryRequired, &c.Enabled, &c.JitEnabled, &c.AllowLocal, &c.TestPassedAt, &c.CreatedAt, &c.UpdatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return IdPConnection{}, ErrNotFound
 	}

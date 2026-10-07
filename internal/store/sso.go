@@ -55,8 +55,13 @@ type IdPConnection struct {
 	ConnectionAlias string
 	DisplayName     string
 	Config          map[string]any
-	SecretRef       string
-	Enabled         bool
+	// SecretRef names the key holding the OIDC client secret in the Polis
+	// secrets Kubernetes Secret; never the secret itself.
+	SecretRef string
+	// SecretReentryRequired is set when a SecretRef that wasn't a key
+	// reference was cleared; an admin must enter the client secret again.
+	SecretReentryRequired bool
+	Enabled               bool
 	// JitEnabled controls whether a first-seen SSO user is JIT-provisioned on
 	// the SSO callback. Defaults true; when false an unknown SSO
 	// email fails closed instead of being auto-created.
@@ -300,9 +305,9 @@ func (s *Store) CreateIdPConnection(ctx context.Context, c IdPConnection) (IdPCo
 	err = s.pool.QueryRow(ctx,
 		`INSERT INTO idp_connections (org_name, protocol, connection_alias, display_name, config, secret_ref)
 		 VALUES ($1,$2,$3,$4,$5::jsonb,$6)
-		 RETURNING id, enabled, jit_enabled, allow_local, test_passed_at, created_at, updated_at`,
+		 RETURNING id, secret_reentry_required, enabled, jit_enabled, allow_local, test_passed_at, created_at, updated_at`,
 		c.OrgName, c.Protocol, c.ConnectionAlias, c.DisplayName, rawConfig, c.SecretRef).
-		Scan(&c.ID, &c.Enabled, &c.JitEnabled, &c.AllowLocal, &c.TestPassedAt, &c.CreatedAt, &c.UpdatedAt)
+		Scan(&c.ID, &c.SecretReentryRequired, &c.Enabled, &c.JitEnabled, &c.AllowLocal, &c.TestPassedAt, &c.CreatedAt, &c.UpdatedAt)
 	if err != nil {
 		return IdPConnection{}, mapPgError(err, ErrConflict)
 	}
@@ -428,10 +433,66 @@ func (s *Store) UpdateIdPConnectionProtocol(ctx context.Context, id uuid.UUID, p
 		return fmt.Errorf("marshal config: %w", err)
 	}
 	tag, err := s.pool.Exec(ctx,
-		`UPDATE idp_connections SET protocol=$2, config=$3::jsonb, secret_ref=$4, updated_at=now() WHERE id=$1`,
+		`UPDATE idp_connections SET protocol=$2, config=$3::jsonb, secret_ref=$4, secret_reentry_required=FALSE, updated_at=now() WHERE id=$1`,
 		id, protocol, rawConfig, secretRef)
 	if err != nil {
 		return mapPgError(err, ErrInvalid)
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+// SetIdPConnectionSecretRef points a connection at the key now holding its
+// client secret and clears the re-entry flag. ErrNotFound when no such row
+// exists.
+func (s *Store) SetIdPConnectionSecretRef(ctx context.Context, id uuid.UUID, secretRef string) error {
+	tag, err := s.pool.Exec(ctx,
+		`UPDATE idp_connections SET secret_ref=$2, secret_reentry_required=FALSE, updated_at=now() WHERE id=$1`,
+		id, secretRef)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+// IdPSecretRef is one connection's stored secret reference.
+type IdPSecretRef struct {
+	ID        uuid.UUID
+	SecretRef string
+}
+
+// ListIdPConnectionSecretRefs returns every connection with a non-empty
+// secret_ref.
+func (s *Store) ListIdPConnectionSecretRefs(ctx context.Context) ([]IdPSecretRef, error) {
+	rows, err := s.pool.Query(ctx, `SELECT id, secret_ref FROM idp_connections WHERE secret_ref <> ''`)
+	if err != nil {
+		return nil, fmt.Errorf("list idp secret refs: %w", err)
+	}
+	defer rows.Close()
+	var out []IdPSecretRef
+	for rows.Next() {
+		var r IdPSecretRef
+		if err := rows.Scan(&r.ID, &r.SecretRef); err != nil {
+			return nil, fmt.Errorf("scan idp secret ref: %w", err)
+		}
+		out = append(out, r)
+	}
+	return out, rows.Err()
+}
+
+// ClearIdPConnectionSecretRef empties a connection's secret_ref and marks it
+// as needing its client secret entered again. ErrNotFound when no such row
+// exists.
+func (s *Store) ClearIdPConnectionSecretRef(ctx context.Context, id uuid.UUID) error {
+	tag, err := s.pool.Exec(ctx,
+		`UPDATE idp_connections SET secret_ref='', secret_reentry_required=TRUE, updated_at=now() WHERE id=$1`, id)
+	if err != nil {
+		return err
 	}
 	if tag.RowsAffected() == 0 {
 		return ErrNotFound

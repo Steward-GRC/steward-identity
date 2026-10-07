@@ -137,6 +137,7 @@ type SSOAdminHandler struct {
 // *polis.Client implements it. CreateConnection is all or nothing.
 type ssoProvisioner interface {
 	CreateConnection(ctx context.Context, spec polis.ConnectionSpec) (polis.ConnectionResult, error)
+	UpdateOIDCSecret(ctx context.Context, ref polis.ConnectionRef, clientSecret string) error
 	DeleteConnection(ctx context.Context, ref polis.ConnectionRef) error
 }
 
@@ -257,7 +258,7 @@ func (h *SSOAdminHandler) requireSPCert() error {
 // (compensating action) and NO domain is registered, so a failed provision can
 // never leave a domain routing to sso. Activation (verify + enable + test) is
 // gated by later tasks — the connection stays disabled here.
-func (h *SSOAdminHandler) AddOrganization(ctx context.Context, req *identityv1.AddOrganizationRequest) (*identityv1.AddOrganizationResponse, error) {
+func (h *SSOAdminHandler) AddOrganization(ctx context.Context, req *identityv1.AddOrganizationRequest) (_ *identityv1.AddOrganizationResponse, retErr error) {
 	actor, err := h.auth.Authorize(ctx)
 	if err != nil {
 		return nil, err
@@ -274,6 +275,18 @@ func (h *SSOAdminHandler) AddOrganization(ctx context.Context, req *identityv1.A
 
 	alias := connectionAlias(orgName, domain)
 	reqCfg := req.GetConfig()
+	if err := rejectSecretConfig(reqCfg); err != nil {
+		return nil, err
+	}
+	sec, err := h.prepareClientSecret(ctx, protocol, req.GetSecretRef(), req.GetClientSecret())
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if retErr != nil && sec.owned {
+			h.dropOwnedSecretKey(ctx, sec.ref)
+		}
+	}()
 
 	// 1. Create the connection DISABLED (the store enforces enabled=false). The
 	// config JSONB starts as the raw (non-secret) wizard settings; a provisioning
@@ -285,7 +298,7 @@ func (h *SSOAdminHandler) AddOrganization(ctx context.Context, req *identityv1.A
 		ConnectionAlias: alias,
 		DisplayName:     req.GetDisplayName(),
 		Config:          stringMapToAny(reqCfg),
-		SecretRef:       req.GetSecretRef(),
+		SecretRef:       sec.ref,
 	})
 	if err != nil {
 		return nil, statusFromStoreErr(err)
@@ -297,12 +310,12 @@ func (h *SSOAdminHandler) AddOrganization(ctx context.Context, req *identityv1.A
 	// delete — a failed provision can never leave a domain routing to sso, since
 	// no domain is registered until step 4.
 	result, provErr := h.prov.CreateConnection(ctx, polis.ConnectionSpec{
-		Alias:       alias,
-		DisplayName: req.GetDisplayName(),
-		Protocol:    protocol,
-		Domain:      domain,
-		SecretRef:   req.GetSecretRef(),
-		Config:      reqCfg,
+		Alias:        alias,
+		DisplayName:  req.GetDisplayName(),
+		Protocol:     protocol,
+		Domain:       domain,
+		ClientSecret: sec.value,
+		Config:       reqCfg,
 	})
 	if provErr != nil {
 		// Compensating rollback: delete the DB row so we never half-create. If the
@@ -449,9 +462,10 @@ func (h *SSOAdminHandler) GetOrganization(ctx context.Context, req *identityv1.G
 // supplied, the connection's non-secret config. Both toggles are `optional` on
 // the wire, so an absent toggle leaves the stored value untouched — the admin
 // wizard flips one switch at a time. An empty config map likewise leaves config
-// as-is (secret_ref rotation is not handled here — it stays a separate flow).
-// NotFound when the domain isn't registered; FailedPrecondition when it has no
-// sso connection.
+// as-is; the Polis identifiers on config are always kept. A client_secret or
+// secret_ref replaces an OIDC connection's client secret in Polis first, so a
+// failure there changes nothing. NotFound when the domain isn't registered;
+// FailedPrecondition when it has no sso connection.
 func (h *SSOAdminHandler) UpdateIdPConnection(ctx context.Context, req *identityv1.UpdateIdPConnectionRequest) (*identityv1.UpdateIdPConnectionResponse, error) {
 	if _, err := h.auth.Authorize(ctx); err != nil {
 		return nil, err
@@ -471,6 +485,14 @@ func (h *SSOAdminHandler) UpdateIdPConnection(ctx context.Context, req *identity
 	if err != nil {
 		return nil, statusFromStoreErr(err)
 	}
+	if err := rejectSecretConfig(req.GetConfig()); err != nil {
+		return nil, err
+	}
+	if req.GetSecretRef() != "" || req.GetClientSecret() != "" {
+		if err := h.replaceClientSecret(ctx, conn, domain, req.GetSecretRef(), req.GetClientSecret()); err != nil {
+			return nil, err
+		}
+	}
 	// Per-org login toggles: a nil pointer leaves that toggle unchanged (the
 	// store COALESCEs it against the stored value).
 	if req.JitEnabled != nil || req.AllowLocal != nil {
@@ -480,7 +502,13 @@ func (h *SSOAdminHandler) UpdateIdPConnection(ctx context.Context, req *identity
 	}
 	// Optional non-secret config overwrite; an empty map leaves config untouched.
 	if cfg := req.GetConfig(); len(cfg) > 0 {
-		if err := h.store.UpdateIdPConnectionConfig(ctx, conn.ID, stringMapToAny(cfg)); err != nil {
+		merged := stringMapToAny(cfg)
+		for _, k := range []string{polis.ConfigKeyPolisClientID, polis.ConfigKeyPolisClientSecretRef, polis.ConfigKeyPolisTenant, polis.ConfigKeyPolisProduct} {
+			if v, ok := conn.Config[k]; ok {
+				merged[k] = v
+			}
+		}
+		if err := h.store.UpdateIdPConnectionConfig(ctx, conn.ID, merged); err != nil {
 			return nil, statusFromStoreErr(err)
 		}
 	}
@@ -490,6 +518,48 @@ func (h *SSOAdminHandler) UpdateIdPConnection(ctx context.Context, req *identity
 		return nil, statusFromStoreErr(err)
 	}
 	return &identityv1.UpdateIdPConnectionResponse{Organization: orgToProto(conn, domain, d.Verified)}, nil
+}
+
+// replaceClientSecret swaps an OIDC connection's client secret: Polis first,
+// then the stored reference, then the replaced key if identity owned it.
+func (h *SSOAdminHandler) replaceClientSecret(ctx context.Context, conn store.IdPConnection, domain, secretRef, secret string) (retErr error) {
+	if conn.Protocol != "oidc" {
+		return status.Error(codes.InvalidArgument, "a SAML connection takes no client secret")
+	}
+	polisSecret := h.resolvePolisSecret(ctx, conn)
+	clientID := configString(conn.Config, polis.ConfigKeyPolisClientID)
+	if h.polisSecrets != nil && (polisSecret == "" || clientID == "") {
+		return status.Error(codes.FailedPrecondition, "the connection's Polis credentials aren't stored: change its protocol or add it again to set a new client secret")
+	}
+	sec, err := h.prepareClientSecret(ctx, conn.Protocol, secretRef, secret)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if retErr != nil && sec.owned {
+			h.dropOwnedSecretKey(ctx, sec.ref)
+		}
+	}()
+	if err := h.prov.UpdateOIDCSecret(ctx, polis.ConnectionRef{
+		Domain:       domain,
+		ClientID:     clientID,
+		ClientSecret: polisSecret,
+		Tenant:       configString(conn.Config, polis.ConfigKeyPolisTenant),
+		Product:      configString(conn.Config, polis.ConfigKeyPolisProduct),
+	}, sec.value); err != nil {
+		dbg := logger.Ctx(ctx)
+		dbg.Debug("sso: client secret update in the backend failed", log.F("connection_id", conn.ID.String()), log.F("error", errText(err)))
+		return errcodes.Error(ctx, errcodes.SSOProviderUnreachable(conn.OrgName, err))
+	}
+	if err := h.store.SetIdPConnectionSecretRef(ctx, conn.ID, sec.ref); err != nil {
+		return statusFromStoreErr(err)
+	}
+	if conn.SecretRef != sec.ref {
+		h.dropOwnedSecretKey(ctx, conn.SecretRef)
+	}
+	lg := logger.Ctx(ctx)
+	lg.Info("sso: client secret replaced", log.F("connection_id", conn.ID.String()))
+	return nil
 }
 
 // ChangeOrgProtocol switches an existing org's IdP protocol (SAML<->OIDC) and
@@ -504,7 +574,7 @@ func (h *SSOAdminHandler) UpdateIdPConnection(ctx context.Context, req *identity
 // mid-re-provision can never leave the org enabled and routing to a
 // half-provisioned IdP: at worst it lands disabled + unverified (the "start"
 // state), which is exactly the intended destination.
-func (h *SSOAdminHandler) ChangeOrgProtocol(ctx context.Context, req *identityv1.ChangeOrgProtocolRequest) (*identityv1.ChangeOrgProtocolResponse, error) {
+func (h *SSOAdminHandler) ChangeOrgProtocol(ctx context.Context, req *identityv1.ChangeOrgProtocolRequest) (_ *identityv1.ChangeOrgProtocolResponse, retErr error) {
 	if _, err := h.auth.Authorize(ctx); err != nil {
 		return nil, err
 	}
@@ -530,6 +600,18 @@ func (h *SSOAdminHandler) ChangeOrgProtocol(ctx context.Context, req *identityv1
 	if protocol == conn.Protocol {
 		return nil, status.Errorf(codes.FailedPrecondition, "protocol is already %q", protocol)
 	}
+	if err := rejectSecretConfig(req.GetConfig()); err != nil {
+		return nil, err
+	}
+	sec, err := h.prepareClientSecret(ctx, protocol, req.GetSecretRef(), req.GetClientSecret())
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if retErr != nil && sec.owned {
+			h.dropOwnedSecretKey(ctx, sec.ref)
+		}
+	}()
 
 	// 1. Reset the org to the start FIRST: disable the connection and clear both
 	// gates. Done before any backend mutation so the org is never left enabled
@@ -563,12 +645,12 @@ func (h *SSOAdminHandler) ChangeOrgProtocol(ctx context.Context, req *identityv1
 	// the admin retries after fixing the backend.
 	reqCfg := req.GetConfig()
 	result, provErr := h.prov.CreateConnection(ctx, polis.ConnectionSpec{
-		Alias:       conn.ConnectionAlias,
-		DisplayName: conn.DisplayName,
-		Protocol:    protocol,
-		Domain:      domain,
-		SecretRef:   req.GetSecretRef(),
-		Config:      reqCfg,
+		Alias:        conn.ConnectionAlias,
+		DisplayName:  conn.DisplayName,
+		Protocol:     protocol,
+		Domain:       domain,
+		ClientSecret: sec.value,
+		Config:       reqCfg,
 	})
 	if provErr != nil {
 		dbg := logger.Ctx(ctx)
@@ -595,8 +677,11 @@ func (h *SSOAdminHandler) ChangeOrgProtocol(ctx context.Context, req *identityv1
 		}
 		merged[polis.ConfigKeyPolisClientSecretRef] = ref
 	}
-	if err := h.store.UpdateIdPConnectionProtocol(ctx, conn.ID, protocol, merged, req.GetSecretRef()); err != nil {
+	if err := h.store.UpdateIdPConnectionProtocol(ctx, conn.ID, protocol, merged, sec.ref); err != nil {
 		return nil, statusFromStoreErr(err)
+	}
+	if conn.SecretRef != sec.ref {
+		h.dropOwnedSecretKey(ctx, conn.SecretRef)
 	}
 
 	// The org lost its verified proof (protocol reset) — surface it like a
@@ -960,6 +1045,8 @@ func (h *SSOAdminHandler) DeleteOrganization(ctx context.Context, req *identityv
 			}); provErr != nil {
 				lg.Warn("sso: delete organization best-effort backend connection delete failed", log.F("domain", domain), log.F("connection_alias", conn.ConnectionAlias), log.F("error", errText(provErr)))
 			}
+			h.dropOwnedSecretKey(ctx, conn.SecretRef)
+			h.dropOwnedSecretKey(ctx, configString(conn.Config, polis.ConfigKeyPolisClientSecretRef))
 		}
 	}
 
@@ -1322,5 +1409,7 @@ func orgToProto(c store.IdPConnection, domain string, verified bool) *identityv1
 		ConnectionId:    c.ID.String(),
 		JitEnabled:      c.JitEnabled,
 		AllowLocal:      c.AllowLocal,
+
+		SecretReentryRequired: c.SecretReentryRequired,
 	}
 }

@@ -23,6 +23,8 @@ type fakePolis struct {
 	gotContentType string
 	gotForm        map[string]string
 	gotDeleteQuery map[string]string
+	gotPatchForm   map[string]string
+	patchStatus    int
 
 	createStatus int    // status to return on POST (default 200)
 	createBody   string // body to return on POST (default a clientID/clientSecret JSON)
@@ -47,6 +49,16 @@ func newFakePolis(t *testing.T) *fakePolis {
 			} else {
 				_, _ = io.WriteString(w, `{"clientID":"cid-123","clientSecret":"csec-456","name":"n"}`)
 			}
+		case http.MethodPatch:
+			f.gotContentType = r.Header.Get("Content-Type")
+			body, _ := io.ReadAll(r.Body)
+			f.gotPatchForm, _ = parseForm(string(body))
+			if f.patchStatus != 0 {
+				w.WriteHeader(f.patchStatus)
+				_, _ = io.WriteString(w, `{"error":{"message":"clientSecret mismatch"}}`)
+				return
+			}
+			w.WriteHeader(http.StatusNoContent)
 		case http.MethodDelete:
 			q := map[string]string{}
 			for k := range r.URL.Query() {
@@ -222,5 +234,77 @@ func TestPolisDeleteConnection(t *testing.T) {
 	}
 	if f.gotAuth != "Api-Key test-key" {
 		t.Errorf("delete auth header: got %q", f.gotAuth)
+	}
+}
+
+func TestPolisCreateConnection_OIDCSendsTheClientSecret(t *testing.T) {
+	f := newFakePolis(t)
+	p := newTestPolis(t, f)
+	_, err := p.CreateConnection(context.Background(), ConnectionSpec{
+		Protocol:     "oidc",
+		Domain:       "partner.example.net",
+		ClientSecret: "resolved-secret",
+		Config:       map[string]string{"issuer": "https://idp.example.net", "clientId": "steward"},
+	})
+	if err != nil {
+		t.Fatalf("create: %v", err)
+	}
+	if f.gotForm["oidcClientSecret"] != "resolved-secret" {
+		t.Fatalf("oidcClientSecret: got %q", f.gotForm["oidcClientSecret"])
+	}
+}
+
+func TestPolisUpdateOIDCSecret_PatchesTheConnection(t *testing.T) {
+	f := newFakePolis(t)
+	p := newTestPolis(t, f)
+	err := p.UpdateOIDCSecret(context.Background(), ConnectionRef{
+		Domain: "Partner.example.net", ClientID: "cid-123", ClientSecret: "csec-456",
+	}, "new-oidc-secret")
+	if err != nil {
+		t.Fatalf("update: %v", err)
+	}
+	want := map[string]string{
+		"clientID":         "cid-123",
+		"clientSecret":     "csec-456",
+		"tenant":           "partner.example.net",
+		"product":          "steward",
+		"oidcClientSecret": "new-oidc-secret",
+	}
+	for k, v := range want {
+		if f.gotPatchForm[k] != v {
+			t.Fatalf("%s: got %q want %q", k, f.gotPatchForm[k], v)
+		}
+	}
+	if f.gotContentType != "application/x-www-form-urlencoded" {
+		t.Fatalf("content type: %q", f.gotContentType)
+	}
+	if f.gotAuth != "Api-Key test-key" {
+		t.Fatalf("auth: %q", f.gotAuth)
+	}
+}
+
+func TestPolisUpdateOIDCSecret_ErrorNeverCarriesTheSecret(t *testing.T) {
+	f := newFakePolis(t)
+	f.patchStatus = http.StatusBadRequest
+	p := newTestPolis(t, f)
+	err := p.UpdateOIDCSecret(context.Background(), ConnectionRef{
+		Domain: "partner.example.net", ClientID: "cid-123", ClientSecret: "csec-456",
+	}, "new-oidc-secret")
+	if err == nil {
+		t.Fatal("want an error")
+	}
+	if strings.Contains(err.Error(), "new-oidc-secret") || strings.Contains(err.Error(), "csec-456") {
+		t.Fatalf("error leaks a secret: %v", err)
+	}
+}
+
+func TestPolisUpdateOIDCSecret_NeedsTheConnectionCoordinates(t *testing.T) {
+	f := newFakePolis(t)
+	p := newTestPolis(t, f)
+	if err := p.UpdateOIDCSecret(context.Background(), ConnectionRef{Domain: "partner.example.net"}, "s"); err == nil {
+		t.Fatal("want an error without the connection's client id and secret")
+	}
+	if f.gotPatchForm != nil {
+		t.Fatal("nothing may be sent")
 	}
 }

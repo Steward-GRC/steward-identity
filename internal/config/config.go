@@ -46,8 +46,11 @@ type SPCert struct {
 	SecretName      string
 	Namespace       string
 	PolisSecretName string
-	TTLDays         int
-	OverlapHours    int
+	// PolisSecretNamespace turns the Polis secrets store on by itself, without
+	// the signing certificate; it defaults to Namespace.
+	PolisSecretNamespace string
+	TTLDays              int
+	OverlapHours         int
 }
 
 // Config is every setting the service runs with.
@@ -174,6 +177,7 @@ func Load(getenv func(string) string) (Config, error) {
 		ObligationsGRPCAddr: getenv("OBLIGATIONS_GRPC_ADDR"),
 	}
 	c.MigrateDSN = or("MIGRATE_DSN", c.DatabaseDSN)
+	c.SPCert.PolisSecretNamespace = or("POLIS_SECRET_NAMESPACE", c.SPCert.Namespace)
 
 	if c.DatabaseDSN == "" {
 		errs = append(errs, errors.New("DATABASE_DSN is required"))

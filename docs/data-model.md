@@ -19,7 +19,9 @@ the first release the baseline stays the only migration.
 | `session_activity` | the last time each Kratos session was used, keyed by its session id (Kratos keeps no such time) |
 
 `idp_connections.connection_alias` is the routing key the SSO broker (Ory Polis) knows a
-connection by. A domain's sign-in method is `local` or `sso`.
+connection by. A domain's sign-in method is `local` or `sso`. `idp_connections.secret_ref` names
+the key holding the OIDC client secret in the Polis secrets Kubernetes Secret, never the secret;
+`secret_reentry_required` marks a connection whose reference was cleared because it wasn't a key.
 
 ## Not in this database
 

@@ -66,8 +66,16 @@ message AddOrganizationRequest {
   string display_name = 4;
   // The connection's non-secret settings.
   map<string, string> config = 5;
-  // A reference to the secret the connection needs, never the secret.
+  // The name of a key an operator created beforehand in the Polis secrets
+  // Kubernetes Secret, holding the OIDC client secret. It must exist; it is
+  // checked before anything is sent to Polis. Leave it empty when
+  // client_secret is set. SAML takes neither.
   string secret_ref = 6;
+  // The OIDC client secret itself, write-only: identity stores it in the
+  // Polis secrets Kubernetes Secret and keeps only the key's name. It is never
+  // stored in the database, returned or logged. Leave it empty when
+  // secret_ref is set.
+  string client_secret = 7;
 }
 
 message AddOrganizationResponse {
@@ -91,10 +99,15 @@ message GetOrganizationResponse {
 message UpdateIdPConnectionRequest {
   string domain = 1;
   map<string, string> config = 2;
+  // Replaces an OIDC connection's client secret with a pre-created key, as in
+  // AddOrganizationRequest.secret_ref. Empty keeps the current secret.
   string secret_ref = 3;
   // The organisation's sign-in toggles; an unset one keeps its value.
   optional bool jit_enabled = 4;
   optional bool allow_local = 5;
+  // Replaces an OIDC connection's client secret, write-only, as in
+  // AddOrganizationRequest.client_secret. Empty keeps the current secret.
+  string client_secret = 6;
 }
 
 message UpdateIdPConnectionResponse {
@@ -105,9 +118,12 @@ message ChangeOrgProtocolRequest {
   string domain = 1;
   // "saml" or "oidc".
   string protocol = 2;
-  // The new protocol's settings and secret reference replace the old ones.
+  // The new protocol's settings and secret replace the old ones. OIDC takes
+  // exactly one of secret_ref and client_secret, as in AddOrganizationRequest;
+  // SAML takes neither.
   map<string, string> config = 3;
   string secret_ref = 4;
+  string client_secret = 5;
 }
 
 message ChangeOrgProtocolResponse {

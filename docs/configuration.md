@@ -90,7 +90,8 @@ A method no caller uses is refused to everyone.
 | `VERIFY_TXT_PREFIX` | `steward-verify` | The domain verification TXT record is `_<prefix>.<domain>` with the value `<prefix>=<token>`. |
 | `DOMAIN_RECHECK_INTERVAL` | `6h` | How often verified domains are checked again. |
 | `SP_CERT_SECRET_NAME`, `SP_CERT_NAMESPACE` | `identity-sp-cert`, `POD_NAMESPACE` | The Kubernetes Secret holding the SAML signing keys. |
-| `POLIS_SECRET_NAME` | `identity-polis-secrets` | The Kubernetes Secret holding each connection's Polis client secret. |
+| `POLIS_SECRET_NAME` | `identity-polis-secrets` | The Kubernetes Secret holding each connection's Polis client secret and every OIDC client secret (an admin's entry, or an operator's pre-created key named by `secret_ref`). Identity reads, writes and deletes keys in it. |
+| `POLIS_SECRET_NAMESPACE` | `SP_CERT_NAMESPACE` | The namespace of that Secret. Setting it alone turns the store on without the SAML signing certificate. Without it (and without an in-cluster client) OIDC client secrets are refused. |
 | `SP_CERT_TTL_DAYS`, `SP_CERT_OVERLAP_HOURS` | `365`, `48` | Signing certificate lifetime, and how long the old one keeps serving after a rotation. |
 
 ## Other services and email

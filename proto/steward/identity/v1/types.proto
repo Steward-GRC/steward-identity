@@ -329,6 +329,11 @@ message Organization {
   // When true, the organisation's users may also sign in with a local
   // password.
   bool allow_local = 11;
+  // True when the stored client secret reference was cleared because it
+  // wasn't a key reference (an older row that held the secret itself). An
+  // admin must enter the client secret again; sign-in through Polis keeps
+  // working meanwhile.
+  bool secret_reentry_required = 12;
 }
 
 // GroupMapping maps one asserted group claim value to a platform group.

@@ -114,7 +114,7 @@ func TestLoadReadsEverySetting(t *testing.T) {
 		RPName: "Example", UserVerification: "required"}, c.WebAuthn)
 	require.Equal(t, "example-verify", c.VerifyTXTPrefix)
 	require.Equal(t, time.Hour, c.DomainRecheckInterval)
-	require.Equal(t, SPCert{SecretName: "sp", Namespace: "steward", PolisSecretName: "ps", TTLDays: 30, OverlapHours: 12}, c.SPCert)
+	require.Equal(t, SPCert{SecretName: "sp", Namespace: "steward", PolisSecretName: "ps", PolisSecretNamespace: "steward", TTLDays: 30, OverlapHours: 12}, c.SPCert)
 	require.Equal(t, "core.example.org:9090", c.CoreGRPCAddr)
 	require.Equal(t, "workflow.example.org:9090", c.WorkflowGRPCAddr)
 	require.Equal(t, "obligations.example.org:9090", c.ObligationsGRPCAddr)
@@ -201,4 +201,13 @@ func TestLoadSessionLastSeenThrottle(t *testing.T) {
 	m["SESSION_LAST_SEEN_THROTTLE"] = "0s"
 	_, err = Load(env(m))
 	require.ErrorContains(t, err, "SESSION_LAST_SEEN_THROTTLE")
+}
+
+func TestLoad_PolisSecretNamespaceStandsAlone(t *testing.T) {
+	m := base()
+	m["POLIS_SECRET_NAMESPACE"] = "steward-ns"
+	c, err := Load(env(m))
+	require.NoError(t, err)
+	require.Empty(t, c.SPCert.Namespace, "the signing certificate stays off")
+	require.Equal(t, "steward-ns", c.SPCert.PolisSecretNamespace)
 }

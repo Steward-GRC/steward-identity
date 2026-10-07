@@ -19,8 +19,9 @@ type ConnectionSpec struct {
 	Protocol string
 	// Domain is the organisation's email domain, lowercased.
 	Domain string
-	// SecretRef is the OIDC client-secret reference; SAML needs none.
-	SecretRef string
+	// ClientSecret is the OIDC client secret itself, already resolved from the
+	// secret store; SAML needs none. Never log it.
+	ClientSecret string
 	// Config is the wizard's settings. SAML: entityId, singleSignOnServiceUrl
 	// and signingCertificate, or a verbatim rawMetadata or metadataUrl. OIDC:
 	// issuer and clientId.

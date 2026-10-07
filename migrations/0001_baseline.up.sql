@@ -211,7 +211,12 @@ CREATE TABLE idp_connections (
   display_name     TEXT NOT NULL DEFAULT '',
   -- Non-secret settings only; secrets are referenced by secret_ref.
   config           JSONB NOT NULL DEFAULT '{}'::jsonb,
+  -- The name of the key holding the OIDC client secret in the Polis secrets
+  -- Kubernetes Secret, never the secret itself.
   secret_ref       TEXT NOT NULL DEFAULT '',
+  -- Set when a secret_ref that wasn't a key reference was cleared: an admin
+  -- must enter the client secret again.
+  secret_reentry_required BOOLEAN NOT NULL DEFAULT FALSE,
   enabled          BOOLEAN NOT NULL DEFAULT FALSE,
   test_passed_at   TIMESTAMPTZ,
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),

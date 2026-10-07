@@ -55,6 +55,34 @@ of any URL registered with Polis or the upstream identity provider. A rename cha
 the organisation name together; a sign-in already in flight with the old alias is refused and the
 user retries.
 
+### OIDC client secrets
+
+An OIDC connection's client secret lives only in the Polis secrets Kubernetes Secret
+(`POLIS_SECRET_NAME` in `POLIS_SECRET_NAMESPACE`); identity never stores it in Postgres, returns it or
+logs it. `AddOrganization`, `ChangeOrgProtocol` and `UpdateIdPConnection` take it one of two ways,
+never both:
+
+- `client_secret`: the secret itself, write-only. Identity writes it to the Secret under a key
+  named `oidc-client-secret-<id>`, keeps only that name in `idp_connections.secret_ref`, and sends
+  the secret to Polis. Replacing it removes the old key.
+- `secret_ref`: the name of a key an operator created in the same Secret beforehand. Identity
+  checks the key exists before anything is sent to Polis, sends Polis the value, and never
+  removes the key. A name Kubernetes wouldn't accept, or one starting with `oidc-client-secret-`
+  or `polis-client-secret-` (identity's own keys), is refused.
+
+A SAML connection takes neither. A secret in the `config` map (any key containing `secret` or
+`password`) is refused. Both inputs need the Secret to be reachable: without
+`POLIS_SECRET_NAMESPACE` (or `SP_CERT_NAMESPACE`) and an in-cluster client they are refused with
+`FailedPrecondition`. `UpdateIdPConnection` sends the new secret to Polis first, so a Polis failure
+changes nothing.
+
+At every start identity checks each stored `secret_ref`. One that doesn't name a key in the Secret
+(an older row that held the secret itself) is cleared; with the store off no reference can name a
+key, so every one is cleared. A cleared connection is flagged `secret_reentry_required`; only the
+count is logged. Sign-in keeps working, since Polis holds its own copy, but an admin enters the
+client secret again with `UpdateIdPConnection`. If the Secret can't be read the check stops
+without clearing anything and runs again at the next start.
+
 `ChangeOrgProtocol` sets the connection up again in Polis and resets both gates.
 `DeleteOrganization` removes it from Polis and identity. The SAML signing certificate is managed
 only when `SP_CERT_NAMESPACE` is set and the service runs in a cluster; its private key lives only
@@ -81,10 +109,12 @@ refused during act-as with `ACT_AS_FORBIDDEN`.
 | `USER_DELETE_CHECKS_UNAVAILABLE` naming `approval_check` | `WORKFLOW_GRPC_ADDR` is unset or steward-workflow didn't answer: deletes stay refused rather than strand approvals. Disable the account to lock the user out. |
 | Merge answers that a service isn't configured | `WORKFLOW_GRPC_ADDR` or `OBLIGATIONS_GRPC_ADDR` is unset. |
 | `SESSIONS_UNAVAILABLE` or `SESSION_REVOKE_UNAVAILABLE` | `KRATOS_ADMIN_URL` and `steward-depstate-kratos`. Nothing was revoked. |
+| An organisation shows `secret_reentry_required` | Its stored reference wasn't a key in the Polis secrets Secret and was cleared at start-up. Enter the OIDC client secret again through `UpdateIdPConnection`. |
 | `SSO_PROVIDER_UNREACHABLE` | `POLIS_ADMIN_URL`, `POLIS_API_KEY` and `steward-depstate-polis`; the log line with the same trace id has the cause. |
 | No events reach audit | `steward-depstate-rabbitmq`, then the `audit` exchange and its binding; rows waiting in `audit_outbox` with status `pending` or `dead`. |
 
 ## Backups
 
 Back up Postgres and `TOTP_ENC_KEY` together; without the key the stored authenticator secrets
-can't be read. The SAML signing keys and Polis client secrets live in their Kubernetes Secrets.
+can't be read. The SAML signing keys, Polis client secrets and OIDC client secrets live in their
+Kubernetes Secrets; back those up too.

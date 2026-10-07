@@ -10,6 +10,7 @@ package spkeys
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -22,10 +23,18 @@ import (
 type Store interface {
 	// PutKey writes pemKey under dataKey, overwriting any existing value.
 	PutKey(ctx context.Context, dataKey string, pemKey []byte) error
-	// GetKey reads the PEM key stored under dataKey. It returns an error when
-	// no value is present for dataKey.
+	// GetKey reads the PEM key stored under dataKey. It returns an error
+	// wrapping ErrKeyNotFound when the Secret has no value for dataKey.
 	GetKey(ctx context.Context, dataKey string) ([]byte, error)
+	// DeleteKey removes dataKey from the Secret; a missing key is not an
+	// error.
+	DeleteKey(ctx context.Context, dataKey string) error
 }
+
+// ErrKeyNotFound means the Secret exists but holds no value under the key. A
+// missing Secret or an API error is a different error, so a caller can tell
+// "this key doesn't exist" from "the store couldn't be read".
+var ErrKeyNotFound = errors.New("spkeys: key not found")
 
 // k8sStore is a Store backed by a single Kubernetes Secret. Each serial is a
 // data-key within that Secret's Data map, so overlapping-rotation keys coexist
@@ -76,9 +85,26 @@ func (s *k8sStore) GetKey(ctx context.Context, dataKey string) ([]byte, error) {
 	}
 	v, ok := sec.Data[dataKey]
 	if !ok {
-		return nil, fmt.Errorf("spkeys: no key %q in secret %s/%s", dataKey, s.ns, s.secretName)
+		return nil, fmt.Errorf("%w: %q in secret %s/%s", ErrKeyNotFound, dataKey, s.ns, s.secretName)
 	}
 	out := make([]byte, len(v))
 	copy(out, v)
 	return out, nil
+}
+
+// DeleteKey removes dataKey from the Secret's data; a key that isn't there
+// leaves the Secret untouched.
+func (s *k8sStore) DeleteKey(ctx context.Context, dataKey string) error {
+	sec, err := s.cs.CoreV1().Secrets(s.ns).Get(ctx, s.secretName, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("spkeys: get secret %s/%s: %w", s.ns, s.secretName, err)
+	}
+	if _, ok := sec.Data[dataKey]; !ok {
+		return nil
+	}
+	delete(sec.Data, dataKey)
+	if _, err := s.cs.CoreV1().Secrets(s.ns).Update(ctx, sec, metav1.UpdateOptions{}); err != nil {
+		return fmt.Errorf("spkeys: update secret %s/%s: %w", s.ns, s.secretName, err)
+	}
+	return nil
 }

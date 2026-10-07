@@ -33,7 +33,11 @@ identity stores that session as seen, at most once per `SESSION_LAST_SEEN_THROTT
 conditional update keeps replicas from writing more often). `ListUserSessions` returns it as
 `Session.last_seen_at` (RFC 3339; empty for a session never seen). A malformed `session_id` is
 `InvalidArgument`; a failed last-seen write is logged and the lookup still answers. Ory Polis brokers SAML and OIDC: an organisation's connection is created in Polis,
-and its `connection_alias` is the routing key the gateway signs users in through.
+and its `connection_alias` is the routing key the gateway signs users in through. An OIDC
+connection's client secret is write-only: `client_secret` on `AddOrganization`, `ChangeOrgProtocol`
+and `UpdateIdPConnection`, or `secret_ref` naming a pre-created key; no response carries either
+(see the [runbook](runbook.md#oidc-client-secrets)). `Organization.secret_reentry_required` says an
+admin must enter the secret again.
 
 `ResolveClaims` takes the subject the sign-in service issued (`external_subject`) and the sign-in's
 claims as fields. With a `connection_alias`, `idp_groups` replaces the user's identity provider
