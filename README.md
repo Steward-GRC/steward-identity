@@ -53,6 +53,10 @@ task license     # check Apache-2.0 headers (golic)
 Set `DATABASE_TEST_DSN` to run the database tests against an existing Postgres instead of a
 container.
 
+## 🙏 Acknowledgements
+
+Steward was originally written by [@Bugs5382](https://github.com/Bugs5382).
+
 ## ⚖️ License
 
 Apache-2.0 (c) 2026 The Steward Authors
