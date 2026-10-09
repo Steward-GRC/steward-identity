@@ -81,7 +81,7 @@ func (s *Store) ListUsersByIdpGroups(ctx context.Context, names []string) ([]Use
 // `deleted_at IS NULL` is EXPLICIT. Before, the `enabled = true`
 // filter excluded tombstones only because both tombstone writers also set
 // enabled = false — correct today, but resting on a coincidence rather than on
-// intent, and TransferRoot already re-enables its target unconditionally.
+// intent, and GrantRoot already re-enables its target unconditionally.
 func (s *Store) CountAllUsers(ctx context.Context) (int, error) {
 	var n int
 	if err := s.pool.QueryRow(ctx,

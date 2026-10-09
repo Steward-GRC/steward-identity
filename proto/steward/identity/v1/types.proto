@@ -27,7 +27,7 @@ message User {
   repeated string idp_groups = 8;
   // Per-policy allow and deny overrides.
   repeated PolicyOverride policy_overrides = 9;
-  // The protected root site-admin.
+  // A root admin. There may be several; the last one can't lose the role.
   bool is_root = 10;
   // The individual policy.read_sensitive grant (root-only to assign).
   bool read_sensitive_grant = 11;
@@ -355,4 +355,42 @@ message SPCertificate {
   string not_after = 4;
   // At most one certificate is active.
   bool active = 5;
+}
+
+// HardResetState is where a hard reset request stands.
+enum HardResetState {
+  HARD_RESET_STATE_UNSPECIFIED = 0;
+  // Waiting for a second root admin.
+  HARD_RESET_STATE_PENDING = 1;
+  // Approved; usable once until approval_expires_at.
+  HARD_RESET_STATE_APPROVED = 2;
+  // Withdrawn by its requester.
+  HARD_RESET_STATE_CANCELLED = 3;
+  // Redeemed by the module's service.
+  HARD_RESET_STATE_CONSUMED = 4;
+  // Not approved, or not used, in time.
+  HARD_RESET_STATE_EXPIRED = 5;
+}
+
+// HardResetRequest is one two-person hard reset of a module. Times are RFC
+// 3339; an empty time hasn't happened.
+message HardResetRequest {
+  string id = 1;
+  string module = 2;
+  string reason = 3;
+  HardResetState state = 4;
+  // The requesting root admin's user id.
+  string requested_by = 5;
+  string requested_at = 6;
+  // The request must be approved before this.
+  string expires_at = 7;
+  // The approving root admin's user id.
+  string approved_by = 8;
+  string approved_at = 9;
+  // The approval must be used before this.
+  string approval_expires_at = 10;
+  string cancelled_at = 11;
+  string consumed_at = 12;
+  // The service that redeemed it.
+  string consumed_by = 13;
 }

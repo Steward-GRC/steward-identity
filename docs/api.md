@@ -43,6 +43,28 @@ admin must enter the secret again.
 claims as fields. With a `connection_alias`, `idp_groups` replaces the user's identity provider
 groups and is matched against the connection's group mappings.
 
+## Root admins and hard resets
+
+There may be several root admins. `GrantRoot` and `RevokeRoot` add and remove one; both need a
+root admin, the caller's step-up code (`RequestStepUpOtp`) and no act-as. The last root admin
+can't lose the role, and a root admin can't be disabled, deleted or merged away until it's
+revoked. `BootstrapRoot` makes only the first.
+
+A hard reset of a module (only `compliance` today) takes two root admins:
+
+1. `RequestHardReset` (module and reason) by one root admin. It waits `HARD_RESET_REQUEST_TTL`
+   (24 hours) for approval, and a module has at most one open request.
+2. `ApproveHardReset` by a different root admin. The approval is usable once, for
+   `HARD_RESET_APPROVAL_TTL` (1 hour).
+3. `ConsumeHardReset` by the module's own service (steward-reporting for `compliance`), calling
+   as itself, just before it runs the reset. It answers with the request naming both admins.
+
+`CancelHardReset` withdraws a pending or approved request; only the requester may.
+`ListHardResetRequests` lists them for a root admin. Request, approve and cancel are refused during
+act-as and from the admin CLI, since both people must be named. Each step is an audit event
+crediting the admin (`hard_reset.requested`, `.approved`, `.cancelled`), or the service
+(`hard_reset.consumed`); a request that runs out of time is recorded as `hard_reset.expired`.
+
 ## Errors
 
 Coded errors carry a `google.rpc.ErrorInfo` with the domain `identity`; see

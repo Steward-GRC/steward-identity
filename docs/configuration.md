@@ -45,8 +45,9 @@ to the caller `<name>`, and checks the per-method allow-list in `internal/server
 
 | Caller | Methods | Access |
 | --- | --- | --- |
-| `gateway` | the sign-in steps and the read, admin and SSO admin methods it serves, including `ListGroups` and `CreateGroup` for the admin app's platform groups | on behalf of the signed-in user |
-| `workflow`, `reporting`, `collab` | `GetUser` | as itself |
+| `gateway` | the sign-in steps and the read, admin and SSO admin methods it serves, including `ListGroups` and `CreateGroup` for the admin app's platform groups, and the root admin and hard reset requests | on behalf of the signed-in user |
+| `reporting` | `GetUser`, `ConsumeHardReset` | as itself |
+| `workflow`, `collab` | `GetUser` | as itself |
 | `obligations` | `GetUser`, `ListAllUsers`, `ResolveEmail`, `ResolveFCMToken` | as itself |
 | `identity` (`identity-admin` in the identity pod) | the CLI's read and admin methods | as itself; the admin methods also need the CLI certificate (`IDENTITY_ADMIN_CLI_ID`) |
 
@@ -82,6 +83,8 @@ A method no caller uses is refused to everyone.
 | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_ORIGINS`, `WEBAUTHN_RP_NAME`, `WEBAUTHN_USER_VERIFICATION` | `localhost`, `http://localhost:5173`, `Steward`, `preferred` | The passkey relying party. |
 | `BREAK_GLASS_DURATION` | `15m` | How long a break-glass reveal lasts. |
 | `SESSION_LAST_SEEN_THROTTLE` | `1m` | How often a sign-in session's last-seen time moves while it is in use. |
+| `HARD_RESET_REQUEST_TTL` | `24h` | How long a hard reset request waits for a second root admin. |
+| `HARD_RESET_APPROVAL_TTL` | `1h` | How long an approved hard reset stays usable, once. |
 
 ## SSO connections
 

@@ -749,8 +749,8 @@ func (h *ReadHandler) BootstrapRoot(ctx context.Context, req *identityv1.Bootstr
 	}
 	u, err := h.store.PreCreateLocalUserRoot(ctx, req.GetUsername(), req.GetEmail(), name)
 	if err != nil {
-		// The single-root index is the atomic backstop against a concurrent
-		// bootstrap.
+		// The store refuses a second root under the root-set lock, the atomic
+		// backstop against a concurrent bootstrap.
 		if errors.Is(err, store.ErrConflict) {
 			return nil, status.Error(codes.FailedPrecondition, "a root user already exists")
 		}

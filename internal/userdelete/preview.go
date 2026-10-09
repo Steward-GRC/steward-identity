@@ -230,7 +230,7 @@ func Preview(ctx context.Context, steps PreviewSteps, acct Account) (*DeletionPr
 		out.BlocksDelete = true
 		out.Warnings = append(out.Warnings, DeletionWarning{
 			Code:    WarnBlockedRootProtected,
-			Message: "This is the protected root administrator account. It cannot be deleted; transfer root to another account first.",
+			Message: "This is a root administrator account. It cannot be deleted; revoke its root role first (another root administrator must remain).",
 		})
 	}
 	if !acct.DeletedAt.IsZero() {

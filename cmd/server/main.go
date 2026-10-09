@@ -174,6 +174,7 @@ func run(ctx context.Context, logger log.Logger) error {
 	adminH.WithOTP(mailer, zl, cfg.OTPDevEcho)
 	adminH.WithMembershipPublisher(jobsPub)
 	adminH.BreakGlassDurationMin = int(cfg.BreakGlassDuration / time.Minute)
+	adminH.WithHardReset(cfg.HardResetRequestTTL, cfg.HardResetApprovalTTL, nil)
 
 	var sessions merge.SessionRevoker
 	if cfg.KratosAdminURL != "" {

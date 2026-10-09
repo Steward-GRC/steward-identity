@@ -554,7 +554,7 @@ func (s *Store) MarkEmailVerified(ctx context.Context, id uuid.UUID, email strin
 // the updated user. Idempotent: re-setting the same value is a no-op (except
 // it always emits an event for the audit lane).
 func (s *Store) SetEnabled(ctx context.Context, id uuid.UUID, enabled bool, actor *uuid.UUID, actorExternal string) (User, error) {
-	// The root account cannot be disabled (lockout-safe). Transfer root
+	// A root admin cannot be disabled (lockout-safe). Revoke root
 	// first to demote it.
 	if !enabled {
 		root, err := s.isRoot(ctx, id)
@@ -603,7 +603,8 @@ func (s *Store) SetEnabled(ctx context.Context, id uuid.UUID, enabled bool, acto
 // Idempotent: a second call keeps the first deleted_at and deletes nothing
 // more.
 func (s *Store) DeleteUser(ctx context.Context, id uuid.UUID, actor *uuid.UUID, actorExternal string) (User, error) {
-	// The root account cannot be deleted; transfer root first.
+	// A root admin cannot be deleted; revoke root first, which the last
+	// root admin can't lose.
 	root, err := s.isRoot(ctx, id)
 	if err != nil {
 		return User{}, err
@@ -971,6 +972,16 @@ func (s *Store) AdoptLocalUser(ctx context.Context, id uuid.UUID, externalSubjec
 func (s *Store) PreCreateLocalUserRoot(ctx context.Context, username, email, name string) (User, error) {
 	var u User
 	if err := s.db.RunInTx(ctx, func(tx pgx.Tx) error {
+		if err := lockRootSet(ctx, tx); err != nil {
+			return err
+		}
+		var rootExists bool
+		if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE is_root)`).Scan(&rootExists); err != nil {
+			return fmt.Errorf("root exists check: %w", err)
+		}
+		if rootExists {
+			return fmt.Errorf("%w: a root admin already exists", ErrConflict)
+		}
 		var err error
 		u.Username = username
 		u.Email = email

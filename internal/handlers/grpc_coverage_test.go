@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -28,8 +29,10 @@ import (
 // panic is recovered and counts as implemented. New RPCs are covered
 // automatically.
 func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
-	// Deferred RPCs, keyed "Service.Method", each with a reason. None today.
-	knownDeferred := map[string]string{}
+	// Deferred RPCs, keyed "Service.Method", each with a reason.
+	knownDeferred := map[string]string{
+		"IdentityAdminService.TransferRoot": "removed now that more than one user can hold root; kept in the proto, unimplemented, so a caller still built against the old shape gets Unimplemented naming GrantRoot and RevokeRoot instead of a broken RPC",
+	}
 
 	tests := []struct {
 		service     string
@@ -104,4 +107,16 @@ func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestTransferRoot_RemovedNamesItsReplacement guards the one RPC
+// knownDeferred above excuses: a caller still built against the old
+// single-root shape gets Unimplemented, not a broken call, and the message
+// names GrantRoot and RevokeRoot.
+func TestTransferRoot_RemovedNamesItsReplacement(t *testing.T) {
+	h := NewAdminHandler(nil, nil)
+	_, err := h.TransferRoot(context.Background(), &identityv1.TransferRootRequest{}) //nolint:staticcheck // exercising the removed RPC's stub
+	require.Equal(t, codes.Unimplemented, status.Code(err))
+	require.Contains(t, err.Error(), "GrantRoot")
+	require.Contains(t, err.Error(), "RevokeRoot")
 }

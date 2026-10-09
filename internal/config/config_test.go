@@ -211,3 +211,22 @@ func TestLoad_PolisSecretNamespaceStandsAlone(t *testing.T) {
 	require.Empty(t, c.SPCert.Namespace, "the signing certificate stays off")
 	require.Equal(t, "steward-ns", c.SPCert.PolisSecretNamespace)
 }
+
+func TestLoadHardResetWindows(t *testing.T) {
+	c, err := Load(env(base()))
+	require.NoError(t, err)
+	require.Equal(t, 24*time.Hour, c.HardResetRequestTTL)
+	require.Equal(t, time.Hour, c.HardResetApprovalTTL)
+
+	m := base()
+	m["HARD_RESET_REQUEST_TTL"] = "48h"
+	m["HARD_RESET_APPROVAL_TTL"] = "30m"
+	c, err = Load(env(m))
+	require.NoError(t, err)
+	require.Equal(t, 48*time.Hour, c.HardResetRequestTTL)
+	require.Equal(t, 30*time.Minute, c.HardResetApprovalTTL)
+
+	m["HARD_RESET_APPROVAL_TTL"] = "0s"
+	_, err = Load(env(m))
+	require.ErrorContains(t, err, "HARD_RESET_APPROVAL_TTL")
+}
