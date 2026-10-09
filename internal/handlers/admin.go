@@ -999,6 +999,15 @@ func (h *AdminHandler) RevokeRoot(ctx context.Context, req *identityv1.RevokeRoo
 	return &identityv1.RevokeRootResponse{User: userToProto(u)}, nil
 }
 
+// TransferRoot is removed now that more than one user can hold the root
+// role: its clear-then-set behavior has no sound meaning once root is a set.
+// It always returns Unimplemented, naming GrantRoot and RevokeRoot, so a
+// caller still built against the old shape gets a clear error instead of a
+// broken RPC. The proto keeps the RPC and its messages only for that.
+func (h *AdminHandler) TransferRoot(context.Context, *identityv1.TransferRootRequest) (*identityv1.TransferRootResponse, error) { //nolint:staticcheck // the removed RPC's own request/response types, kept only for this stub
+	return nil, status.Error(codes.Unimplemented, "TransferRoot is removed; use GrantRoot and RevokeRoot")
+}
+
 // authorizeRootChange runs the checks every change to the root admins needs:
 // a site-admin caller, no act-as, a root admin, then the step-up code.
 func (h *AdminHandler) authorizeRootChange(ctx context.Context, userID, otp string) (adminActor, uuid.UUID, error) {

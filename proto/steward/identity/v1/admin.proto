@@ -78,6 +78,13 @@ service IdentityAdminService {
   // RevokeRoot takes the root role from a user, who keeps site-admin. The
   // last root admin can't lose it. Same checks as GrantRoot.
   rpc RevokeRoot(RevokeRootRequest) returns (RevokeRootResponse);
+  // TransferRoot is removed now that more than one user can hold the root
+  // role: it always returns Unimplemented, naming GrantRoot and RevokeRoot.
+  // Kept only so a caller still built against the old shape gets a clear
+  // error instead of a broken RPC.
+  rpc TransferRoot(TransferRootRequest) returns (TransferRootResponse) {
+    option deprecated = true;
+  };
   // RequestHardReset starts a two-person hard reset of a module: one root
   // admin asks, a different root admin approves. The request expires after
   // HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
@@ -336,6 +343,18 @@ message RevokeRootRequest {
 }
 
 message RevokeRootResponse {
+  User user = 1;
+}
+
+message TransferRootRequest {
+  option deprecated = true;
+  string to_user_id = 1;
+  // The calling admin's step-up code.
+  string otp = 2;
+}
+
+message TransferRootResponse {
+  option deprecated = true;
   User user = 1;
 }
 
