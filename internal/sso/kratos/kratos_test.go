@@ -321,7 +321,7 @@ func TestUpdateProfileReplacesEmailAndName(t *testing.T) {
 }
 
 // The session surface used to drop the device IP Kratos records; it now
-// reads it the same way it already read the user agent (steward-web#27).
+// reads it the same way it already read the user agent (Steward-GRC/steward-web-archive#27).
 func TestListSessionsMapsTheSessionsAndTheirIP(t *testing.T) {
 	f := &fakeKratos{knownEmail: bobEmail, identityID: bobID}
 	srv := f.server(t)
