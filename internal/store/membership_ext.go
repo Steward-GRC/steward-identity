@@ -4,8 +4,11 @@
 package store
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -222,4 +225,60 @@ func (s *Store) SetPolicyOverride(ctx context.Context, userID uuid.UUID,
 		return User{}, err
 	}
 	return s.GetUser(ctx, userID)
+}
+
+// ListGroupNamesByUser returns, for each given user, the names of the groups the
+// user is a direct member of. Each list is sorted by name without regard to
+// case, then by exact name, then by group id, so the order is the same on every
+// read and on every database collation. A user with no groups, or an id nobody
+// has, is absent from the map. An empty id list returns an empty map without a
+// query. Display data for the ack roster: it reads no role, permission or
+// access row.
+func (s *Store) ListGroupNamesByUser(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID][]string, error) {
+	out := map[uuid.UUID][]string{}
+	if len(userIDs) == 0 {
+		return out, nil
+	}
+	rows, err := s.pool.Query(ctx, `
+		SELECT m.user_id, g.name, g.id
+		FROM group_membership m
+		JOIN groups g ON g.id = m.group_id
+		WHERE m.user_id = ANY($1)`, userIDs)
+	if err != nil {
+		return nil, fmt.Errorf("list group names by user: %w", err)
+	}
+	defer rows.Close()
+	type named struct {
+		name string
+		id   uuid.UUID
+	}
+	byUser := map[uuid.UUID][]named{}
+	for rows.Next() {
+		var uid uuid.UUID
+		var n named
+		if err := rows.Scan(&uid, &n.name, &n.id); err != nil {
+			return nil, fmt.Errorf("scan group name: %w", err)
+		}
+		byUser[uid] = append(byUser[uid], n)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("list group names by user: %w", err)
+	}
+	for uid, ns := range byUser {
+		sort.Slice(ns, func(i, j int) bool {
+			if li, lj := strings.ToLower(ns[i].name), strings.ToLower(ns[j].name); li != lj {
+				return li < lj
+			}
+			if ns[i].name != ns[j].name {
+				return ns[i].name < ns[j].name
+			}
+			return bytes.Compare(ns[i].id[:], ns[j].id[:]) < 0
+		})
+		names := make([]string, len(ns))
+		for i, n := range ns {
+			names[i] = n.name
+		}
+		out[uid] = names
+	}
+	return out, nil
 }

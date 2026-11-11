@@ -62,6 +62,12 @@ service IdentityReadService {
   rpc CountAllUsers(CountAllUsersRequest) returns (CountAllUsersResponse);
   // ListUserIdpGroups returns one user's identity provider group names.
   rpc ListUserIdpGroups(ListUserIdpGroupsRequest) returns (ListUserIdpGroupsResponse);
+  // ListUserGroupNames returns, for each named user, the display names of the
+  // platform groups the user is a direct member of: sorted by name without
+  // regard to case, then by group id. One entry per requested id, in request
+  // order; a user with no groups, or an unknown id, gets an empty list. At
+  // most 1000 ids. Display data only: it carries no ids, roles or access.
+  rpc ListUserGroupNames(ListUserGroupNamesRequest) returns (ListUserGroupNamesResponse);
   // RevokeMySessions revokes every session of the calling user.
   rpc RevokeMySessions(RevokeMySessionsRequest) returns (RevokeMySessionsResponse);
   // GetSetupState reports whether first-run setup is still needed (no root
@@ -332,6 +338,21 @@ message ListUserIdpGroupsRequest {
 
 message ListUserIdpGroupsResponse {
   repeated string idp_groups = 1;
+}
+
+message ListUserGroupNamesRequest {
+  repeated string user_ids = 1;
+}
+
+// UserGroupNames is one user's group display names, in the order
+// ListUserGroupNames documents.
+message UserGroupNames {
+  string user_id = 1;
+  repeated string group_names = 2;
+}
+
+message ListUserGroupNamesResponse {
+  repeated UserGroupNames users = 1;
 }
 
 message RevokeMySessionsRequest {}
