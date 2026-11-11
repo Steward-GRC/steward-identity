@@ -121,6 +121,9 @@ message Session {
   // RFC 3339 time the session was last used for an authenticated request, to
   // within the throttle window; empty when it was never seen.
   string last_seen_at = 9;
+  // True on the session a ListMySessions call runs on; never set by the admin
+  // listing.
+  bool current = 10;
 }
 
 // UserFactor is one second factor a user can satisfy.

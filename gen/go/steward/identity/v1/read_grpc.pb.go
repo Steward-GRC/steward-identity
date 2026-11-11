@@ -42,6 +42,8 @@ const (
 	IdentityReadService_ListUserIdpGroups_FullMethodName          = "/steward.identity.v1.IdentityReadService/ListUserIdpGroups"
 	IdentityReadService_ListUserGroupNames_FullMethodName         = "/steward.identity.v1.IdentityReadService/ListUserGroupNames"
 	IdentityReadService_RevokeMySessions_FullMethodName           = "/steward.identity.v1.IdentityReadService/RevokeMySessions"
+	IdentityReadService_ListMySessions_FullMethodName             = "/steward.identity.v1.IdentityReadService/ListMySessions"
+	IdentityReadService_RevokeMySession_FullMethodName            = "/steward.identity.v1.IdentityReadService/RevokeMySession"
 	IdentityReadService_GetSetupState_FullMethodName              = "/steward.identity.v1.IdentityReadService/GetSetupState"
 	IdentityReadService_BootstrapRoot_FullMethodName              = "/steward.identity.v1.IdentityReadService/BootstrapRoot"
 	IdentityReadService_GetAuthConfig_FullMethodName              = "/steward.identity.v1.IdentityReadService/GetAuthConfig"
@@ -133,6 +135,16 @@ type IdentityReadServiceClient interface {
 	ListUserGroupNames(ctx context.Context, in *ListUserGroupNamesRequest, opts ...grpc.CallOption) (*ListUserGroupNamesResponse, error)
 	// RevokeMySessions revokes every session of the calling user.
 	RevokeMySessions(ctx context.Context, in *RevokeMySessionsRequest, opts ...grpc.CallOption) (*RevokeMySessionsResponse, error)
+	// ListMySessions lists the calling user's active sign-in sessions and marks
+	// the one the call runs on. Self-service: the user comes from the forwarded
+	// actor, never from the request. Unavailable when the sign-in service
+	// can't answer, so a failure never reads as "signed in nowhere".
+	ListMySessions(ctx context.Context, in *ListMySessionsRequest, opts ...grpc.CallOption) (*ListMySessionsResponse, error)
+	// RevokeMySession signs out one of the calling user's other sessions. It
+	// refuses the current session (FailedPrecondition; use RevokeMySessions to
+	// end everything) and a session that isn't the caller's (NotFound, the same
+	// as an unknown one). Audited as session.revoked.
+	RevokeMySession(ctx context.Context, in *RevokeMySessionRequest, opts ...grpc.CallOption) (*RevokeMySessionResponse, error)
 	// GetSetupState reports whether first-run setup is still needed (no root
 	// admin exists).
 	GetSetupState(ctx context.Context, in *GetSetupStateRequest, opts ...grpc.CallOption) (*GetSetupStateResponse, error)
@@ -410,6 +422,26 @@ func (c *identityReadServiceClient) RevokeMySessions(ctx context.Context, in *Re
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RevokeMySessionsResponse)
 	err := c.cc.Invoke(ctx, IdentityReadService_RevokeMySessions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *identityReadServiceClient) ListMySessions(ctx context.Context, in *ListMySessionsRequest, opts ...grpc.CallOption) (*ListMySessionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListMySessionsResponse)
+	err := c.cc.Invoke(ctx, IdentityReadService_ListMySessions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *identityReadServiceClient) RevokeMySession(ctx context.Context, in *RevokeMySessionRequest, opts ...grpc.CallOption) (*RevokeMySessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RevokeMySessionResponse)
+	err := c.cc.Invoke(ctx, IdentityReadService_RevokeMySession_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -721,6 +753,16 @@ type IdentityReadServiceServer interface {
 	ListUserGroupNames(context.Context, *ListUserGroupNamesRequest) (*ListUserGroupNamesResponse, error)
 	// RevokeMySessions revokes every session of the calling user.
 	RevokeMySessions(context.Context, *RevokeMySessionsRequest) (*RevokeMySessionsResponse, error)
+	// ListMySessions lists the calling user's active sign-in sessions and marks
+	// the one the call runs on. Self-service: the user comes from the forwarded
+	// actor, never from the request. Unavailable when the sign-in service
+	// can't answer, so a failure never reads as "signed in nowhere".
+	ListMySessions(context.Context, *ListMySessionsRequest) (*ListMySessionsResponse, error)
+	// RevokeMySession signs out one of the calling user's other sessions. It
+	// refuses the current session (FailedPrecondition; use RevokeMySessions to
+	// end everything) and a session that isn't the caller's (NotFound, the same
+	// as an unknown one). Audited as session.revoked.
+	RevokeMySession(context.Context, *RevokeMySessionRequest) (*RevokeMySessionResponse, error)
 	// GetSetupState reports whether first-run setup is still needed (no root
 	// admin exists).
 	GetSetupState(context.Context, *GetSetupStateRequest) (*GetSetupStateResponse, error)
@@ -863,6 +905,12 @@ func (UnimplementedIdentityReadServiceServer) ListUserGroupNames(context.Context
 }
 func (UnimplementedIdentityReadServiceServer) RevokeMySessions(context.Context, *RevokeMySessionsRequest) (*RevokeMySessionsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RevokeMySessions not implemented")
+}
+func (UnimplementedIdentityReadServiceServer) ListMySessions(context.Context, *ListMySessionsRequest) (*ListMySessionsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMySessions not implemented")
+}
+func (UnimplementedIdentityReadServiceServer) RevokeMySession(context.Context, *RevokeMySessionRequest) (*RevokeMySessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevokeMySession not implemented")
 }
 func (UnimplementedIdentityReadServiceServer) GetSetupState(context.Context, *GetSetupStateRequest) (*GetSetupStateResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSetupState not implemented")
@@ -1313,6 +1361,42 @@ func _IdentityReadService_RevokeMySessions_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IdentityReadServiceServer).RevokeMySessions(ctx, req.(*RevokeMySessionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IdentityReadService_ListMySessions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMySessionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityReadServiceServer).ListMySessions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityReadService_ListMySessions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityReadServiceServer).ListMySessions(ctx, req.(*ListMySessionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IdentityReadService_RevokeMySession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeMySessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityReadServiceServer).RevokeMySession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityReadService_RevokeMySession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityReadServiceServer).RevokeMySession(ctx, req.(*RevokeMySessionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1835,6 +1919,14 @@ var IdentityReadService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RevokeMySessions",
 			Handler:    _IdentityReadService_RevokeMySessions_Handler,
+		},
+		{
+			MethodName: "ListMySessions",
+			Handler:    _IdentityReadService_ListMySessions_Handler,
+		},
+		{
+			MethodName: "RevokeMySession",
+			Handler:    _IdentityReadService_RevokeMySession_Handler,
 		},
 		{
 			MethodName: "GetSetupState",
