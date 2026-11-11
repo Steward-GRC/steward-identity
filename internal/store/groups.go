@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -326,6 +327,37 @@ func (s *Store) ListAncestors(ctx context.Context, id uuid.UUID) ([]Group, error
 	}
 	defer rows.Close()
 	return scanGroups(rows)
+}
+
+// SearchGroups returns up to limit groups, at any depth, whose name contains
+// query, case-insensitively, ordered by name then id. query is text: a percent
+// sign, underscore or backslash in it matches itself, never a wildcard. An
+// empty query matches nothing (callers refuse it earlier).
+func (s *Store) SearchGroups(ctx context.Context, query string, limit int) ([]Group, error) {
+	if query == "" {
+		return nil, nil
+	}
+	if limit <= 0 {
+		limit = 50
+	}
+	rows, err := s.pool.Query(ctx, `
+		SELECT id, name, parent_id, metadata, created_at, updated_at
+		  FROM groups
+		 WHERE name ILIKE '%' || $1 || '%' ESCAPE '\'
+		 ORDER BY name ASC, id ASC
+		 LIMIT $2`,
+		escapeLike(query), limit)
+	if err != nil {
+		return nil, fmt.Errorf("search groups: %w", err)
+	}
+	defer rows.Close()
+	return scanGroups(rows)
+}
+
+// escapeLike makes s match itself inside a LIKE pattern that uses \ as the
+// escape character.
+func escapeLike(s string) string {
+	return strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`).Replace(s)
 }
 
 func scanGroups(rows pgx.Rows) ([]Group, error) {

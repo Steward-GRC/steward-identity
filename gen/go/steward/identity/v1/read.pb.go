@@ -1314,6 +1314,104 @@ func (x *ListGroupsRequest) GetPageToken() string {
 	return ""
 }
 
+type SearchGroupsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Required; trimmed.
+	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	// 50 when unset; at most 200.
+	Limit         int32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchGroupsRequest) Reset() {
+	*x = SearchGroupsRequest{}
+	mi := &file_steward_identity_v1_read_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchGroupsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchGroupsRequest) ProtoMessage() {}
+
+func (x *SearchGroupsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_read_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchGroupsRequest.ProtoReflect.Descriptor instead.
+func (*SearchGroupsRequest) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *SearchGroupsRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *SearchGroupsRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type SearchGroupsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Groups        []*Group               `protobuf:"bytes,1,rep,name=groups,proto3" json:"groups,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchGroupsResponse) Reset() {
+	*x = SearchGroupsResponse{}
+	mi := &file_steward_identity_v1_read_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchGroupsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchGroupsResponse) ProtoMessage() {}
+
+func (x *SearchGroupsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_read_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchGroupsResponse.ProtoReflect.Descriptor instead.
+func (*SearchGroupsResponse) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *SearchGroupsResponse) GetGroups() []*Group {
+	if x != nil {
+		return x.Groups
+	}
+	return nil
+}
+
 type ListGroupsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Groups        []*Group               `protobuf:"bytes,1,rep,name=groups,proto3" json:"groups,omitempty"`
@@ -1324,7 +1422,7 @@ type ListGroupsResponse struct {
 
 func (x *ListGroupsResponse) Reset() {
 	*x = ListGroupsResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[25]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1336,7 +1434,7 @@ func (x *ListGroupsResponse) String() string {
 func (*ListGroupsResponse) ProtoMessage() {}
 
 func (x *ListGroupsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[25]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1349,7 +1447,7 @@ func (x *ListGroupsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGroupsResponse.ProtoReflect.Descriptor instead.
 func (*ListGroupsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{25}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ListGroupsResponse) GetGroups() []*Group {
@@ -1375,7 +1473,7 @@ type ListUsersByIdpGroupsRequest struct {
 
 func (x *ListUsersByIdpGroupsRequest) Reset() {
 	*x = ListUsersByIdpGroupsRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[26]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1387,7 +1485,7 @@ func (x *ListUsersByIdpGroupsRequest) String() string {
 func (*ListUsersByIdpGroupsRequest) ProtoMessage() {}
 
 func (x *ListUsersByIdpGroupsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[26]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1400,7 +1498,7 @@ func (x *ListUsersByIdpGroupsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersByIdpGroupsRequest.ProtoReflect.Descriptor instead.
 func (*ListUsersByIdpGroupsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{26}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ListUsersByIdpGroupsRequest) GetIdpGroupNames() []string {
@@ -1419,7 +1517,7 @@ type ListUsersByIdpGroupsResponse struct {
 
 func (x *ListUsersByIdpGroupsResponse) Reset() {
 	*x = ListUsersByIdpGroupsResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[27]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1431,7 +1529,7 @@ func (x *ListUsersByIdpGroupsResponse) String() string {
 func (*ListUsersByIdpGroupsResponse) ProtoMessage() {}
 
 func (x *ListUsersByIdpGroupsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[27]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1444,7 +1542,7 @@ func (x *ListUsersByIdpGroupsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersByIdpGroupsResponse.ProtoReflect.Descriptor instead.
 func (*ListUsersByIdpGroupsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{27}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ListUsersByIdpGroupsResponse) GetUsers() []*User {
@@ -1463,7 +1561,7 @@ type CountUsersByIdpGroupsRequest struct {
 
 func (x *CountUsersByIdpGroupsRequest) Reset() {
 	*x = CountUsersByIdpGroupsRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[28]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1475,7 +1573,7 @@ func (x *CountUsersByIdpGroupsRequest) String() string {
 func (*CountUsersByIdpGroupsRequest) ProtoMessage() {}
 
 func (x *CountUsersByIdpGroupsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[28]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1488,7 +1586,7 @@ func (x *CountUsersByIdpGroupsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CountUsersByIdpGroupsRequest.ProtoReflect.Descriptor instead.
 func (*CountUsersByIdpGroupsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{28}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *CountUsersByIdpGroupsRequest) GetIdpGroupNames() []string {
@@ -1507,7 +1605,7 @@ type CountUsersByIdpGroupsResponse struct {
 
 func (x *CountUsersByIdpGroupsResponse) Reset() {
 	*x = CountUsersByIdpGroupsResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[29]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1519,7 +1617,7 @@ func (x *CountUsersByIdpGroupsResponse) String() string {
 func (*CountUsersByIdpGroupsResponse) ProtoMessage() {}
 
 func (x *CountUsersByIdpGroupsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[29]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1532,7 +1630,7 @@ func (x *CountUsersByIdpGroupsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CountUsersByIdpGroupsResponse.ProtoReflect.Descriptor instead.
 func (*CountUsersByIdpGroupsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{29}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *CountUsersByIdpGroupsResponse) GetCount() int32 {
@@ -1550,7 +1648,7 @@ type ListAllUsersRequest struct {
 
 func (x *ListAllUsersRequest) Reset() {
 	*x = ListAllUsersRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[30]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1562,7 +1660,7 @@ func (x *ListAllUsersRequest) String() string {
 func (*ListAllUsersRequest) ProtoMessage() {}
 
 func (x *ListAllUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[30]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1575,7 +1673,7 @@ func (x *ListAllUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAllUsersRequest.ProtoReflect.Descriptor instead.
 func (*ListAllUsersRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{30}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{32}
 }
 
 type ListAllUsersResponse struct {
@@ -1587,7 +1685,7 @@ type ListAllUsersResponse struct {
 
 func (x *ListAllUsersResponse) Reset() {
 	*x = ListAllUsersResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[31]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1599,7 +1697,7 @@ func (x *ListAllUsersResponse) String() string {
 func (*ListAllUsersResponse) ProtoMessage() {}
 
 func (x *ListAllUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[31]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1612,7 +1710,7 @@ func (x *ListAllUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAllUsersResponse.ProtoReflect.Descriptor instead.
 func (*ListAllUsersResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{31}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ListAllUsersResponse) GetUsers() []*User {
@@ -1630,7 +1728,7 @@ type CountAllUsersRequest struct {
 
 func (x *CountAllUsersRequest) Reset() {
 	*x = CountAllUsersRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[32]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1642,7 +1740,7 @@ func (x *CountAllUsersRequest) String() string {
 func (*CountAllUsersRequest) ProtoMessage() {}
 
 func (x *CountAllUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[32]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1655,7 +1753,7 @@ func (x *CountAllUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CountAllUsersRequest.ProtoReflect.Descriptor instead.
 func (*CountAllUsersRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{32}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{34}
 }
 
 type CountAllUsersResponse struct {
@@ -1667,7 +1765,7 @@ type CountAllUsersResponse struct {
 
 func (x *CountAllUsersResponse) Reset() {
 	*x = CountAllUsersResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[33]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1679,7 +1777,7 @@ func (x *CountAllUsersResponse) String() string {
 func (*CountAllUsersResponse) ProtoMessage() {}
 
 func (x *CountAllUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[33]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1692,7 +1790,7 @@ func (x *CountAllUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CountAllUsersResponse.ProtoReflect.Descriptor instead.
 func (*CountAllUsersResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{33}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *CountAllUsersResponse) GetCount() int32 {
@@ -1711,7 +1809,7 @@ type ListUserIdpGroupsRequest struct {
 
 func (x *ListUserIdpGroupsRequest) Reset() {
 	*x = ListUserIdpGroupsRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[34]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1723,7 +1821,7 @@ func (x *ListUserIdpGroupsRequest) String() string {
 func (*ListUserIdpGroupsRequest) ProtoMessage() {}
 
 func (x *ListUserIdpGroupsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[34]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1736,7 +1834,7 @@ func (x *ListUserIdpGroupsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserIdpGroupsRequest.ProtoReflect.Descriptor instead.
 func (*ListUserIdpGroupsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{34}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ListUserIdpGroupsRequest) GetUserId() string {
@@ -1755,7 +1853,7 @@ type ListUserIdpGroupsResponse struct {
 
 func (x *ListUserIdpGroupsResponse) Reset() {
 	*x = ListUserIdpGroupsResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[35]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1767,7 +1865,7 @@ func (x *ListUserIdpGroupsResponse) String() string {
 func (*ListUserIdpGroupsResponse) ProtoMessage() {}
 
 func (x *ListUserIdpGroupsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[35]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1780,7 +1878,7 @@ func (x *ListUserIdpGroupsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserIdpGroupsResponse.ProtoReflect.Descriptor instead.
 func (*ListUserIdpGroupsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{35}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ListUserIdpGroupsResponse) GetIdpGroups() []string {
@@ -1799,7 +1897,7 @@ type ListUserGroupNamesRequest struct {
 
 func (x *ListUserGroupNamesRequest) Reset() {
 	*x = ListUserGroupNamesRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[36]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1811,7 +1909,7 @@ func (x *ListUserGroupNamesRequest) String() string {
 func (*ListUserGroupNamesRequest) ProtoMessage() {}
 
 func (x *ListUserGroupNamesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[36]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1824,7 +1922,7 @@ func (x *ListUserGroupNamesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserGroupNamesRequest.ProtoReflect.Descriptor instead.
 func (*ListUserGroupNamesRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{36}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *ListUserGroupNamesRequest) GetUserIds() []string {
@@ -1846,7 +1944,7 @@ type UserGroupNames struct {
 
 func (x *UserGroupNames) Reset() {
 	*x = UserGroupNames{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[37]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1858,7 +1956,7 @@ func (x *UserGroupNames) String() string {
 func (*UserGroupNames) ProtoMessage() {}
 
 func (x *UserGroupNames) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[37]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1871,7 +1969,7 @@ func (x *UserGroupNames) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserGroupNames.ProtoReflect.Descriptor instead.
 func (*UserGroupNames) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{37}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *UserGroupNames) GetUserId() string {
@@ -1897,7 +1995,7 @@ type ListUserGroupNamesResponse struct {
 
 func (x *ListUserGroupNamesResponse) Reset() {
 	*x = ListUserGroupNamesResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[38]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1909,7 +2007,7 @@ func (x *ListUserGroupNamesResponse) String() string {
 func (*ListUserGroupNamesResponse) ProtoMessage() {}
 
 func (x *ListUserGroupNamesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[38]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1922,7 +2020,7 @@ func (x *ListUserGroupNamesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserGroupNamesResponse.ProtoReflect.Descriptor instead.
 func (*ListUserGroupNamesResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{38}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *ListUserGroupNamesResponse) GetUsers() []*UserGroupNames {
@@ -1940,7 +2038,7 @@ type RevokeMySessionsRequest struct {
 
 func (x *RevokeMySessionsRequest) Reset() {
 	*x = RevokeMySessionsRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[39]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1952,7 +2050,7 @@ func (x *RevokeMySessionsRequest) String() string {
 func (*RevokeMySessionsRequest) ProtoMessage() {}
 
 func (x *RevokeMySessionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[39]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1965,7 +2063,7 @@ func (x *RevokeMySessionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeMySessionsRequest.ProtoReflect.Descriptor instead.
 func (*RevokeMySessionsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{39}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{41}
 }
 
 type RevokeMySessionsResponse struct {
@@ -1977,7 +2075,7 @@ type RevokeMySessionsResponse struct {
 
 func (x *RevokeMySessionsResponse) Reset() {
 	*x = RevokeMySessionsResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[40]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1989,7 +2087,7 @@ func (x *RevokeMySessionsResponse) String() string {
 func (*RevokeMySessionsResponse) ProtoMessage() {}
 
 func (x *RevokeMySessionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[40]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2002,7 +2100,7 @@ func (x *RevokeMySessionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeMySessionsResponse.ProtoReflect.Descriptor instead.
 func (*RevokeMySessionsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{40}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *RevokeMySessionsResponse) GetRevoked() int32 {
@@ -2023,7 +2121,7 @@ type ListMySessionsRequest struct {
 
 func (x *ListMySessionsRequest) Reset() {
 	*x = ListMySessionsRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[41]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2035,7 +2133,7 @@ func (x *ListMySessionsRequest) String() string {
 func (*ListMySessionsRequest) ProtoMessage() {}
 
 func (x *ListMySessionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[41]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2048,7 +2146,7 @@ func (x *ListMySessionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMySessionsRequest.ProtoReflect.Descriptor instead.
 func (*ListMySessionsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{41}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ListMySessionsRequest) GetCurrentSessionId() string {
@@ -2068,7 +2166,7 @@ type ListMySessionsResponse struct {
 
 func (x *ListMySessionsResponse) Reset() {
 	*x = ListMySessionsResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[42]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2080,7 +2178,7 @@ func (x *ListMySessionsResponse) String() string {
 func (*ListMySessionsResponse) ProtoMessage() {}
 
 func (x *ListMySessionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[42]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2093,7 +2191,7 @@ func (x *ListMySessionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMySessionsResponse.ProtoReflect.Descriptor instead.
 func (*ListMySessionsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{42}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *ListMySessionsResponse) GetSessions() []*Session {
@@ -2115,7 +2213,7 @@ type RevokeMySessionRequest struct {
 
 func (x *RevokeMySessionRequest) Reset() {
 	*x = RevokeMySessionRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[43]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2127,7 +2225,7 @@ func (x *RevokeMySessionRequest) String() string {
 func (*RevokeMySessionRequest) ProtoMessage() {}
 
 func (x *RevokeMySessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[43]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2140,7 +2238,7 @@ func (x *RevokeMySessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeMySessionRequest.ProtoReflect.Descriptor instead.
 func (*RevokeMySessionRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{43}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *RevokeMySessionRequest) GetSessionId() string {
@@ -2168,7 +2266,7 @@ type RevokeMySessionResponse struct {
 
 func (x *RevokeMySessionResponse) Reset() {
 	*x = RevokeMySessionResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[44]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2180,7 +2278,7 @@ func (x *RevokeMySessionResponse) String() string {
 func (*RevokeMySessionResponse) ProtoMessage() {}
 
 func (x *RevokeMySessionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[44]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2193,7 +2291,7 @@ func (x *RevokeMySessionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeMySessionResponse.ProtoReflect.Descriptor instead.
 func (*RevokeMySessionResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{44}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *RevokeMySessionResponse) GetRevoked() int32 {
@@ -2211,7 +2309,7 @@ type GetSetupStateRequest struct {
 
 func (x *GetSetupStateRequest) Reset() {
 	*x = GetSetupStateRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[45]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2223,7 +2321,7 @@ func (x *GetSetupStateRequest) String() string {
 func (*GetSetupStateRequest) ProtoMessage() {}
 
 func (x *GetSetupStateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[45]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2236,7 +2334,7 @@ func (x *GetSetupStateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSetupStateRequest.ProtoReflect.Descriptor instead.
 func (*GetSetupStateRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{45}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{47}
 }
 
 type GetSetupStateResponse struct {
@@ -2248,7 +2346,7 @@ type GetSetupStateResponse struct {
 
 func (x *GetSetupStateResponse) Reset() {
 	*x = GetSetupStateResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[46]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2260,7 +2358,7 @@ func (x *GetSetupStateResponse) String() string {
 func (*GetSetupStateResponse) ProtoMessage() {}
 
 func (x *GetSetupStateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[46]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2273,7 +2371,7 @@ func (x *GetSetupStateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSetupStateResponse.ProtoReflect.Descriptor instead.
 func (*GetSetupStateResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{46}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *GetSetupStateResponse) GetNeedsSetup() bool {
@@ -2295,7 +2393,7 @@ type BootstrapRootRequest struct {
 
 func (x *BootstrapRootRequest) Reset() {
 	*x = BootstrapRootRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[47]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2307,7 +2405,7 @@ func (x *BootstrapRootRequest) String() string {
 func (*BootstrapRootRequest) ProtoMessage() {}
 
 func (x *BootstrapRootRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[47]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2320,7 +2418,7 @@ func (x *BootstrapRootRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BootstrapRootRequest.ProtoReflect.Descriptor instead.
 func (*BootstrapRootRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{47}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *BootstrapRootRequest) GetUsername() string {
@@ -2361,7 +2459,7 @@ type BootstrapRootResponse struct {
 
 func (x *BootstrapRootResponse) Reset() {
 	*x = BootstrapRootResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[48]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2373,7 +2471,7 @@ func (x *BootstrapRootResponse) String() string {
 func (*BootstrapRootResponse) ProtoMessage() {}
 
 func (x *BootstrapRootResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[48]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2386,7 +2484,7 @@ func (x *BootstrapRootResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BootstrapRootResponse.ProtoReflect.Descriptor instead.
 func (*BootstrapRootResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{48}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *BootstrapRootResponse) GetUser() *User {
@@ -2404,7 +2502,7 @@ type GetAuthConfigRequest struct {
 
 func (x *GetAuthConfigRequest) Reset() {
 	*x = GetAuthConfigRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[49]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2416,7 +2514,7 @@ func (x *GetAuthConfigRequest) String() string {
 func (*GetAuthConfigRequest) ProtoMessage() {}
 
 func (x *GetAuthConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[49]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2429,7 +2527,7 @@ func (x *GetAuthConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAuthConfigRequest.ProtoReflect.Descriptor instead.
 func (*GetAuthConfigRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{49}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{51}
 }
 
 type GetAuthConfigResponse struct {
@@ -2446,7 +2544,7 @@ type GetAuthConfigResponse struct {
 
 func (x *GetAuthConfigResponse) Reset() {
 	*x = GetAuthConfigResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[50]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2458,7 +2556,7 @@ func (x *GetAuthConfigResponse) String() string {
 func (*GetAuthConfigResponse) ProtoMessage() {}
 
 func (x *GetAuthConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[50]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2471,7 +2569,7 @@ func (x *GetAuthConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAuthConfigResponse.ProtoReflect.Descriptor instead.
 func (*GetAuthConfigResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{50}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *GetAuthConfigResponse) GetLogin_2FaEnabled() bool {
@@ -2497,7 +2595,7 @@ type RequestPasswordResetRequest struct {
 
 func (x *RequestPasswordResetRequest) Reset() {
 	*x = RequestPasswordResetRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[51]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2509,7 +2607,7 @@ func (x *RequestPasswordResetRequest) String() string {
 func (*RequestPasswordResetRequest) ProtoMessage() {}
 
 func (x *RequestPasswordResetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[51]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2522,7 +2620,7 @@ func (x *RequestPasswordResetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestPasswordResetRequest.ProtoReflect.Descriptor instead.
 func (*RequestPasswordResetRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{51}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *RequestPasswordResetRequest) GetEmail() string {
@@ -2540,7 +2638,7 @@ type RequestPasswordResetResponse struct {
 
 func (x *RequestPasswordResetResponse) Reset() {
 	*x = RequestPasswordResetResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[52]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2552,7 +2650,7 @@ func (x *RequestPasswordResetResponse) String() string {
 func (*RequestPasswordResetResponse) ProtoMessage() {}
 
 func (x *RequestPasswordResetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[52]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2565,7 +2663,7 @@ func (x *RequestPasswordResetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestPasswordResetResponse.ProtoReflect.Descriptor instead.
 func (*RequestPasswordResetResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{52}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{54}
 }
 
 type ResetPasswordWithCodeRequest struct {
@@ -2579,7 +2677,7 @@ type ResetPasswordWithCodeRequest struct {
 
 func (x *ResetPasswordWithCodeRequest) Reset() {
 	*x = ResetPasswordWithCodeRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[53]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2591,7 +2689,7 @@ func (x *ResetPasswordWithCodeRequest) String() string {
 func (*ResetPasswordWithCodeRequest) ProtoMessage() {}
 
 func (x *ResetPasswordWithCodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[53]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2604,7 +2702,7 @@ func (x *ResetPasswordWithCodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetPasswordWithCodeRequest.ProtoReflect.Descriptor instead.
 func (*ResetPasswordWithCodeRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{53}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *ResetPasswordWithCodeRequest) GetEmail() string {
@@ -2636,7 +2734,7 @@ type ResetPasswordWithCodeResponse struct {
 
 func (x *ResetPasswordWithCodeResponse) Reset() {
 	*x = ResetPasswordWithCodeResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[54]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2648,7 +2746,7 @@ func (x *ResetPasswordWithCodeResponse) String() string {
 func (*ResetPasswordWithCodeResponse) ProtoMessage() {}
 
 func (x *ResetPasswordWithCodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[54]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2661,7 +2759,7 @@ func (x *ResetPasswordWithCodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetPasswordWithCodeResponse.ProtoReflect.Descriptor instead.
 func (*ResetPasswordWithCodeResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{54}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{56}
 }
 
 type RequestLoginOtpRequest struct {
@@ -2675,7 +2773,7 @@ type RequestLoginOtpRequest struct {
 
 func (x *RequestLoginOtpRequest) Reset() {
 	*x = RequestLoginOtpRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[55]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2687,7 +2785,7 @@ func (x *RequestLoginOtpRequest) String() string {
 func (*RequestLoginOtpRequest) ProtoMessage() {}
 
 func (x *RequestLoginOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[55]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2700,7 +2798,7 @@ func (x *RequestLoginOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestLoginOtpRequest.ProtoReflect.Descriptor instead.
 func (*RequestLoginOtpRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{55}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *RequestLoginOtpRequest) GetUsername() string {
@@ -2725,7 +2823,7 @@ type RequestLoginOtpResponse struct {
 
 func (x *RequestLoginOtpResponse) Reset() {
 	*x = RequestLoginOtpResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[56]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2737,7 +2835,7 @@ func (x *RequestLoginOtpResponse) String() string {
 func (*RequestLoginOtpResponse) ProtoMessage() {}
 
 func (x *RequestLoginOtpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[56]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2750,7 +2848,7 @@ func (x *RequestLoginOtpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestLoginOtpResponse.ProtoReflect.Descriptor instead.
 func (*RequestLoginOtpResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{56}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{58}
 }
 
 type VerifyLoginOtpRequest struct {
@@ -2764,7 +2862,7 @@ type VerifyLoginOtpRequest struct {
 
 func (x *VerifyLoginOtpRequest) Reset() {
 	*x = VerifyLoginOtpRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[57]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2776,7 +2874,7 @@ func (x *VerifyLoginOtpRequest) String() string {
 func (*VerifyLoginOtpRequest) ProtoMessage() {}
 
 func (x *VerifyLoginOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[57]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2789,7 +2887,7 @@ func (x *VerifyLoginOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyLoginOtpRequest.ProtoReflect.Descriptor instead.
 func (*VerifyLoginOtpRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{57}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *VerifyLoginOtpRequest) GetUsername() string {
@@ -2824,7 +2922,7 @@ type VerifyLoginOtpResponse struct {
 
 func (x *VerifyLoginOtpResponse) Reset() {
 	*x = VerifyLoginOtpResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[58]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2836,7 +2934,7 @@ func (x *VerifyLoginOtpResponse) String() string {
 func (*VerifyLoginOtpResponse) ProtoMessage() {}
 
 func (x *VerifyLoginOtpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[58]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2849,7 +2947,7 @@ func (x *VerifyLoginOtpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyLoginOtpResponse.ProtoReflect.Descriptor instead.
 func (*VerifyLoginOtpResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{58}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *VerifyLoginOtpResponse) GetVerified() bool {
@@ -2869,7 +2967,7 @@ type MarkEmailVerifiedRequest struct {
 
 func (x *MarkEmailVerifiedRequest) Reset() {
 	*x = MarkEmailVerifiedRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[59]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2881,7 +2979,7 @@ func (x *MarkEmailVerifiedRequest) String() string {
 func (*MarkEmailVerifiedRequest) ProtoMessage() {}
 
 func (x *MarkEmailVerifiedRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[59]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2894,7 +2992,7 @@ func (x *MarkEmailVerifiedRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkEmailVerifiedRequest.ProtoReflect.Descriptor instead.
 func (*MarkEmailVerifiedRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{59}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *MarkEmailVerifiedRequest) GetUserId() string {
@@ -2921,7 +3019,7 @@ type MarkEmailVerifiedResponse struct {
 
 func (x *MarkEmailVerifiedResponse) Reset() {
 	*x = MarkEmailVerifiedResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[60]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2933,7 +3031,7 @@ func (x *MarkEmailVerifiedResponse) String() string {
 func (*MarkEmailVerifiedResponse) ProtoMessage() {}
 
 func (x *MarkEmailVerifiedResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[60]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2946,7 +3044,7 @@ func (x *MarkEmailVerifiedResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkEmailVerifiedResponse.ProtoReflect.Descriptor instead.
 func (*MarkEmailVerifiedResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{60}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *MarkEmailVerifiedResponse) GetAlreadyVerified() bool {
@@ -2965,7 +3063,7 @@ type EnrollTotpBeginRequest struct {
 
 func (x *EnrollTotpBeginRequest) Reset() {
 	*x = EnrollTotpBeginRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[61]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2977,7 +3075,7 @@ func (x *EnrollTotpBeginRequest) String() string {
 func (*EnrollTotpBeginRequest) ProtoMessage() {}
 
 func (x *EnrollTotpBeginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[61]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2990,7 +3088,7 @@ func (x *EnrollTotpBeginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnrollTotpBeginRequest.ProtoReflect.Descriptor instead.
 func (*EnrollTotpBeginRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{61}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *EnrollTotpBeginRequest) GetUserId() string {
@@ -3013,7 +3111,7 @@ type EnrollTotpBeginResponse struct {
 
 func (x *EnrollTotpBeginResponse) Reset() {
 	*x = EnrollTotpBeginResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[62]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3025,7 +3123,7 @@ func (x *EnrollTotpBeginResponse) String() string {
 func (*EnrollTotpBeginResponse) ProtoMessage() {}
 
 func (x *EnrollTotpBeginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[62]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3038,7 +3136,7 @@ func (x *EnrollTotpBeginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnrollTotpBeginResponse.ProtoReflect.Descriptor instead.
 func (*EnrollTotpBeginResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{62}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *EnrollTotpBeginResponse) GetOtpauthUri() string {
@@ -3065,7 +3163,7 @@ type EnrollTotpConfirmRequest struct {
 
 func (x *EnrollTotpConfirmRequest) Reset() {
 	*x = EnrollTotpConfirmRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[63]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3077,7 +3175,7 @@ func (x *EnrollTotpConfirmRequest) String() string {
 func (*EnrollTotpConfirmRequest) ProtoMessage() {}
 
 func (x *EnrollTotpConfirmRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[63]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3090,7 +3188,7 @@ func (x *EnrollTotpConfirmRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnrollTotpConfirmRequest.ProtoReflect.Descriptor instead.
 func (*EnrollTotpConfirmRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{63}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *EnrollTotpConfirmRequest) GetUserId() string {
@@ -3115,7 +3213,7 @@ type EnrollTotpConfirmResponse struct {
 
 func (x *EnrollTotpConfirmResponse) Reset() {
 	*x = EnrollTotpConfirmResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[64]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3127,7 +3225,7 @@ func (x *EnrollTotpConfirmResponse) String() string {
 func (*EnrollTotpConfirmResponse) ProtoMessage() {}
 
 func (x *EnrollTotpConfirmResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[64]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3140,7 +3238,7 @@ func (x *EnrollTotpConfirmResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnrollTotpConfirmResponse.ProtoReflect.Descriptor instead.
 func (*EnrollTotpConfirmResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{64}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{66}
 }
 
 type VerifyTotpRequest struct {
@@ -3153,7 +3251,7 @@ type VerifyTotpRequest struct {
 
 func (x *VerifyTotpRequest) Reset() {
 	*x = VerifyTotpRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[65]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3165,7 +3263,7 @@ func (x *VerifyTotpRequest) String() string {
 func (*VerifyTotpRequest) ProtoMessage() {}
 
 func (x *VerifyTotpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[65]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3178,7 +3276,7 @@ func (x *VerifyTotpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyTotpRequest.ProtoReflect.Descriptor instead.
 func (*VerifyTotpRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{65}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *VerifyTotpRequest) GetUserId() string {
@@ -3204,7 +3302,7 @@ type VerifyTotpResponse struct {
 
 func (x *VerifyTotpResponse) Reset() {
 	*x = VerifyTotpResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[66]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3216,7 +3314,7 @@ func (x *VerifyTotpResponse) String() string {
 func (*VerifyTotpResponse) ProtoMessage() {}
 
 func (x *VerifyTotpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[66]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3229,7 +3327,7 @@ func (x *VerifyTotpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyTotpResponse.ProtoReflect.Descriptor instead.
 func (*VerifyTotpResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{66}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *VerifyTotpResponse) GetOk() bool {
@@ -3251,7 +3349,7 @@ type SendEmailOtpRequest struct {
 
 func (x *SendEmailOtpRequest) Reset() {
 	*x = SendEmailOtpRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[67]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3263,7 +3361,7 @@ func (x *SendEmailOtpRequest) String() string {
 func (*SendEmailOtpRequest) ProtoMessage() {}
 
 func (x *SendEmailOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[67]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3276,7 +3374,7 @@ func (x *SendEmailOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendEmailOtpRequest.ProtoReflect.Descriptor instead.
 func (*SendEmailOtpRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{67}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *SendEmailOtpRequest) GetUserId() string {
@@ -3301,7 +3399,7 @@ type SendEmailOtpResponse struct {
 
 func (x *SendEmailOtpResponse) Reset() {
 	*x = SendEmailOtpResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[68]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3313,7 +3411,7 @@ func (x *SendEmailOtpResponse) String() string {
 func (*SendEmailOtpResponse) ProtoMessage() {}
 
 func (x *SendEmailOtpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[68]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3326,7 +3424,7 @@ func (x *SendEmailOtpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendEmailOtpResponse.ProtoReflect.Descriptor instead.
 func (*SendEmailOtpResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{68}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{70}
 }
 
 type VerifyEmailOtpRequest struct {
@@ -3340,7 +3438,7 @@ type VerifyEmailOtpRequest struct {
 
 func (x *VerifyEmailOtpRequest) Reset() {
 	*x = VerifyEmailOtpRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[69]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3352,7 +3450,7 @@ func (x *VerifyEmailOtpRequest) String() string {
 func (*VerifyEmailOtpRequest) ProtoMessage() {}
 
 func (x *VerifyEmailOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[69]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3365,7 +3463,7 @@ func (x *VerifyEmailOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyEmailOtpRequest.ProtoReflect.Descriptor instead.
 func (*VerifyEmailOtpRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{69}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *VerifyEmailOtpRequest) GetUserId() string {
@@ -3399,7 +3497,7 @@ type VerifyEmailOtpResponse struct {
 
 func (x *VerifyEmailOtpResponse) Reset() {
 	*x = VerifyEmailOtpResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[70]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3411,7 +3509,7 @@ func (x *VerifyEmailOtpResponse) String() string {
 func (*VerifyEmailOtpResponse) ProtoMessage() {}
 
 func (x *VerifyEmailOtpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[70]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3424,7 +3522,7 @@ func (x *VerifyEmailOtpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyEmailOtpResponse.ProtoReflect.Descriptor instead.
 func (*VerifyEmailOtpResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{70}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *VerifyEmailOtpResponse) GetOk() bool {
@@ -3443,7 +3541,7 @@ type ListUserFactorsRequest struct {
 
 func (x *ListUserFactorsRequest) Reset() {
 	*x = ListUserFactorsRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[71]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3455,7 +3553,7 @@ func (x *ListUserFactorsRequest) String() string {
 func (*ListUserFactorsRequest) ProtoMessage() {}
 
 func (x *ListUserFactorsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[71]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3468,7 +3566,7 @@ func (x *ListUserFactorsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserFactorsRequest.ProtoReflect.Descriptor instead.
 func (*ListUserFactorsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{71}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *ListUserFactorsRequest) GetUserId() string {
@@ -3487,7 +3585,7 @@ type ListUserFactorsResponse struct {
 
 func (x *ListUserFactorsResponse) Reset() {
 	*x = ListUserFactorsResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[72]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3499,7 +3597,7 @@ func (x *ListUserFactorsResponse) String() string {
 func (*ListUserFactorsResponse) ProtoMessage() {}
 
 func (x *ListUserFactorsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[72]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3512,7 +3610,7 @@ func (x *ListUserFactorsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserFactorsResponse.ProtoReflect.Descriptor instead.
 func (*ListUserFactorsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{72}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *ListUserFactorsResponse) GetFactors() []*UserFactor {
@@ -3532,7 +3630,7 @@ type RemoveFactorRequest struct {
 
 func (x *RemoveFactorRequest) Reset() {
 	*x = RemoveFactorRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[73]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3544,7 +3642,7 @@ func (x *RemoveFactorRequest) String() string {
 func (*RemoveFactorRequest) ProtoMessage() {}
 
 func (x *RemoveFactorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[73]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3557,7 +3655,7 @@ func (x *RemoveFactorRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveFactorRequest.ProtoReflect.Descriptor instead.
 func (*RemoveFactorRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{73}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *RemoveFactorRequest) GetUserId() string {
@@ -3582,7 +3680,7 @@ type RemoveFactorResponse struct {
 
 func (x *RemoveFactorResponse) Reset() {
 	*x = RemoveFactorResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[74]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3594,7 +3692,7 @@ func (x *RemoveFactorResponse) String() string {
 func (*RemoveFactorResponse) ProtoMessage() {}
 
 func (x *RemoveFactorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[74]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3607,7 +3705,7 @@ func (x *RemoveFactorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveFactorResponse.ProtoReflect.Descriptor instead.
 func (*RemoveFactorResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{74}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{76}
 }
 
 type RenameMFAMethodRequest struct {
@@ -3623,7 +3721,7 @@ type RenameMFAMethodRequest struct {
 
 func (x *RenameMFAMethodRequest) Reset() {
 	*x = RenameMFAMethodRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[75]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3635,7 +3733,7 @@ func (x *RenameMFAMethodRequest) String() string {
 func (*RenameMFAMethodRequest) ProtoMessage() {}
 
 func (x *RenameMFAMethodRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[75]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3648,7 +3746,7 @@ func (x *RenameMFAMethodRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RenameMFAMethodRequest.ProtoReflect.Descriptor instead.
 func (*RenameMFAMethodRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{75}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *RenameMFAMethodRequest) GetUserId() string {
@@ -3680,7 +3778,7 @@ type RenameMFAMethodResponse struct {
 
 func (x *RenameMFAMethodResponse) Reset() {
 	*x = RenameMFAMethodResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[76]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3692,7 +3790,7 @@ func (x *RenameMFAMethodResponse) String() string {
 func (*RenameMFAMethodResponse) ProtoMessage() {}
 
 func (x *RenameMFAMethodResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[76]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3705,7 +3803,7 @@ func (x *RenameMFAMethodResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RenameMFAMethodResponse.ProtoReflect.Descriptor instead.
 func (*RenameMFAMethodResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{76}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{78}
 }
 
 type WebauthnRegisterBeginRequest struct {
@@ -3717,7 +3815,7 @@ type WebauthnRegisterBeginRequest struct {
 
 func (x *WebauthnRegisterBeginRequest) Reset() {
 	*x = WebauthnRegisterBeginRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[77]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3729,7 +3827,7 @@ func (x *WebauthnRegisterBeginRequest) String() string {
 func (*WebauthnRegisterBeginRequest) ProtoMessage() {}
 
 func (x *WebauthnRegisterBeginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[77]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3742,7 +3840,7 @@ func (x *WebauthnRegisterBeginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebauthnRegisterBeginRequest.ProtoReflect.Descriptor instead.
 func (*WebauthnRegisterBeginRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{77}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *WebauthnRegisterBeginRequest) GetUserId() string {
@@ -3766,7 +3864,7 @@ type WebauthnRegisterBeginResponse struct {
 
 func (x *WebauthnRegisterBeginResponse) Reset() {
 	*x = WebauthnRegisterBeginResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[78]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3778,7 +3876,7 @@ func (x *WebauthnRegisterBeginResponse) String() string {
 func (*WebauthnRegisterBeginResponse) ProtoMessage() {}
 
 func (x *WebauthnRegisterBeginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[78]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3791,7 +3889,7 @@ func (x *WebauthnRegisterBeginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebauthnRegisterBeginResponse.ProtoReflect.Descriptor instead.
 func (*WebauthnRegisterBeginResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{78}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *WebauthnRegisterBeginResponse) GetOptionsJson() string {
@@ -3822,7 +3920,7 @@ type WebauthnRegisterFinishRequest struct {
 
 func (x *WebauthnRegisterFinishRequest) Reset() {
 	*x = WebauthnRegisterFinishRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[79]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3834,7 +3932,7 @@ func (x *WebauthnRegisterFinishRequest) String() string {
 func (*WebauthnRegisterFinishRequest) ProtoMessage() {}
 
 func (x *WebauthnRegisterFinishRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[79]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3847,7 +3945,7 @@ func (x *WebauthnRegisterFinishRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebauthnRegisterFinishRequest.ProtoReflect.Descriptor instead.
 func (*WebauthnRegisterFinishRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{79}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{81}
 }
 
 func (x *WebauthnRegisterFinishRequest) GetUserId() string {
@@ -3886,7 +3984,7 @@ type WebauthnRegisterFinishResponse struct {
 
 func (x *WebauthnRegisterFinishResponse) Reset() {
 	*x = WebauthnRegisterFinishResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[80]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3898,7 +3996,7 @@ func (x *WebauthnRegisterFinishResponse) String() string {
 func (*WebauthnRegisterFinishResponse) ProtoMessage() {}
 
 func (x *WebauthnRegisterFinishResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[80]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3911,7 +4009,7 @@ func (x *WebauthnRegisterFinishResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebauthnRegisterFinishResponse.ProtoReflect.Descriptor instead.
 func (*WebauthnRegisterFinishResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{80}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{82}
 }
 
 type WebauthnAssertBeginRequest struct {
@@ -3923,7 +4021,7 @@ type WebauthnAssertBeginRequest struct {
 
 func (x *WebauthnAssertBeginRequest) Reset() {
 	*x = WebauthnAssertBeginRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[81]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3935,7 +4033,7 @@ func (x *WebauthnAssertBeginRequest) String() string {
 func (*WebauthnAssertBeginRequest) ProtoMessage() {}
 
 func (x *WebauthnAssertBeginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[81]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3948,7 +4046,7 @@ func (x *WebauthnAssertBeginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebauthnAssertBeginRequest.ProtoReflect.Descriptor instead.
 func (*WebauthnAssertBeginRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{81}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *WebauthnAssertBeginRequest) GetUserId() string {
@@ -3970,7 +4068,7 @@ type WebauthnAssertBeginResponse struct {
 
 func (x *WebauthnAssertBeginResponse) Reset() {
 	*x = WebauthnAssertBeginResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[82]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3982,7 +4080,7 @@ func (x *WebauthnAssertBeginResponse) String() string {
 func (*WebauthnAssertBeginResponse) ProtoMessage() {}
 
 func (x *WebauthnAssertBeginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[82]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3995,7 +4093,7 @@ func (x *WebauthnAssertBeginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebauthnAssertBeginResponse.ProtoReflect.Descriptor instead.
 func (*WebauthnAssertBeginResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{82}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{84}
 }
 
 func (x *WebauthnAssertBeginResponse) GetOptionsJson() string {
@@ -4024,7 +4122,7 @@ type WebauthnAssertFinishRequest struct {
 
 func (x *WebauthnAssertFinishRequest) Reset() {
 	*x = WebauthnAssertFinishRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[83]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4036,7 +4134,7 @@ func (x *WebauthnAssertFinishRequest) String() string {
 func (*WebauthnAssertFinishRequest) ProtoMessage() {}
 
 func (x *WebauthnAssertFinishRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[83]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4049,7 +4147,7 @@ func (x *WebauthnAssertFinishRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebauthnAssertFinishRequest.ProtoReflect.Descriptor instead.
 func (*WebauthnAssertFinishRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{83}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{85}
 }
 
 func (x *WebauthnAssertFinishRequest) GetUserId() string {
@@ -4082,7 +4180,7 @@ type WebauthnAssertFinishResponse struct {
 
 func (x *WebauthnAssertFinishResponse) Reset() {
 	*x = WebauthnAssertFinishResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[84]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4094,7 +4192,7 @@ func (x *WebauthnAssertFinishResponse) String() string {
 func (*WebauthnAssertFinishResponse) ProtoMessage() {}
 
 func (x *WebauthnAssertFinishResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[84]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4107,7 +4205,7 @@ func (x *WebauthnAssertFinishResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebauthnAssertFinishResponse.ProtoReflect.Descriptor instead.
 func (*WebauthnAssertFinishResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{84}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{86}
 }
 
 func (x *WebauthnAssertFinishResponse) GetOk() bool {
@@ -4126,7 +4224,7 @@ type ListWebauthnCredentialsRequest struct {
 
 func (x *ListWebauthnCredentialsRequest) Reset() {
 	*x = ListWebauthnCredentialsRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[85]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4138,7 +4236,7 @@ func (x *ListWebauthnCredentialsRequest) String() string {
 func (*ListWebauthnCredentialsRequest) ProtoMessage() {}
 
 func (x *ListWebauthnCredentialsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[85]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4151,7 +4249,7 @@ func (x *ListWebauthnCredentialsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListWebauthnCredentialsRequest.ProtoReflect.Descriptor instead.
 func (*ListWebauthnCredentialsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{85}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{87}
 }
 
 func (x *ListWebauthnCredentialsRequest) GetUserId() string {
@@ -4170,7 +4268,7 @@ type ListWebauthnCredentialsResponse struct {
 
 func (x *ListWebauthnCredentialsResponse) Reset() {
 	*x = ListWebauthnCredentialsResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[86]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4182,7 +4280,7 @@ func (x *ListWebauthnCredentialsResponse) String() string {
 func (*ListWebauthnCredentialsResponse) ProtoMessage() {}
 
 func (x *ListWebauthnCredentialsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[86]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4195,7 +4293,7 @@ func (x *ListWebauthnCredentialsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListWebauthnCredentialsResponse.ProtoReflect.Descriptor instead.
 func (*ListWebauthnCredentialsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{86}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{88}
 }
 
 func (x *ListWebauthnCredentialsResponse) GetCredentials() []*WebauthnCredential {
@@ -4215,7 +4313,7 @@ type RemoveWebauthnCredentialRequest struct {
 
 func (x *RemoveWebauthnCredentialRequest) Reset() {
 	*x = RemoveWebauthnCredentialRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[87]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[89]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4227,7 +4325,7 @@ func (x *RemoveWebauthnCredentialRequest) String() string {
 func (*RemoveWebauthnCredentialRequest) ProtoMessage() {}
 
 func (x *RemoveWebauthnCredentialRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[87]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[89]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4240,7 +4338,7 @@ func (x *RemoveWebauthnCredentialRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveWebauthnCredentialRequest.ProtoReflect.Descriptor instead.
 func (*RemoveWebauthnCredentialRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{87}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{89}
 }
 
 func (x *RemoveWebauthnCredentialRequest) GetUserId() string {
@@ -4265,7 +4363,7 @@ type RemoveWebauthnCredentialResponse struct {
 
 func (x *RemoveWebauthnCredentialResponse) Reset() {
 	*x = RemoveWebauthnCredentialResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[88]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[90]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4277,7 +4375,7 @@ func (x *RemoveWebauthnCredentialResponse) String() string {
 func (*RemoveWebauthnCredentialResponse) ProtoMessage() {}
 
 func (x *RemoveWebauthnCredentialResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[88]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[90]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4290,7 +4388,7 @@ func (x *RemoveWebauthnCredentialResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveWebauthnCredentialResponse.ProtoReflect.Descriptor instead.
 func (*RemoveWebauthnCredentialResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{88}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{90}
 }
 
 type DiscoverRequest struct {
@@ -4302,7 +4400,7 @@ type DiscoverRequest struct {
 
 func (x *DiscoverRequest) Reset() {
 	*x = DiscoverRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[89]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[91]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4314,7 +4412,7 @@ func (x *DiscoverRequest) String() string {
 func (*DiscoverRequest) ProtoMessage() {}
 
 func (x *DiscoverRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[89]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[91]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4327,7 +4425,7 @@ func (x *DiscoverRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiscoverRequest.ProtoReflect.Descriptor instead.
 func (*DiscoverRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{89}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{91}
 }
 
 func (x *DiscoverRequest) GetIdentifier() string {
@@ -4355,7 +4453,7 @@ type DiscoverResponse struct {
 
 func (x *DiscoverResponse) Reset() {
 	*x = DiscoverResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[90]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4367,7 +4465,7 @@ func (x *DiscoverResponse) String() string {
 func (*DiscoverResponse) ProtoMessage() {}
 
 func (x *DiscoverResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[90]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4380,7 +4478,7 @@ func (x *DiscoverResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiscoverResponse.ProtoReflect.Descriptor instead.
 func (*DiscoverResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{90}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{92}
 }
 
 func (x *DiscoverResponse) GetMethod() string {
@@ -4420,7 +4518,7 @@ type CheckBreakGlassEligibilityRequest struct {
 
 func (x *CheckBreakGlassEligibilityRequest) Reset() {
 	*x = CheckBreakGlassEligibilityRequest{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[91]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4432,7 +4530,7 @@ func (x *CheckBreakGlassEligibilityRequest) String() string {
 func (*CheckBreakGlassEligibilityRequest) ProtoMessage() {}
 
 func (x *CheckBreakGlassEligibilityRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[91]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4445,7 +4543,7 @@ func (x *CheckBreakGlassEligibilityRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use CheckBreakGlassEligibilityRequest.ProtoReflect.Descriptor instead.
 func (*CheckBreakGlassEligibilityRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{91}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{93}
 }
 
 func (x *CheckBreakGlassEligibilityRequest) GetEmail() string {
@@ -4465,7 +4563,7 @@ type CheckBreakGlassEligibilityResponse struct {
 
 func (x *CheckBreakGlassEligibilityResponse) Reset() {
 	*x = CheckBreakGlassEligibilityResponse{}
-	mi := &file_steward_identity_v1_read_proto_msgTypes[92]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4477,7 +4575,7 @@ func (x *CheckBreakGlassEligibilityResponse) String() string {
 func (*CheckBreakGlassEligibilityResponse) ProtoMessage() {}
 
 func (x *CheckBreakGlassEligibilityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_read_proto_msgTypes[92]
+	mi := &file_steward_identity_v1_read_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4490,7 +4588,7 @@ func (x *CheckBreakGlassEligibilityResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use CheckBreakGlassEligibilityResponse.ProtoReflect.Descriptor instead.
 func (*CheckBreakGlassEligibilityResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{92}
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{94}
 }
 
 func (x *CheckBreakGlassEligibilityResponse) GetEligible() bool {
@@ -4589,7 +4687,12 @@ const file_steward_identity_v1_read_proto_rawDesc = "" +
 	"\x13include_descendants\x18\x02 \x01(\bR\x12includeDescendants\x12\x14\n" +
 	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x1d\n" +
 	"\n" +
-	"page_token\x18\x04 \x01(\tR\tpageToken\"p\n" +
+	"page_token\x18\x04 \x01(\tR\tpageToken\"A\n" +
+	"\x13SearchGroupsRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\"J\n" +
+	"\x14SearchGroupsResponse\x122\n" +
+	"\x06groups\x18\x01 \x03(\v2\x1a.steward.identity.v1.GroupR\x06groups\"p\n" +
 	"\x12ListGroupsResponse\x122\n" +
 	"\x06groups\x18\x01 \x03(\v2\x1a.steward.identity.v1.GroupR\x06groups\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"E\n" +
@@ -4757,7 +4860,7 @@ const file_steward_identity_v1_read_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\"X\n" +
 	"\"CheckBreakGlassEligibilityResponse\x12\x1a\n" +
 	"\beligible\x18\x01 \x01(\bR\beligible\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason2\xcc(\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason2\xb1)\n" +
 	"\x13IdentityReadService\x12f\n" +
 	"\rResolveClaims\x12).steward.identity.v1.ResolveClaimsRequest\x1a*.steward.identity.v1.ResolveClaimsResponse\x12T\n" +
 	"\aGetUser\x12#.steward.identity.v1.GetUserRequest\x1a$.steward.identity.v1.GetUserResponse\x12i\n" +
@@ -4772,7 +4875,8 @@ const file_steward_identity_v1_read_proto_rawDesc = "" +
 	"\x0eListUserGroups\x12*.steward.identity.v1.ListUserGroupsRequest\x1a+.steward.identity.v1.ListUserGroupsResponse\x12o\n" +
 	"\x10ListUsersByEmail\x12,.steward.identity.v1.ListUsersByEmailRequest\x1a-.steward.identity.v1.ListUsersByEmailResponse\x12]\n" +
 	"\n" +
-	"ListGroups\x12&.steward.identity.v1.ListGroupsRequest\x1a'.steward.identity.v1.ListGroupsResponse\x12{\n" +
+	"ListGroups\x12&.steward.identity.v1.ListGroupsRequest\x1a'.steward.identity.v1.ListGroupsResponse\x12c\n" +
+	"\fSearchGroups\x12(.steward.identity.v1.SearchGroupsRequest\x1a).steward.identity.v1.SearchGroupsResponse\x12{\n" +
 	"\x14ListUsersByIdpGroups\x120.steward.identity.v1.ListUsersByIdpGroupsRequest\x1a1.steward.identity.v1.ListUsersByIdpGroupsResponse\x12~\n" +
 	"\x15CountUsersByIdpGroups\x121.steward.identity.v1.CountUsersByIdpGroupsRequest\x1a2.steward.identity.v1.CountUsersByIdpGroupsResponse\x12c\n" +
 	"\fListAllUsers\x12(.steward.identity.v1.ListAllUsersRequest\x1a).steward.identity.v1.ListAllUsersResponse\x12f\n" +
@@ -4820,7 +4924,7 @@ func file_steward_identity_v1_read_proto_rawDescGZIP() []byte {
 	return file_steward_identity_v1_read_proto_rawDescData
 }
 
-var file_steward_identity_v1_read_proto_msgTypes = make([]protoimpl.MessageInfo, 93)
+var file_steward_identity_v1_read_proto_msgTypes = make([]protoimpl.MessageInfo, 95)
 var file_steward_identity_v1_read_proto_goTypes = []any{
 	(*ResolveClaimsRequest)(nil),               // 0: steward.identity.v1.ResolveClaimsRequest
 	(*ResolveClaimsResponse)(nil),              // 1: steward.identity.v1.ResolveClaimsResponse
@@ -4847,196 +4951,201 @@ var file_steward_identity_v1_read_proto_goTypes = []any{
 	(*ListUsersByEmailRequest)(nil),            // 22: steward.identity.v1.ListUsersByEmailRequest
 	(*ListUsersByEmailResponse)(nil),           // 23: steward.identity.v1.ListUsersByEmailResponse
 	(*ListGroupsRequest)(nil),                  // 24: steward.identity.v1.ListGroupsRequest
-	(*ListGroupsResponse)(nil),                 // 25: steward.identity.v1.ListGroupsResponse
-	(*ListUsersByIdpGroupsRequest)(nil),        // 26: steward.identity.v1.ListUsersByIdpGroupsRequest
-	(*ListUsersByIdpGroupsResponse)(nil),       // 27: steward.identity.v1.ListUsersByIdpGroupsResponse
-	(*CountUsersByIdpGroupsRequest)(nil),       // 28: steward.identity.v1.CountUsersByIdpGroupsRequest
-	(*CountUsersByIdpGroupsResponse)(nil),      // 29: steward.identity.v1.CountUsersByIdpGroupsResponse
-	(*ListAllUsersRequest)(nil),                // 30: steward.identity.v1.ListAllUsersRequest
-	(*ListAllUsersResponse)(nil),               // 31: steward.identity.v1.ListAllUsersResponse
-	(*CountAllUsersRequest)(nil),               // 32: steward.identity.v1.CountAllUsersRequest
-	(*CountAllUsersResponse)(nil),              // 33: steward.identity.v1.CountAllUsersResponse
-	(*ListUserIdpGroupsRequest)(nil),           // 34: steward.identity.v1.ListUserIdpGroupsRequest
-	(*ListUserIdpGroupsResponse)(nil),          // 35: steward.identity.v1.ListUserIdpGroupsResponse
-	(*ListUserGroupNamesRequest)(nil),          // 36: steward.identity.v1.ListUserGroupNamesRequest
-	(*UserGroupNames)(nil),                     // 37: steward.identity.v1.UserGroupNames
-	(*ListUserGroupNamesResponse)(nil),         // 38: steward.identity.v1.ListUserGroupNamesResponse
-	(*RevokeMySessionsRequest)(nil),            // 39: steward.identity.v1.RevokeMySessionsRequest
-	(*RevokeMySessionsResponse)(nil),           // 40: steward.identity.v1.RevokeMySessionsResponse
-	(*ListMySessionsRequest)(nil),              // 41: steward.identity.v1.ListMySessionsRequest
-	(*ListMySessionsResponse)(nil),             // 42: steward.identity.v1.ListMySessionsResponse
-	(*RevokeMySessionRequest)(nil),             // 43: steward.identity.v1.RevokeMySessionRequest
-	(*RevokeMySessionResponse)(nil),            // 44: steward.identity.v1.RevokeMySessionResponse
-	(*GetSetupStateRequest)(nil),               // 45: steward.identity.v1.GetSetupStateRequest
-	(*GetSetupStateResponse)(nil),              // 46: steward.identity.v1.GetSetupStateResponse
-	(*BootstrapRootRequest)(nil),               // 47: steward.identity.v1.BootstrapRootRequest
-	(*BootstrapRootResponse)(nil),              // 48: steward.identity.v1.BootstrapRootResponse
-	(*GetAuthConfigRequest)(nil),               // 49: steward.identity.v1.GetAuthConfigRequest
-	(*GetAuthConfigResponse)(nil),              // 50: steward.identity.v1.GetAuthConfigResponse
-	(*RequestPasswordResetRequest)(nil),        // 51: steward.identity.v1.RequestPasswordResetRequest
-	(*RequestPasswordResetResponse)(nil),       // 52: steward.identity.v1.RequestPasswordResetResponse
-	(*ResetPasswordWithCodeRequest)(nil),       // 53: steward.identity.v1.ResetPasswordWithCodeRequest
-	(*ResetPasswordWithCodeResponse)(nil),      // 54: steward.identity.v1.ResetPasswordWithCodeResponse
-	(*RequestLoginOtpRequest)(nil),             // 55: steward.identity.v1.RequestLoginOtpRequest
-	(*RequestLoginOtpResponse)(nil),            // 56: steward.identity.v1.RequestLoginOtpResponse
-	(*VerifyLoginOtpRequest)(nil),              // 57: steward.identity.v1.VerifyLoginOtpRequest
-	(*VerifyLoginOtpResponse)(nil),             // 58: steward.identity.v1.VerifyLoginOtpResponse
-	(*MarkEmailVerifiedRequest)(nil),           // 59: steward.identity.v1.MarkEmailVerifiedRequest
-	(*MarkEmailVerifiedResponse)(nil),          // 60: steward.identity.v1.MarkEmailVerifiedResponse
-	(*EnrollTotpBeginRequest)(nil),             // 61: steward.identity.v1.EnrollTotpBeginRequest
-	(*EnrollTotpBeginResponse)(nil),            // 62: steward.identity.v1.EnrollTotpBeginResponse
-	(*EnrollTotpConfirmRequest)(nil),           // 63: steward.identity.v1.EnrollTotpConfirmRequest
-	(*EnrollTotpConfirmResponse)(nil),          // 64: steward.identity.v1.EnrollTotpConfirmResponse
-	(*VerifyTotpRequest)(nil),                  // 65: steward.identity.v1.VerifyTotpRequest
-	(*VerifyTotpResponse)(nil),                 // 66: steward.identity.v1.VerifyTotpResponse
-	(*SendEmailOtpRequest)(nil),                // 67: steward.identity.v1.SendEmailOtpRequest
-	(*SendEmailOtpResponse)(nil),               // 68: steward.identity.v1.SendEmailOtpResponse
-	(*VerifyEmailOtpRequest)(nil),              // 69: steward.identity.v1.VerifyEmailOtpRequest
-	(*VerifyEmailOtpResponse)(nil),             // 70: steward.identity.v1.VerifyEmailOtpResponse
-	(*ListUserFactorsRequest)(nil),             // 71: steward.identity.v1.ListUserFactorsRequest
-	(*ListUserFactorsResponse)(nil),            // 72: steward.identity.v1.ListUserFactorsResponse
-	(*RemoveFactorRequest)(nil),                // 73: steward.identity.v1.RemoveFactorRequest
-	(*RemoveFactorResponse)(nil),               // 74: steward.identity.v1.RemoveFactorResponse
-	(*RenameMFAMethodRequest)(nil),             // 75: steward.identity.v1.RenameMFAMethodRequest
-	(*RenameMFAMethodResponse)(nil),            // 76: steward.identity.v1.RenameMFAMethodResponse
-	(*WebauthnRegisterBeginRequest)(nil),       // 77: steward.identity.v1.WebauthnRegisterBeginRequest
-	(*WebauthnRegisterBeginResponse)(nil),      // 78: steward.identity.v1.WebauthnRegisterBeginResponse
-	(*WebauthnRegisterFinishRequest)(nil),      // 79: steward.identity.v1.WebauthnRegisterFinishRequest
-	(*WebauthnRegisterFinishResponse)(nil),     // 80: steward.identity.v1.WebauthnRegisterFinishResponse
-	(*WebauthnAssertBeginRequest)(nil),         // 81: steward.identity.v1.WebauthnAssertBeginRequest
-	(*WebauthnAssertBeginResponse)(nil),        // 82: steward.identity.v1.WebauthnAssertBeginResponse
-	(*WebauthnAssertFinishRequest)(nil),        // 83: steward.identity.v1.WebauthnAssertFinishRequest
-	(*WebauthnAssertFinishResponse)(nil),       // 84: steward.identity.v1.WebauthnAssertFinishResponse
-	(*ListWebauthnCredentialsRequest)(nil),     // 85: steward.identity.v1.ListWebauthnCredentialsRequest
-	(*ListWebauthnCredentialsResponse)(nil),    // 86: steward.identity.v1.ListWebauthnCredentialsResponse
-	(*RemoveWebauthnCredentialRequest)(nil),    // 87: steward.identity.v1.RemoveWebauthnCredentialRequest
-	(*RemoveWebauthnCredentialResponse)(nil),   // 88: steward.identity.v1.RemoveWebauthnCredentialResponse
-	(*DiscoverRequest)(nil),                    // 89: steward.identity.v1.DiscoverRequest
-	(*DiscoverResponse)(nil),                   // 90: steward.identity.v1.DiscoverResponse
-	(*CheckBreakGlassEligibilityRequest)(nil),  // 91: steward.identity.v1.CheckBreakGlassEligibilityRequest
-	(*CheckBreakGlassEligibilityResponse)(nil), // 92: steward.identity.v1.CheckBreakGlassEligibilityResponse
-	(*User)(nil),               // 93: steward.identity.v1.User
-	(*Group)(nil),              // 94: steward.identity.v1.Group
-	(*Session)(nil),            // 95: steward.identity.v1.Session
-	(*UserFactor)(nil),         // 96: steward.identity.v1.UserFactor
-	(*WebauthnCredential)(nil), // 97: steward.identity.v1.WebauthnCredential
+	(*SearchGroupsRequest)(nil),                // 25: steward.identity.v1.SearchGroupsRequest
+	(*SearchGroupsResponse)(nil),               // 26: steward.identity.v1.SearchGroupsResponse
+	(*ListGroupsResponse)(nil),                 // 27: steward.identity.v1.ListGroupsResponse
+	(*ListUsersByIdpGroupsRequest)(nil),        // 28: steward.identity.v1.ListUsersByIdpGroupsRequest
+	(*ListUsersByIdpGroupsResponse)(nil),       // 29: steward.identity.v1.ListUsersByIdpGroupsResponse
+	(*CountUsersByIdpGroupsRequest)(nil),       // 30: steward.identity.v1.CountUsersByIdpGroupsRequest
+	(*CountUsersByIdpGroupsResponse)(nil),      // 31: steward.identity.v1.CountUsersByIdpGroupsResponse
+	(*ListAllUsersRequest)(nil),                // 32: steward.identity.v1.ListAllUsersRequest
+	(*ListAllUsersResponse)(nil),               // 33: steward.identity.v1.ListAllUsersResponse
+	(*CountAllUsersRequest)(nil),               // 34: steward.identity.v1.CountAllUsersRequest
+	(*CountAllUsersResponse)(nil),              // 35: steward.identity.v1.CountAllUsersResponse
+	(*ListUserIdpGroupsRequest)(nil),           // 36: steward.identity.v1.ListUserIdpGroupsRequest
+	(*ListUserIdpGroupsResponse)(nil),          // 37: steward.identity.v1.ListUserIdpGroupsResponse
+	(*ListUserGroupNamesRequest)(nil),          // 38: steward.identity.v1.ListUserGroupNamesRequest
+	(*UserGroupNames)(nil),                     // 39: steward.identity.v1.UserGroupNames
+	(*ListUserGroupNamesResponse)(nil),         // 40: steward.identity.v1.ListUserGroupNamesResponse
+	(*RevokeMySessionsRequest)(nil),            // 41: steward.identity.v1.RevokeMySessionsRequest
+	(*RevokeMySessionsResponse)(nil),           // 42: steward.identity.v1.RevokeMySessionsResponse
+	(*ListMySessionsRequest)(nil),              // 43: steward.identity.v1.ListMySessionsRequest
+	(*ListMySessionsResponse)(nil),             // 44: steward.identity.v1.ListMySessionsResponse
+	(*RevokeMySessionRequest)(nil),             // 45: steward.identity.v1.RevokeMySessionRequest
+	(*RevokeMySessionResponse)(nil),            // 46: steward.identity.v1.RevokeMySessionResponse
+	(*GetSetupStateRequest)(nil),               // 47: steward.identity.v1.GetSetupStateRequest
+	(*GetSetupStateResponse)(nil),              // 48: steward.identity.v1.GetSetupStateResponse
+	(*BootstrapRootRequest)(nil),               // 49: steward.identity.v1.BootstrapRootRequest
+	(*BootstrapRootResponse)(nil),              // 50: steward.identity.v1.BootstrapRootResponse
+	(*GetAuthConfigRequest)(nil),               // 51: steward.identity.v1.GetAuthConfigRequest
+	(*GetAuthConfigResponse)(nil),              // 52: steward.identity.v1.GetAuthConfigResponse
+	(*RequestPasswordResetRequest)(nil),        // 53: steward.identity.v1.RequestPasswordResetRequest
+	(*RequestPasswordResetResponse)(nil),       // 54: steward.identity.v1.RequestPasswordResetResponse
+	(*ResetPasswordWithCodeRequest)(nil),       // 55: steward.identity.v1.ResetPasswordWithCodeRequest
+	(*ResetPasswordWithCodeResponse)(nil),      // 56: steward.identity.v1.ResetPasswordWithCodeResponse
+	(*RequestLoginOtpRequest)(nil),             // 57: steward.identity.v1.RequestLoginOtpRequest
+	(*RequestLoginOtpResponse)(nil),            // 58: steward.identity.v1.RequestLoginOtpResponse
+	(*VerifyLoginOtpRequest)(nil),              // 59: steward.identity.v1.VerifyLoginOtpRequest
+	(*VerifyLoginOtpResponse)(nil),             // 60: steward.identity.v1.VerifyLoginOtpResponse
+	(*MarkEmailVerifiedRequest)(nil),           // 61: steward.identity.v1.MarkEmailVerifiedRequest
+	(*MarkEmailVerifiedResponse)(nil),          // 62: steward.identity.v1.MarkEmailVerifiedResponse
+	(*EnrollTotpBeginRequest)(nil),             // 63: steward.identity.v1.EnrollTotpBeginRequest
+	(*EnrollTotpBeginResponse)(nil),            // 64: steward.identity.v1.EnrollTotpBeginResponse
+	(*EnrollTotpConfirmRequest)(nil),           // 65: steward.identity.v1.EnrollTotpConfirmRequest
+	(*EnrollTotpConfirmResponse)(nil),          // 66: steward.identity.v1.EnrollTotpConfirmResponse
+	(*VerifyTotpRequest)(nil),                  // 67: steward.identity.v1.VerifyTotpRequest
+	(*VerifyTotpResponse)(nil),                 // 68: steward.identity.v1.VerifyTotpResponse
+	(*SendEmailOtpRequest)(nil),                // 69: steward.identity.v1.SendEmailOtpRequest
+	(*SendEmailOtpResponse)(nil),               // 70: steward.identity.v1.SendEmailOtpResponse
+	(*VerifyEmailOtpRequest)(nil),              // 71: steward.identity.v1.VerifyEmailOtpRequest
+	(*VerifyEmailOtpResponse)(nil),             // 72: steward.identity.v1.VerifyEmailOtpResponse
+	(*ListUserFactorsRequest)(nil),             // 73: steward.identity.v1.ListUserFactorsRequest
+	(*ListUserFactorsResponse)(nil),            // 74: steward.identity.v1.ListUserFactorsResponse
+	(*RemoveFactorRequest)(nil),                // 75: steward.identity.v1.RemoveFactorRequest
+	(*RemoveFactorResponse)(nil),               // 76: steward.identity.v1.RemoveFactorResponse
+	(*RenameMFAMethodRequest)(nil),             // 77: steward.identity.v1.RenameMFAMethodRequest
+	(*RenameMFAMethodResponse)(nil),            // 78: steward.identity.v1.RenameMFAMethodResponse
+	(*WebauthnRegisterBeginRequest)(nil),       // 79: steward.identity.v1.WebauthnRegisterBeginRequest
+	(*WebauthnRegisterBeginResponse)(nil),      // 80: steward.identity.v1.WebauthnRegisterBeginResponse
+	(*WebauthnRegisterFinishRequest)(nil),      // 81: steward.identity.v1.WebauthnRegisterFinishRequest
+	(*WebauthnRegisterFinishResponse)(nil),     // 82: steward.identity.v1.WebauthnRegisterFinishResponse
+	(*WebauthnAssertBeginRequest)(nil),         // 83: steward.identity.v1.WebauthnAssertBeginRequest
+	(*WebauthnAssertBeginResponse)(nil),        // 84: steward.identity.v1.WebauthnAssertBeginResponse
+	(*WebauthnAssertFinishRequest)(nil),        // 85: steward.identity.v1.WebauthnAssertFinishRequest
+	(*WebauthnAssertFinishResponse)(nil),       // 86: steward.identity.v1.WebauthnAssertFinishResponse
+	(*ListWebauthnCredentialsRequest)(nil),     // 87: steward.identity.v1.ListWebauthnCredentialsRequest
+	(*ListWebauthnCredentialsResponse)(nil),    // 88: steward.identity.v1.ListWebauthnCredentialsResponse
+	(*RemoveWebauthnCredentialRequest)(nil),    // 89: steward.identity.v1.RemoveWebauthnCredentialRequest
+	(*RemoveWebauthnCredentialResponse)(nil),   // 90: steward.identity.v1.RemoveWebauthnCredentialResponse
+	(*DiscoverRequest)(nil),                    // 91: steward.identity.v1.DiscoverRequest
+	(*DiscoverResponse)(nil),                   // 92: steward.identity.v1.DiscoverResponse
+	(*CheckBreakGlassEligibilityRequest)(nil),  // 93: steward.identity.v1.CheckBreakGlassEligibilityRequest
+	(*CheckBreakGlassEligibilityResponse)(nil), // 94: steward.identity.v1.CheckBreakGlassEligibilityResponse
+	(*User)(nil),               // 95: steward.identity.v1.User
+	(*Group)(nil),              // 96: steward.identity.v1.Group
+	(*Session)(nil),            // 97: steward.identity.v1.Session
+	(*UserFactor)(nil),         // 98: steward.identity.v1.UserFactor
+	(*WebauthnCredential)(nil), // 99: steward.identity.v1.WebauthnCredential
 }
 var file_steward_identity_v1_read_proto_depIdxs = []int32{
-	93, // 0: steward.identity.v1.ResolveClaimsResponse.user:type_name -> steward.identity.v1.User
-	93, // 1: steward.identity.v1.GetUserResponse.user:type_name -> steward.identity.v1.User
-	93, // 2: steward.identity.v1.GetUserByEmailResponse.user:type_name -> steward.identity.v1.User
-	93, // 3: steward.identity.v1.JitProvisionByEmailResponse.user:type_name -> steward.identity.v1.User
-	93, // 4: steward.identity.v1.ListUsersInGroupResponse.users:type_name -> steward.identity.v1.User
-	94, // 5: steward.identity.v1.GetGroupResponse.group:type_name -> steward.identity.v1.Group
-	94, // 6: steward.identity.v1.ListGroupDescendantsResponse.groups:type_name -> steward.identity.v1.Group
-	94, // 7: steward.identity.v1.ListGroupAncestorsResponse.groups:type_name -> steward.identity.v1.Group
-	94, // 8: steward.identity.v1.ListUserGroupsResponse.groups:type_name -> steward.identity.v1.Group
-	93, // 9: steward.identity.v1.ListUsersByEmailResponse.users:type_name -> steward.identity.v1.User
-	94, // 10: steward.identity.v1.ListGroupsResponse.groups:type_name -> steward.identity.v1.Group
-	93, // 11: steward.identity.v1.ListUsersByIdpGroupsResponse.users:type_name -> steward.identity.v1.User
-	93, // 12: steward.identity.v1.ListAllUsersResponse.users:type_name -> steward.identity.v1.User
-	37, // 13: steward.identity.v1.ListUserGroupNamesResponse.users:type_name -> steward.identity.v1.UserGroupNames
-	95, // 14: steward.identity.v1.ListMySessionsResponse.sessions:type_name -> steward.identity.v1.Session
-	93, // 15: steward.identity.v1.BootstrapRootResponse.user:type_name -> steward.identity.v1.User
-	96, // 16: steward.identity.v1.ListUserFactorsResponse.factors:type_name -> steward.identity.v1.UserFactor
-	97, // 17: steward.identity.v1.ListWebauthnCredentialsResponse.credentials:type_name -> steward.identity.v1.WebauthnCredential
-	0,  // 18: steward.identity.v1.IdentityReadService.ResolveClaims:input_type -> steward.identity.v1.ResolveClaimsRequest
-	2,  // 19: steward.identity.v1.IdentityReadService.GetUser:input_type -> steward.identity.v1.GetUserRequest
-	4,  // 20: steward.identity.v1.IdentityReadService.GetUserByEmail:input_type -> steward.identity.v1.GetUserByEmailRequest
-	6,  // 21: steward.identity.v1.IdentityReadService.JitProvisionByEmail:input_type -> steward.identity.v1.JitProvisionByEmailRequest
-	8,  // 22: steward.identity.v1.IdentityReadService.ListUsersInGroup:input_type -> steward.identity.v1.ListUsersInGroupRequest
-	10, // 23: steward.identity.v1.IdentityReadService.GetGroup:input_type -> steward.identity.v1.GetGroupRequest
-	12, // 24: steward.identity.v1.IdentityReadService.ListGroupDescendants:input_type -> steward.identity.v1.ListGroupDescendantsRequest
-	14, // 25: steward.identity.v1.IdentityReadService.ListGroupAncestors:input_type -> steward.identity.v1.ListGroupAncestorsRequest
-	16, // 26: steward.identity.v1.IdentityReadService.ResolveEmail:input_type -> steward.identity.v1.ResolveEmailRequest
-	18, // 27: steward.identity.v1.IdentityReadService.ResolveFCMToken:input_type -> steward.identity.v1.ResolveFCMTokenRequest
-	20, // 28: steward.identity.v1.IdentityReadService.ListUserGroups:input_type -> steward.identity.v1.ListUserGroupsRequest
-	22, // 29: steward.identity.v1.IdentityReadService.ListUsersByEmail:input_type -> steward.identity.v1.ListUsersByEmailRequest
-	24, // 30: steward.identity.v1.IdentityReadService.ListGroups:input_type -> steward.identity.v1.ListGroupsRequest
-	26, // 31: steward.identity.v1.IdentityReadService.ListUsersByIdpGroups:input_type -> steward.identity.v1.ListUsersByIdpGroupsRequest
-	28, // 32: steward.identity.v1.IdentityReadService.CountUsersByIdpGroups:input_type -> steward.identity.v1.CountUsersByIdpGroupsRequest
-	30, // 33: steward.identity.v1.IdentityReadService.ListAllUsers:input_type -> steward.identity.v1.ListAllUsersRequest
-	32, // 34: steward.identity.v1.IdentityReadService.CountAllUsers:input_type -> steward.identity.v1.CountAllUsersRequest
-	34, // 35: steward.identity.v1.IdentityReadService.ListUserIdpGroups:input_type -> steward.identity.v1.ListUserIdpGroupsRequest
-	36, // 36: steward.identity.v1.IdentityReadService.ListUserGroupNames:input_type -> steward.identity.v1.ListUserGroupNamesRequest
-	39, // 37: steward.identity.v1.IdentityReadService.RevokeMySessions:input_type -> steward.identity.v1.RevokeMySessionsRequest
-	41, // 38: steward.identity.v1.IdentityReadService.ListMySessions:input_type -> steward.identity.v1.ListMySessionsRequest
-	43, // 39: steward.identity.v1.IdentityReadService.RevokeMySession:input_type -> steward.identity.v1.RevokeMySessionRequest
-	45, // 40: steward.identity.v1.IdentityReadService.GetSetupState:input_type -> steward.identity.v1.GetSetupStateRequest
-	47, // 41: steward.identity.v1.IdentityReadService.BootstrapRoot:input_type -> steward.identity.v1.BootstrapRootRequest
-	49, // 42: steward.identity.v1.IdentityReadService.GetAuthConfig:input_type -> steward.identity.v1.GetAuthConfigRequest
-	51, // 43: steward.identity.v1.IdentityReadService.RequestPasswordReset:input_type -> steward.identity.v1.RequestPasswordResetRequest
-	53, // 44: steward.identity.v1.IdentityReadService.ResetPasswordWithCode:input_type -> steward.identity.v1.ResetPasswordWithCodeRequest
-	55, // 45: steward.identity.v1.IdentityReadService.RequestLoginOtp:input_type -> steward.identity.v1.RequestLoginOtpRequest
-	57, // 46: steward.identity.v1.IdentityReadService.VerifyLoginOtp:input_type -> steward.identity.v1.VerifyLoginOtpRequest
-	59, // 47: steward.identity.v1.IdentityReadService.MarkEmailVerified:input_type -> steward.identity.v1.MarkEmailVerifiedRequest
-	61, // 48: steward.identity.v1.IdentityReadService.EnrollTotpBegin:input_type -> steward.identity.v1.EnrollTotpBeginRequest
-	63, // 49: steward.identity.v1.IdentityReadService.EnrollTotpConfirm:input_type -> steward.identity.v1.EnrollTotpConfirmRequest
-	65, // 50: steward.identity.v1.IdentityReadService.VerifyTotp:input_type -> steward.identity.v1.VerifyTotpRequest
-	67, // 51: steward.identity.v1.IdentityReadService.SendEmailOtp:input_type -> steward.identity.v1.SendEmailOtpRequest
-	69, // 52: steward.identity.v1.IdentityReadService.VerifyEmailOtp:input_type -> steward.identity.v1.VerifyEmailOtpRequest
-	71, // 53: steward.identity.v1.IdentityReadService.ListUserFactors:input_type -> steward.identity.v1.ListUserFactorsRequest
-	73, // 54: steward.identity.v1.IdentityReadService.RemoveFactor:input_type -> steward.identity.v1.RemoveFactorRequest
-	77, // 55: steward.identity.v1.IdentityReadService.WebauthnRegisterBegin:input_type -> steward.identity.v1.WebauthnRegisterBeginRequest
-	79, // 56: steward.identity.v1.IdentityReadService.WebauthnRegisterFinish:input_type -> steward.identity.v1.WebauthnRegisterFinishRequest
-	81, // 57: steward.identity.v1.IdentityReadService.WebauthnAssertBegin:input_type -> steward.identity.v1.WebauthnAssertBeginRequest
-	83, // 58: steward.identity.v1.IdentityReadService.WebauthnAssertFinish:input_type -> steward.identity.v1.WebauthnAssertFinishRequest
-	85, // 59: steward.identity.v1.IdentityReadService.ListWebauthnCredentials:input_type -> steward.identity.v1.ListWebauthnCredentialsRequest
-	87, // 60: steward.identity.v1.IdentityReadService.RemoveWebauthnCredential:input_type -> steward.identity.v1.RemoveWebauthnCredentialRequest
-	75, // 61: steward.identity.v1.IdentityReadService.RenameMFAMethod:input_type -> steward.identity.v1.RenameMFAMethodRequest
-	89, // 62: steward.identity.v1.IdentityReadService.Discover:input_type -> steward.identity.v1.DiscoverRequest
-	91, // 63: steward.identity.v1.IdentityReadService.CheckBreakGlassEligibility:input_type -> steward.identity.v1.CheckBreakGlassEligibilityRequest
-	1,  // 64: steward.identity.v1.IdentityReadService.ResolveClaims:output_type -> steward.identity.v1.ResolveClaimsResponse
-	3,  // 65: steward.identity.v1.IdentityReadService.GetUser:output_type -> steward.identity.v1.GetUserResponse
-	5,  // 66: steward.identity.v1.IdentityReadService.GetUserByEmail:output_type -> steward.identity.v1.GetUserByEmailResponse
-	7,  // 67: steward.identity.v1.IdentityReadService.JitProvisionByEmail:output_type -> steward.identity.v1.JitProvisionByEmailResponse
-	9,  // 68: steward.identity.v1.IdentityReadService.ListUsersInGroup:output_type -> steward.identity.v1.ListUsersInGroupResponse
-	11, // 69: steward.identity.v1.IdentityReadService.GetGroup:output_type -> steward.identity.v1.GetGroupResponse
-	13, // 70: steward.identity.v1.IdentityReadService.ListGroupDescendants:output_type -> steward.identity.v1.ListGroupDescendantsResponse
-	15, // 71: steward.identity.v1.IdentityReadService.ListGroupAncestors:output_type -> steward.identity.v1.ListGroupAncestorsResponse
-	17, // 72: steward.identity.v1.IdentityReadService.ResolveEmail:output_type -> steward.identity.v1.ResolveEmailResponse
-	19, // 73: steward.identity.v1.IdentityReadService.ResolveFCMToken:output_type -> steward.identity.v1.ResolveFCMTokenResponse
-	21, // 74: steward.identity.v1.IdentityReadService.ListUserGroups:output_type -> steward.identity.v1.ListUserGroupsResponse
-	23, // 75: steward.identity.v1.IdentityReadService.ListUsersByEmail:output_type -> steward.identity.v1.ListUsersByEmailResponse
-	25, // 76: steward.identity.v1.IdentityReadService.ListGroups:output_type -> steward.identity.v1.ListGroupsResponse
-	27, // 77: steward.identity.v1.IdentityReadService.ListUsersByIdpGroups:output_type -> steward.identity.v1.ListUsersByIdpGroupsResponse
-	29, // 78: steward.identity.v1.IdentityReadService.CountUsersByIdpGroups:output_type -> steward.identity.v1.CountUsersByIdpGroupsResponse
-	31, // 79: steward.identity.v1.IdentityReadService.ListAllUsers:output_type -> steward.identity.v1.ListAllUsersResponse
-	33, // 80: steward.identity.v1.IdentityReadService.CountAllUsers:output_type -> steward.identity.v1.CountAllUsersResponse
-	35, // 81: steward.identity.v1.IdentityReadService.ListUserIdpGroups:output_type -> steward.identity.v1.ListUserIdpGroupsResponse
-	38, // 82: steward.identity.v1.IdentityReadService.ListUserGroupNames:output_type -> steward.identity.v1.ListUserGroupNamesResponse
-	40, // 83: steward.identity.v1.IdentityReadService.RevokeMySessions:output_type -> steward.identity.v1.RevokeMySessionsResponse
-	42, // 84: steward.identity.v1.IdentityReadService.ListMySessions:output_type -> steward.identity.v1.ListMySessionsResponse
-	44, // 85: steward.identity.v1.IdentityReadService.RevokeMySession:output_type -> steward.identity.v1.RevokeMySessionResponse
-	46, // 86: steward.identity.v1.IdentityReadService.GetSetupState:output_type -> steward.identity.v1.GetSetupStateResponse
-	48, // 87: steward.identity.v1.IdentityReadService.BootstrapRoot:output_type -> steward.identity.v1.BootstrapRootResponse
-	50, // 88: steward.identity.v1.IdentityReadService.GetAuthConfig:output_type -> steward.identity.v1.GetAuthConfigResponse
-	52, // 89: steward.identity.v1.IdentityReadService.RequestPasswordReset:output_type -> steward.identity.v1.RequestPasswordResetResponse
-	54, // 90: steward.identity.v1.IdentityReadService.ResetPasswordWithCode:output_type -> steward.identity.v1.ResetPasswordWithCodeResponse
-	56, // 91: steward.identity.v1.IdentityReadService.RequestLoginOtp:output_type -> steward.identity.v1.RequestLoginOtpResponse
-	58, // 92: steward.identity.v1.IdentityReadService.VerifyLoginOtp:output_type -> steward.identity.v1.VerifyLoginOtpResponse
-	60, // 93: steward.identity.v1.IdentityReadService.MarkEmailVerified:output_type -> steward.identity.v1.MarkEmailVerifiedResponse
-	62, // 94: steward.identity.v1.IdentityReadService.EnrollTotpBegin:output_type -> steward.identity.v1.EnrollTotpBeginResponse
-	64, // 95: steward.identity.v1.IdentityReadService.EnrollTotpConfirm:output_type -> steward.identity.v1.EnrollTotpConfirmResponse
-	66, // 96: steward.identity.v1.IdentityReadService.VerifyTotp:output_type -> steward.identity.v1.VerifyTotpResponse
-	68, // 97: steward.identity.v1.IdentityReadService.SendEmailOtp:output_type -> steward.identity.v1.SendEmailOtpResponse
-	70, // 98: steward.identity.v1.IdentityReadService.VerifyEmailOtp:output_type -> steward.identity.v1.VerifyEmailOtpResponse
-	72, // 99: steward.identity.v1.IdentityReadService.ListUserFactors:output_type -> steward.identity.v1.ListUserFactorsResponse
-	74, // 100: steward.identity.v1.IdentityReadService.RemoveFactor:output_type -> steward.identity.v1.RemoveFactorResponse
-	78, // 101: steward.identity.v1.IdentityReadService.WebauthnRegisterBegin:output_type -> steward.identity.v1.WebauthnRegisterBeginResponse
-	80, // 102: steward.identity.v1.IdentityReadService.WebauthnRegisterFinish:output_type -> steward.identity.v1.WebauthnRegisterFinishResponse
-	82, // 103: steward.identity.v1.IdentityReadService.WebauthnAssertBegin:output_type -> steward.identity.v1.WebauthnAssertBeginResponse
-	84, // 104: steward.identity.v1.IdentityReadService.WebauthnAssertFinish:output_type -> steward.identity.v1.WebauthnAssertFinishResponse
-	86, // 105: steward.identity.v1.IdentityReadService.ListWebauthnCredentials:output_type -> steward.identity.v1.ListWebauthnCredentialsResponse
-	88, // 106: steward.identity.v1.IdentityReadService.RemoveWebauthnCredential:output_type -> steward.identity.v1.RemoveWebauthnCredentialResponse
-	76, // 107: steward.identity.v1.IdentityReadService.RenameMFAMethod:output_type -> steward.identity.v1.RenameMFAMethodResponse
-	90, // 108: steward.identity.v1.IdentityReadService.Discover:output_type -> steward.identity.v1.DiscoverResponse
-	92, // 109: steward.identity.v1.IdentityReadService.CheckBreakGlassEligibility:output_type -> steward.identity.v1.CheckBreakGlassEligibilityResponse
-	64, // [64:110] is the sub-list for method output_type
-	18, // [18:64] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	95, // 0: steward.identity.v1.ResolveClaimsResponse.user:type_name -> steward.identity.v1.User
+	95, // 1: steward.identity.v1.GetUserResponse.user:type_name -> steward.identity.v1.User
+	95, // 2: steward.identity.v1.GetUserByEmailResponse.user:type_name -> steward.identity.v1.User
+	95, // 3: steward.identity.v1.JitProvisionByEmailResponse.user:type_name -> steward.identity.v1.User
+	95, // 4: steward.identity.v1.ListUsersInGroupResponse.users:type_name -> steward.identity.v1.User
+	96, // 5: steward.identity.v1.GetGroupResponse.group:type_name -> steward.identity.v1.Group
+	96, // 6: steward.identity.v1.ListGroupDescendantsResponse.groups:type_name -> steward.identity.v1.Group
+	96, // 7: steward.identity.v1.ListGroupAncestorsResponse.groups:type_name -> steward.identity.v1.Group
+	96, // 8: steward.identity.v1.ListUserGroupsResponse.groups:type_name -> steward.identity.v1.Group
+	95, // 9: steward.identity.v1.ListUsersByEmailResponse.users:type_name -> steward.identity.v1.User
+	96, // 10: steward.identity.v1.SearchGroupsResponse.groups:type_name -> steward.identity.v1.Group
+	96, // 11: steward.identity.v1.ListGroupsResponse.groups:type_name -> steward.identity.v1.Group
+	95, // 12: steward.identity.v1.ListUsersByIdpGroupsResponse.users:type_name -> steward.identity.v1.User
+	95, // 13: steward.identity.v1.ListAllUsersResponse.users:type_name -> steward.identity.v1.User
+	39, // 14: steward.identity.v1.ListUserGroupNamesResponse.users:type_name -> steward.identity.v1.UserGroupNames
+	97, // 15: steward.identity.v1.ListMySessionsResponse.sessions:type_name -> steward.identity.v1.Session
+	95, // 16: steward.identity.v1.BootstrapRootResponse.user:type_name -> steward.identity.v1.User
+	98, // 17: steward.identity.v1.ListUserFactorsResponse.factors:type_name -> steward.identity.v1.UserFactor
+	99, // 18: steward.identity.v1.ListWebauthnCredentialsResponse.credentials:type_name -> steward.identity.v1.WebauthnCredential
+	0,  // 19: steward.identity.v1.IdentityReadService.ResolveClaims:input_type -> steward.identity.v1.ResolveClaimsRequest
+	2,  // 20: steward.identity.v1.IdentityReadService.GetUser:input_type -> steward.identity.v1.GetUserRequest
+	4,  // 21: steward.identity.v1.IdentityReadService.GetUserByEmail:input_type -> steward.identity.v1.GetUserByEmailRequest
+	6,  // 22: steward.identity.v1.IdentityReadService.JitProvisionByEmail:input_type -> steward.identity.v1.JitProvisionByEmailRequest
+	8,  // 23: steward.identity.v1.IdentityReadService.ListUsersInGroup:input_type -> steward.identity.v1.ListUsersInGroupRequest
+	10, // 24: steward.identity.v1.IdentityReadService.GetGroup:input_type -> steward.identity.v1.GetGroupRequest
+	12, // 25: steward.identity.v1.IdentityReadService.ListGroupDescendants:input_type -> steward.identity.v1.ListGroupDescendantsRequest
+	14, // 26: steward.identity.v1.IdentityReadService.ListGroupAncestors:input_type -> steward.identity.v1.ListGroupAncestorsRequest
+	16, // 27: steward.identity.v1.IdentityReadService.ResolveEmail:input_type -> steward.identity.v1.ResolveEmailRequest
+	18, // 28: steward.identity.v1.IdentityReadService.ResolveFCMToken:input_type -> steward.identity.v1.ResolveFCMTokenRequest
+	20, // 29: steward.identity.v1.IdentityReadService.ListUserGroups:input_type -> steward.identity.v1.ListUserGroupsRequest
+	22, // 30: steward.identity.v1.IdentityReadService.ListUsersByEmail:input_type -> steward.identity.v1.ListUsersByEmailRequest
+	24, // 31: steward.identity.v1.IdentityReadService.ListGroups:input_type -> steward.identity.v1.ListGroupsRequest
+	25, // 32: steward.identity.v1.IdentityReadService.SearchGroups:input_type -> steward.identity.v1.SearchGroupsRequest
+	28, // 33: steward.identity.v1.IdentityReadService.ListUsersByIdpGroups:input_type -> steward.identity.v1.ListUsersByIdpGroupsRequest
+	30, // 34: steward.identity.v1.IdentityReadService.CountUsersByIdpGroups:input_type -> steward.identity.v1.CountUsersByIdpGroupsRequest
+	32, // 35: steward.identity.v1.IdentityReadService.ListAllUsers:input_type -> steward.identity.v1.ListAllUsersRequest
+	34, // 36: steward.identity.v1.IdentityReadService.CountAllUsers:input_type -> steward.identity.v1.CountAllUsersRequest
+	36, // 37: steward.identity.v1.IdentityReadService.ListUserIdpGroups:input_type -> steward.identity.v1.ListUserIdpGroupsRequest
+	38, // 38: steward.identity.v1.IdentityReadService.ListUserGroupNames:input_type -> steward.identity.v1.ListUserGroupNamesRequest
+	41, // 39: steward.identity.v1.IdentityReadService.RevokeMySessions:input_type -> steward.identity.v1.RevokeMySessionsRequest
+	43, // 40: steward.identity.v1.IdentityReadService.ListMySessions:input_type -> steward.identity.v1.ListMySessionsRequest
+	45, // 41: steward.identity.v1.IdentityReadService.RevokeMySession:input_type -> steward.identity.v1.RevokeMySessionRequest
+	47, // 42: steward.identity.v1.IdentityReadService.GetSetupState:input_type -> steward.identity.v1.GetSetupStateRequest
+	49, // 43: steward.identity.v1.IdentityReadService.BootstrapRoot:input_type -> steward.identity.v1.BootstrapRootRequest
+	51, // 44: steward.identity.v1.IdentityReadService.GetAuthConfig:input_type -> steward.identity.v1.GetAuthConfigRequest
+	53, // 45: steward.identity.v1.IdentityReadService.RequestPasswordReset:input_type -> steward.identity.v1.RequestPasswordResetRequest
+	55, // 46: steward.identity.v1.IdentityReadService.ResetPasswordWithCode:input_type -> steward.identity.v1.ResetPasswordWithCodeRequest
+	57, // 47: steward.identity.v1.IdentityReadService.RequestLoginOtp:input_type -> steward.identity.v1.RequestLoginOtpRequest
+	59, // 48: steward.identity.v1.IdentityReadService.VerifyLoginOtp:input_type -> steward.identity.v1.VerifyLoginOtpRequest
+	61, // 49: steward.identity.v1.IdentityReadService.MarkEmailVerified:input_type -> steward.identity.v1.MarkEmailVerifiedRequest
+	63, // 50: steward.identity.v1.IdentityReadService.EnrollTotpBegin:input_type -> steward.identity.v1.EnrollTotpBeginRequest
+	65, // 51: steward.identity.v1.IdentityReadService.EnrollTotpConfirm:input_type -> steward.identity.v1.EnrollTotpConfirmRequest
+	67, // 52: steward.identity.v1.IdentityReadService.VerifyTotp:input_type -> steward.identity.v1.VerifyTotpRequest
+	69, // 53: steward.identity.v1.IdentityReadService.SendEmailOtp:input_type -> steward.identity.v1.SendEmailOtpRequest
+	71, // 54: steward.identity.v1.IdentityReadService.VerifyEmailOtp:input_type -> steward.identity.v1.VerifyEmailOtpRequest
+	73, // 55: steward.identity.v1.IdentityReadService.ListUserFactors:input_type -> steward.identity.v1.ListUserFactorsRequest
+	75, // 56: steward.identity.v1.IdentityReadService.RemoveFactor:input_type -> steward.identity.v1.RemoveFactorRequest
+	79, // 57: steward.identity.v1.IdentityReadService.WebauthnRegisterBegin:input_type -> steward.identity.v1.WebauthnRegisterBeginRequest
+	81, // 58: steward.identity.v1.IdentityReadService.WebauthnRegisterFinish:input_type -> steward.identity.v1.WebauthnRegisterFinishRequest
+	83, // 59: steward.identity.v1.IdentityReadService.WebauthnAssertBegin:input_type -> steward.identity.v1.WebauthnAssertBeginRequest
+	85, // 60: steward.identity.v1.IdentityReadService.WebauthnAssertFinish:input_type -> steward.identity.v1.WebauthnAssertFinishRequest
+	87, // 61: steward.identity.v1.IdentityReadService.ListWebauthnCredentials:input_type -> steward.identity.v1.ListWebauthnCredentialsRequest
+	89, // 62: steward.identity.v1.IdentityReadService.RemoveWebauthnCredential:input_type -> steward.identity.v1.RemoveWebauthnCredentialRequest
+	77, // 63: steward.identity.v1.IdentityReadService.RenameMFAMethod:input_type -> steward.identity.v1.RenameMFAMethodRequest
+	91, // 64: steward.identity.v1.IdentityReadService.Discover:input_type -> steward.identity.v1.DiscoverRequest
+	93, // 65: steward.identity.v1.IdentityReadService.CheckBreakGlassEligibility:input_type -> steward.identity.v1.CheckBreakGlassEligibilityRequest
+	1,  // 66: steward.identity.v1.IdentityReadService.ResolveClaims:output_type -> steward.identity.v1.ResolveClaimsResponse
+	3,  // 67: steward.identity.v1.IdentityReadService.GetUser:output_type -> steward.identity.v1.GetUserResponse
+	5,  // 68: steward.identity.v1.IdentityReadService.GetUserByEmail:output_type -> steward.identity.v1.GetUserByEmailResponse
+	7,  // 69: steward.identity.v1.IdentityReadService.JitProvisionByEmail:output_type -> steward.identity.v1.JitProvisionByEmailResponse
+	9,  // 70: steward.identity.v1.IdentityReadService.ListUsersInGroup:output_type -> steward.identity.v1.ListUsersInGroupResponse
+	11, // 71: steward.identity.v1.IdentityReadService.GetGroup:output_type -> steward.identity.v1.GetGroupResponse
+	13, // 72: steward.identity.v1.IdentityReadService.ListGroupDescendants:output_type -> steward.identity.v1.ListGroupDescendantsResponse
+	15, // 73: steward.identity.v1.IdentityReadService.ListGroupAncestors:output_type -> steward.identity.v1.ListGroupAncestorsResponse
+	17, // 74: steward.identity.v1.IdentityReadService.ResolveEmail:output_type -> steward.identity.v1.ResolveEmailResponse
+	19, // 75: steward.identity.v1.IdentityReadService.ResolveFCMToken:output_type -> steward.identity.v1.ResolveFCMTokenResponse
+	21, // 76: steward.identity.v1.IdentityReadService.ListUserGroups:output_type -> steward.identity.v1.ListUserGroupsResponse
+	23, // 77: steward.identity.v1.IdentityReadService.ListUsersByEmail:output_type -> steward.identity.v1.ListUsersByEmailResponse
+	27, // 78: steward.identity.v1.IdentityReadService.ListGroups:output_type -> steward.identity.v1.ListGroupsResponse
+	26, // 79: steward.identity.v1.IdentityReadService.SearchGroups:output_type -> steward.identity.v1.SearchGroupsResponse
+	29, // 80: steward.identity.v1.IdentityReadService.ListUsersByIdpGroups:output_type -> steward.identity.v1.ListUsersByIdpGroupsResponse
+	31, // 81: steward.identity.v1.IdentityReadService.CountUsersByIdpGroups:output_type -> steward.identity.v1.CountUsersByIdpGroupsResponse
+	33, // 82: steward.identity.v1.IdentityReadService.ListAllUsers:output_type -> steward.identity.v1.ListAllUsersResponse
+	35, // 83: steward.identity.v1.IdentityReadService.CountAllUsers:output_type -> steward.identity.v1.CountAllUsersResponse
+	37, // 84: steward.identity.v1.IdentityReadService.ListUserIdpGroups:output_type -> steward.identity.v1.ListUserIdpGroupsResponse
+	40, // 85: steward.identity.v1.IdentityReadService.ListUserGroupNames:output_type -> steward.identity.v1.ListUserGroupNamesResponse
+	42, // 86: steward.identity.v1.IdentityReadService.RevokeMySessions:output_type -> steward.identity.v1.RevokeMySessionsResponse
+	44, // 87: steward.identity.v1.IdentityReadService.ListMySessions:output_type -> steward.identity.v1.ListMySessionsResponse
+	46, // 88: steward.identity.v1.IdentityReadService.RevokeMySession:output_type -> steward.identity.v1.RevokeMySessionResponse
+	48, // 89: steward.identity.v1.IdentityReadService.GetSetupState:output_type -> steward.identity.v1.GetSetupStateResponse
+	50, // 90: steward.identity.v1.IdentityReadService.BootstrapRoot:output_type -> steward.identity.v1.BootstrapRootResponse
+	52, // 91: steward.identity.v1.IdentityReadService.GetAuthConfig:output_type -> steward.identity.v1.GetAuthConfigResponse
+	54, // 92: steward.identity.v1.IdentityReadService.RequestPasswordReset:output_type -> steward.identity.v1.RequestPasswordResetResponse
+	56, // 93: steward.identity.v1.IdentityReadService.ResetPasswordWithCode:output_type -> steward.identity.v1.ResetPasswordWithCodeResponse
+	58, // 94: steward.identity.v1.IdentityReadService.RequestLoginOtp:output_type -> steward.identity.v1.RequestLoginOtpResponse
+	60, // 95: steward.identity.v1.IdentityReadService.VerifyLoginOtp:output_type -> steward.identity.v1.VerifyLoginOtpResponse
+	62, // 96: steward.identity.v1.IdentityReadService.MarkEmailVerified:output_type -> steward.identity.v1.MarkEmailVerifiedResponse
+	64, // 97: steward.identity.v1.IdentityReadService.EnrollTotpBegin:output_type -> steward.identity.v1.EnrollTotpBeginResponse
+	66, // 98: steward.identity.v1.IdentityReadService.EnrollTotpConfirm:output_type -> steward.identity.v1.EnrollTotpConfirmResponse
+	68, // 99: steward.identity.v1.IdentityReadService.VerifyTotp:output_type -> steward.identity.v1.VerifyTotpResponse
+	70, // 100: steward.identity.v1.IdentityReadService.SendEmailOtp:output_type -> steward.identity.v1.SendEmailOtpResponse
+	72, // 101: steward.identity.v1.IdentityReadService.VerifyEmailOtp:output_type -> steward.identity.v1.VerifyEmailOtpResponse
+	74, // 102: steward.identity.v1.IdentityReadService.ListUserFactors:output_type -> steward.identity.v1.ListUserFactorsResponse
+	76, // 103: steward.identity.v1.IdentityReadService.RemoveFactor:output_type -> steward.identity.v1.RemoveFactorResponse
+	80, // 104: steward.identity.v1.IdentityReadService.WebauthnRegisterBegin:output_type -> steward.identity.v1.WebauthnRegisterBeginResponse
+	82, // 105: steward.identity.v1.IdentityReadService.WebauthnRegisterFinish:output_type -> steward.identity.v1.WebauthnRegisterFinishResponse
+	84, // 106: steward.identity.v1.IdentityReadService.WebauthnAssertBegin:output_type -> steward.identity.v1.WebauthnAssertBeginResponse
+	86, // 107: steward.identity.v1.IdentityReadService.WebauthnAssertFinish:output_type -> steward.identity.v1.WebauthnAssertFinishResponse
+	88, // 108: steward.identity.v1.IdentityReadService.ListWebauthnCredentials:output_type -> steward.identity.v1.ListWebauthnCredentialsResponse
+	90, // 109: steward.identity.v1.IdentityReadService.RemoveWebauthnCredential:output_type -> steward.identity.v1.RemoveWebauthnCredentialResponse
+	78, // 110: steward.identity.v1.IdentityReadService.RenameMFAMethod:output_type -> steward.identity.v1.RenameMFAMethodResponse
+	92, // 111: steward.identity.v1.IdentityReadService.Discover:output_type -> steward.identity.v1.DiscoverResponse
+	94, // 112: steward.identity.v1.IdentityReadService.CheckBreakGlassEligibility:output_type -> steward.identity.v1.CheckBreakGlassEligibilityResponse
+	66, // [66:113] is the sub-list for method output_type
+	19, // [19:66] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_steward_identity_v1_read_proto_init() }
@@ -5051,7 +5160,7 @@ func file_steward_identity_v1_read_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_steward_identity_v1_read_proto_rawDesc), len(file_steward_identity_v1_read_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   93,
+			NumMessages:   95,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
