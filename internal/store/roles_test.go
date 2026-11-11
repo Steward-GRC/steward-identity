@@ -325,3 +325,67 @@ func TestRevokeRole_RootKeepsSiteAdmin(t *testing.T) {
 func containsString(haystack []string, needle string) bool {
 	return slices.Contains(haystack, needle)
 }
+
+// Issue #45: privacy-officer is a stored global role, as in the mock.
+func TestGrantAndRevokePrivacyOfficer(t *testing.T) {
+	pool := newTestDB(t)
+	if pool == nil {
+		return
+	}
+	s := newStoreFor(t, pool)
+	ctx := context.Background()
+	u, err := s.JITProvision(ctx, "sub-privacy", "po@e", "PO")
+	if err != nil {
+		t.Fatalf("JIT: %v", err)
+	}
+
+	u, err = s.GrantRole(ctx, u.ID, "privacy-officer", "", nil, "tester")
+	if err != nil {
+		t.Fatalf("GrantRole privacy-officer: %v", err)
+	}
+	if !containsString(u.Roles, "privacy-officer") {
+		t.Fatalf("expected privacy-officer in Roles, got %v", u.Roles)
+	}
+
+	u, err = s.GrantRole(ctx, u.ID, "privacy-officer", "", nil, "tester")
+	if err != nil {
+		t.Fatalf("GrantRole privacy-officer (again): %v", err)
+	}
+	if n := countString(u.Roles, "privacy-officer"); n != 1 {
+		t.Fatalf("expected one privacy-officer entry, got %d in %v", n, u.Roles)
+	}
+
+	u, err = s.RevokeRole(ctx, u.ID, "privacy-officer", "", nil, "tester")
+	if err != nil {
+		t.Fatalf("RevokeRole privacy-officer: %v", err)
+	}
+	if containsString(u.Roles, "privacy-officer") {
+		t.Fatalf("expected privacy-officer revoked, got %v", u.Roles)
+	}
+}
+
+func TestGrantPrivacyOfficerRejectsCategory(t *testing.T) {
+	pool := newTestDB(t)
+	if pool == nil {
+		return
+	}
+	s := newStoreFor(t, pool)
+	ctx := context.Background()
+	u, err := s.JITProvision(ctx, "sub-privacy-cat", "poc@e", "POC")
+	if err != nil {
+		t.Fatalf("JIT: %v", err)
+	}
+	if _, err := s.GrantRole(ctx, u.ID, "privacy-officer", "Facilities", nil, "tester"); !errors.Is(err, store.ErrInvalid) {
+		t.Fatalf("expected ErrInvalid for privacy-officer with a category, got %v", err)
+	}
+}
+
+func countString(list []string, want string) int {
+	n := 0
+	for _, v := range list {
+		if v == want {
+			n++
+		}
+	}
+	return n
+}

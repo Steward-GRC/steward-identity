@@ -131,7 +131,7 @@ func newUserDisableCmd(opt rootCommandOptions) *cobra.Command {
 func newUserGrantRoleCmd(opt rootCommandOptions) *cobra.Command {
 	return &cobra.Command{
 		Use:   "grant-role <email-or-id> <role>",
-		Short: "Grant a global role (admin | site-admin | template-admin | compliance-admin)",
+		Short: "Grant a global role (site-admin | template-admin | compliance-admin | privacy-officer)",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runRoleMutation(cmd, opt, args[0], args[1], true)

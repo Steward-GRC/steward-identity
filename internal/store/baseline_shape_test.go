@@ -43,6 +43,15 @@ func TestBaselineRolesConstraints(t *testing.T) {
 		`INSERT INTO user_roles (user_id, role, scope_category) VALUES ($1,'site-admin','')`, uid); err != nil {
 		t.Fatalf("global site-admin insert should succeed: %v", err)
 	}
+	// privacy-officer is a global role: allowed empty, rejected with a category.
+	if _, err := pool.Exec(ctx,
+		`INSERT INTO user_roles (user_id, role, scope_category) VALUES ($1,'privacy-officer','')`, uid); err != nil {
+		t.Fatalf("global privacy-officer insert should succeed: %v", err)
+	}
+	if _, err := pool.Exec(ctx,
+		`INSERT INTO user_roles (user_id, role, scope_category) VALUES ($1,'privacy-officer','Facilities')`, uid); err == nil {
+		t.Fatal("privacy-officer with a category must be rejected")
+	}
 	// The retired 'admin' role is rejected by the role check.
 	if _, err := pool.Exec(ctx,
 		`INSERT INTO user_roles (user_id, role, scope_category) VALUES ($1,'admin','')`, uid); err == nil {

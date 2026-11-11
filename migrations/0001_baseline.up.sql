@@ -94,7 +94,7 @@ CREATE TABLE user_roles (
   scope_category      TEXT NOT NULL DEFAULT '',
   PRIMARY KEY (user_id, role, scope_category),
   CONSTRAINT user_roles_role_check
-    CHECK (role IN ('author','approver','site-admin','template-admin','compliance-admin')),
+    CHECK (role IN ('author','approver','site-admin','template-admin','compliance-admin','privacy-officer')),
   CONSTRAINT user_roles_scope_check CHECK (
     (role IN ('author','approver') AND scope_category <> '')
     OR (role NOT IN ('author','approver') AND scope_category = '')
