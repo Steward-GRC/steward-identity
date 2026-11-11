@@ -440,6 +440,28 @@ func (s *Store) UpdateUserProfile(ctx context.Context, id uuid.UUID, email, name
 	return s.GetUser(ctx, id)
 }
 
+// SetUserLocale sets one user's locale and emits a `user.preferences.updated`
+// audit event under the actor (an administrator's user id or an operator
+// name). Nothing else on the row changes. A tombstoned account is ErrNotFound,
+// like any other write to a deleted account.
+func (s *Store) SetUserLocale(ctx context.Context, id uuid.UUID, locale string, actor *uuid.UUID, actorExternal string) (User, error) {
+	if err := s.db.RunInTx(ctx, func(tx pgx.Tx) error {
+		tag, err := tx.Exec(ctx,
+			`UPDATE users SET locale = $2, updated_at = now() WHERE id = $1 AND deleted_at IS NULL`, id, locale)
+		if err != nil {
+			return fmt.Errorf("set locale: %w", err)
+		}
+		if tag.RowsAffected() == 0 {
+			return ErrNotFound
+		}
+		return s.emitAuditTx(ctx, tx, "user.preferences.updated", actor, actorExternal, &id, nil,
+			map[string]any{"locale": locale})
+	}); err != nil {
+		return User{}, err
+	}
+	return s.GetUser(ctx, id)
+}
+
 // UpdateUsername sets the login username for a user and emits a
 // `user.username.updated` audit event. The username is validated for
 // case-insensitive uniqueness by the users_lower_username_uniq index; a

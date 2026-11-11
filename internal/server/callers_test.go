@@ -135,6 +135,7 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 		identityv1.IdentityAdminService_SetUserPolicyOverride_FullMethodName,
 		identityv1.IdentityAdminService_UpdateMyProfile_FullMethodName,
 		identityv1.IdentityAdminService_UpdateUserProfile_FullMethodName,
+		identityv1.IdentityAdminService_UpdateUserPreferences_FullMethodName,
 		identityv1.IdentitySSOAdminService_ActivateOrganization_FullMethodName,
 		identityv1.IdentitySSOAdminService_AddGroupMapping_FullMethodName,
 		identityv1.IdentitySSOAdminService_AddOrganization_FullMethodName,

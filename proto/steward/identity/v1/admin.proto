@@ -143,6 +143,11 @@ service IdentityAdminService {
   // AdminRenameUserFactor labels one of a user's factors. An empty label
   // clears it.
   rpc AdminRenameUserFactor(AdminRenameUserFactorRequest) returns (AdminRenameUserFactorResponse);
+  // UpdateUserPreferences sets another user's preferences; today only the
+  // language (locale). Site-admin only, audited, and it works on local and
+  // directory accounts alike. A time zone and the person's own name stay
+  // with UpdateMyProfile and UpdateUserProfile.
+  rpc UpdateUserPreferences(UpdateUserPreferencesRequest) returns (UpdateUserPreferencesResponse);
 }
 
 message EnableUserRequest {
@@ -545,3 +550,14 @@ message AdminRenameUserFactorRequest {
 }
 
 message AdminRenameUserFactorResponse {}
+
+message UpdateUserPreferencesRequest {
+  string user_id = 1;
+  // A BCP 47 tag such as "en-US", trimmed. Omitted leaves the stored value
+  // unchanged; an empty string clears it.
+  optional string locale = 2;
+}
+
+message UpdateUserPreferencesResponse {
+  User user = 1;
+}

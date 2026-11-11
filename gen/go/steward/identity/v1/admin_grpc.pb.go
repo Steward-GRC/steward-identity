@@ -64,6 +64,7 @@ const (
 	IdentityAdminService_AdminListUserFactors_FullMethodName  = "/steward.identity.v1.IdentityAdminService/AdminListUserFactors"
 	IdentityAdminService_AdminRemoveUserFactor_FullMethodName = "/steward.identity.v1.IdentityAdminService/AdminRemoveUserFactor"
 	IdentityAdminService_AdminRenameUserFactor_FullMethodName = "/steward.identity.v1.IdentityAdminService/AdminRenameUserFactor"
+	IdentityAdminService_UpdateUserPreferences_FullMethodName = "/steward.identity.v1.IdentityAdminService/UpdateUserPreferences"
 )
 
 // IdentityAdminServiceClient is the client API for IdentityAdminService service.
@@ -203,6 +204,11 @@ type IdentityAdminServiceClient interface {
 	// AdminRenameUserFactor labels one of a user's factors. An empty label
 	// clears it.
 	AdminRenameUserFactor(ctx context.Context, in *AdminRenameUserFactorRequest, opts ...grpc.CallOption) (*AdminRenameUserFactorResponse, error)
+	// UpdateUserPreferences sets another user's preferences; today only the
+	// language (locale). Site-admin only, audited, and it works on local and
+	// directory accounts alike. A time zone and the person's own name stay
+	// with UpdateMyProfile and UpdateUserProfile.
+	UpdateUserPreferences(ctx context.Context, in *UpdateUserPreferencesRequest, opts ...grpc.CallOption) (*UpdateUserPreferencesResponse, error)
 }
 
 type identityAdminServiceClient struct {
@@ -634,6 +640,16 @@ func (c *identityAdminServiceClient) AdminRenameUserFactor(ctx context.Context, 
 	return out, nil
 }
 
+func (c *identityAdminServiceClient) UpdateUserPreferences(ctx context.Context, in *UpdateUserPreferencesRequest, opts ...grpc.CallOption) (*UpdateUserPreferencesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateUserPreferencesResponse)
+	err := c.cc.Invoke(ctx, IdentityAdminService_UpdateUserPreferences_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IdentityAdminServiceServer is the server API for IdentityAdminService service.
 // All implementations must embed UnimplementedIdentityAdminServiceServer
 // for forward compatibility.
@@ -771,6 +787,11 @@ type IdentityAdminServiceServer interface {
 	// AdminRenameUserFactor labels one of a user's factors. An empty label
 	// clears it.
 	AdminRenameUserFactor(context.Context, *AdminRenameUserFactorRequest) (*AdminRenameUserFactorResponse, error)
+	// UpdateUserPreferences sets another user's preferences; today only the
+	// language (locale). Site-admin only, audited, and it works on local and
+	// directory accounts alike. A time zone and the person's own name stay
+	// with UpdateMyProfile and UpdateUserProfile.
+	UpdateUserPreferences(context.Context, *UpdateUserPreferencesRequest) (*UpdateUserPreferencesResponse, error)
 	mustEmbedUnimplementedIdentityAdminServiceServer()
 }
 
@@ -906,6 +927,9 @@ func (UnimplementedIdentityAdminServiceServer) AdminRemoveUserFactor(context.Con
 }
 func (UnimplementedIdentityAdminServiceServer) AdminRenameUserFactor(context.Context, *AdminRenameUserFactorRequest) (*AdminRenameUserFactorResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AdminRenameUserFactor not implemented")
+}
+func (UnimplementedIdentityAdminServiceServer) UpdateUserPreferences(context.Context, *UpdateUserPreferencesRequest) (*UpdateUserPreferencesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateUserPreferences not implemented")
 }
 func (UnimplementedIdentityAdminServiceServer) mustEmbedUnimplementedIdentityAdminServiceServer() {}
 func (UnimplementedIdentityAdminServiceServer) testEmbeddedByValue()                              {}
@@ -1684,6 +1708,24 @@ func _IdentityAdminService_AdminRenameUserFactor_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IdentityAdminService_UpdateUserPreferences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserPreferencesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityAdminServiceServer).UpdateUserPreferences(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityAdminService_UpdateUserPreferences_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityAdminServiceServer).UpdateUserPreferences(ctx, req.(*UpdateUserPreferencesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IdentityAdminService_ServiceDesc is the grpc.ServiceDesc for IdentityAdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1858,6 +1900,10 @@ var IdentityAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdminRenameUserFactor",
 			Handler:    _IdentityAdminService_AdminRenameUserFactor_Handler,
+		},
+		{
+			MethodName: "UpdateUserPreferences",
+			Handler:    _IdentityAdminService_UpdateUserPreferences_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
