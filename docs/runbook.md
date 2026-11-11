@@ -109,6 +109,7 @@ refused during act-as with `ACT_AS_FORBIDDEN`.
 | `USER_DELETE_CHECKS_UNAVAILABLE` naming `approval_check` | `WORKFLOW_GRPC_ADDR` is unset or steward-workflow didn't answer: deletes stay refused rather than strand approvals. Disable the account to lock the user out. |
 | Merge answers that a service isn't configured | `WORKFLOW_GRPC_ADDR` or `OBLIGATIONS_GRPC_ADDR` is unset. |
 | `SESSIONS_UNAVAILABLE` or `SESSION_REVOKE_UNAVAILABLE` | `KRATOS_ADMIN_URL` and `steward-depstate-kratos`. Nothing was revoked. |
+| `PASSWORD_CHANGE_UNAVAILABLE` | `KRATOS_PUBLIC_URL` (needs `KRATOS_ADMIN_URL` too) and `steward-depstate-kratos`; the log line with the same trace id has the cause. Nothing was changed. |
 | An organisation shows `secret_reentry_required` | Its stored reference wasn't a key in the Polis secrets Secret and was cleared at start-up. Enter the OIDC client secret again through `UpdateIdPConnection`. |
 | `SSO_PROVIDER_UNREACHABLE` | `POLIS_ADMIN_URL`, `POLIS_API_KEY` and `steward-depstate-polis`; the log line with the same trace id has the cause. |
 | No events reach audit | `steward-depstate-rabbitmq`, then the `audit` exchange and its binding; rows waiting in `audit_outbox` with status `pending` or `dead`. |

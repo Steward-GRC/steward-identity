@@ -86,6 +86,11 @@ service IdentityReadService {
   // end everything) and a session that isn't the caller's (NotFound, the same
   // as an unknown one). Audited as session.revoked.
   rpc RevokeMySession(RevokeMySessionRequest) returns (RevokeMySessionResponse);
+  // ChangeMyPassword changes the calling user's own password. It checks the
+  // current password through the sign-in service and applies the new one
+  // under that service's password policy. A wrong current password, a weak
+  // new one and an account with no local password each answer a coded error.
+  rpc ChangeMyPassword(ChangeMyPasswordRequest) returns (ChangeMyPasswordResponse);
   // GetSetupState reports whether first-run setup is still needed (no root
   // admin exists).
   rpc GetSetupState(GetSetupStateRequest) returns (GetSetupStateResponse);
@@ -411,6 +416,12 @@ message RevokeMySessionResponse {
   // ended.
   int32 revoked = 1;
 }
+message ChangeMyPasswordRequest {
+  string current_password = 1;
+  string new_password = 2;
+}
+
+message ChangeMyPasswordResponse {}
 
 message GetSetupStateRequest {}
 

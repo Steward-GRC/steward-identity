@@ -7,6 +7,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -93,8 +94,14 @@ type Config struct {
 	// KratosAdminURL is the Kratos admin API. Empty turns local accounts and
 	// session management off (they answer with coded "unavailable" errors).
 	KratosAdminURL string
-	KratosSchemaID string
-	Polis          Polis
+	// KratosPublicURL is the Kratos public API. A person's own password
+	// change proves the current password and applies the new one through its
+	// self-service flows, because the admin API does neither. Empty turns
+	// that change off (it answers a coded "unavailable" error); it needs
+	// KratosAdminURL too.
+	KratosPublicURL string
+	KratosSchemaID  string
+	Polis           Polis
 
 	Login2FAEnabled bool
 	// OTPDevEcho logs one-time codes, for local development only.
@@ -166,6 +173,7 @@ func Load(getenv func(string) string) (Config, error) {
 		HardResetRequestTTL:     duration("HARD_RESET_REQUEST_TTL", "24h"),
 		HardResetApprovalTTL:    duration("HARD_RESET_APPROVAL_TTL", "1h"),
 		KratosAdminURL:          getenv("KRATOS_ADMIN_URL"),
+		KratosPublicURL:         getenv("KRATOS_PUBLIC_URL"),
 		KratosSchemaID:          or("KRATOS_SCHEMA_ID", "default"),
 		Polis: Polis{AdminURL: getenv("POLIS_ADMIN_URL"), APIKey: getenv("POLIS_API_KEY"),
 			Product: or("POLIS_PRODUCT", "steward"), GatewayBaseURL: or("GATEWAY_BASE_URL", "http://localhost:5173")},
@@ -198,6 +206,14 @@ func Load(getenv func(string) string) (Config, error) {
 	}
 	if c.AdminCLIID != "" && !tlsSet {
 		errs = append(errs, errors.New("IDENTITY_ADMIN_CLI_ID needs GRPC_TLS_* with client certificates"))
+	}
+	if c.KratosPublicURL != "" {
+		if u, perr := url.Parse(c.KratosPublicURL); perr != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+			errs = append(errs, errors.New("KRATOS_PUBLIC_URL must be an http or https URL with a host"))
+		}
+		if c.KratosAdminURL == "" {
+			errs = append(errs, errors.New("KRATOS_PUBLIC_URL needs KRATOS_ADMIN_URL"))
+		}
 	}
 	var err error
 	if c.WorkloadAuth, c.WorkloadAuthEnabled, err = serverWorkloadConfig(getenv); err != nil {

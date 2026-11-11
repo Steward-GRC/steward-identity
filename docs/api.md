@@ -32,7 +32,15 @@ calls `GetUser` for a signed-in request it passes the Kratos session id as `sess
 identity stores that session as seen, at most once per `SESSION_LAST_SEEN_THROTTLE` per replica (a
 conditional update keeps replicas from writing more often). `ListUserSessions` returns it as
 `Session.last_seen_at` (RFC 3339; empty for a session never seen). A malformed `session_id` is
-`InvalidArgument`; a failed last-seen write is logged and the lookup still answers. Ory Polis brokers SAML and OIDC: an organisation's connection is created in Polis,
+`InvalidArgument`; a failed last-seen write is logged and the lookup still answers. `ChangeMyPassword` changes the caller's own password (the forwarded actor, never a request field; refused
+during act-as). Kratos's admin API sets a password without applying its password policy and cannot
+check a current one, so identity uses Kratos's public API (`KRATOS_PUBLIC_URL`): a sign-in flow with
+the current password proves it (`CURRENT_PASSWORD_WRONG` otherwise), then the settings flow on that
+session sets the new one under Kratos's own policy (`PASSWORD_TOO_WEAK` when it refuses), and the
+short-lived session is signed out. An account with no local password answers `NO_LOCAL_PASSWORD`,
+and an unreachable or unconfigured Kratos `PASSWORD_CHANGE_UNAVAILABLE`. A change is audited as
+`user.password.changed` and a refused attempt as `user.password.change_failed` (with a `reason`);
+neither payload, nor any log line, carries a password or a token. Ory Polis brokers SAML and OIDC: an organisation's connection is created in Polis,
 and its `connection_alias` is the routing key the gateway signs users in through. An OIDC
 connection's client secret is write-only: `client_secret` on `AddOrganization`, `ChangeOrgProtocol`
 and `UpdateIdPConnection`, or `secret_ref` naming a pre-created key; no response carries either

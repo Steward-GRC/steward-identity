@@ -36,6 +36,10 @@ type ReadHandler struct {
 	// signIn is the Kratos admin API: passwords and sessions. Nil turns those
 	// calls into coded "unavailable" errors.
 	signIn signInService
+	// passwords changes a person's own password through the sign-in
+	// service's public flows. Nil turns the change into a coded "unavailable"
+	// error.
+	passwords passwordChanger
 	// otp holds the email-code wiring (password reset and sign-in codes);
 	// the code RPCs answer Unavailable while it is unset.
 	otp *otpDeps

@@ -42,6 +42,7 @@ func TestLoadDefaults(t *testing.T) {
 	require.Empty(t, c.AdminCLIID, "the admin CLI has no access by default")
 	require.Equal(t, 15*time.Minute, c.BreakGlassDuration)
 	require.Empty(t, c.KratosAdminURL, "local accounts and sessions are off unless Kratos is configured")
+	require.Empty(t, c.KratosPublicURL, "changing a password is off unless the Kratos public API is configured")
 	require.Equal(t, "default", c.KratosSchemaID)
 	require.Empty(t, c.Polis.AdminURL)
 	require.Equal(t, "steward", c.Polis.Product)
@@ -76,7 +77,8 @@ func TestLoadReadsEverySetting(t *testing.T) {
 		"IDENTITY_ADMIN_CLI_ID":            "spiffe://example.org/ns/steward/sa/identity-admin",
 		"BREAK_GLASS_DURATION":             "30m",
 		"KRATOS_ADMIN_URL":                 "http://kratos.example.org:4434", "KRATOS_SCHEMA_ID": "staff",
-		"POLIS_ADMIN_URL": "http://polis.example.org:5225", "POLIS_API_KEY": "key", "POLIS_PRODUCT": "acme",
+		"KRATOS_PUBLIC_URL": "http://kratos.example.org:4433",
+		"POLIS_ADMIN_URL":   "http://polis.example.org:5225", "POLIS_API_KEY": "key", "POLIS_PRODUCT": "acme",
 		"GATEWAY_BASE_URL":  "https://policies.example.org",
 		"LOGIN_2FA_ENABLED": "true", "OTP_DEV_ECHO": "true", "TOTP_ENC_KEY": "k",
 		"WEBAUTHN_RP_ID": "policies.example.org", "WEBAUTHN_RP_ORIGINS": "https://policies.example.org, https://staff.example.org",
@@ -105,6 +107,7 @@ func TestLoadReadsEverySetting(t *testing.T) {
 	require.Equal(t, "spiffe://example.org/ns/steward/sa/identity-admin", c.AdminCLIID)
 	require.Equal(t, 30*time.Minute, c.BreakGlassDuration)
 	require.Equal(t, "http://kratos.example.org:4434", c.KratosAdminURL)
+	require.Equal(t, "http://kratos.example.org:4433", c.KratosPublicURL)
 	require.Equal(t, "staff", c.KratosSchemaID)
 	require.Equal(t, Polis{AdminURL: "http://polis.example.org:5225", APIKey: "key", Product: "acme", GatewayBaseURL: "https://policies.example.org"}, c.Polis)
 	require.True(t, c.Login2FAEnabled)
@@ -144,6 +147,30 @@ func TestLoadRejectsBadValues(t *testing.T) {
 		require.Error(t, err, k)
 		require.Contains(t, err.Error(), k)
 	}
+}
+
+func TestLoadValidatesTheKratosPublicURL(t *testing.T) {
+	for name, m := range map[string]map[string]string{
+		"not a URL":             {"KRATOS_PUBLIC_URL": "kratos", "KRATOS_ADMIN_URL": "http://kratos:4434"},
+		"wrong scheme":          {"KRATOS_PUBLIC_URL": "ftp://kratos:4433", "KRATOS_ADMIN_URL": "http://kratos:4434"},
+		"no host":               {"KRATOS_PUBLIC_URL": "http://", "KRATOS_ADMIN_URL": "http://kratos:4434"},
+		"without the admin API": {"KRATOS_PUBLIC_URL": "http://kratos:4433"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			m2 := base()
+			for k, v := range m {
+				m2[k] = v
+			}
+			_, err := Load(env(m2))
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "KRATOS_PUBLIC_URL")
+		})
+	}
+	m := base()
+	m["KRATOS_ADMIN_URL"], m["KRATOS_PUBLIC_URL"] = "http://kratos:4434", "https://kratos.example.org/"
+	c, err := Load(env(m))
+	require.NoError(t, err)
+	require.Equal(t, "https://kratos.example.org/", c.KratosPublicURL)
 }
 
 func TestLoadFailsClosedWithoutWorkloadAuth(t *testing.T) {

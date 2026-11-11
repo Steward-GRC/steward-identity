@@ -75,6 +75,7 @@ A method no caller uses is refused to everyone.
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `KRATOS_ADMIN_URL` | empty | Ory Kratos admin API. Empty turns off local accounts, password resets and session management: they answer `LOCAL_ACCOUNTS_UNAVAILABLE`, `SESSIONS_UNAVAILABLE` or `SESSION_REVOKE_UNAVAILABLE`. |
+| `KRATOS_PUBLIC_URL` | empty | Ory Kratos public API (for example `http://kratos-public:4433`). A person's own password change (`ChangeMyPassword`) proves the current password through Kratos's sign-in flow and sets the new one through its settings flow, so Kratos's password policy decides what is too weak; the admin API does neither. It must be an http or https URL and needs `KRATOS_ADMIN_URL`. Empty turns the change off: it answers `PASSWORD_CHANGE_UNAVAILABLE`. |
 | `KRATOS_SCHEMA_ID` | `default` | The identity schema new local accounts get. It needs the traits `email` (the password and recovery identifier), `username` and `name`. |
 | `POLIS_ADMIN_URL`, `POLIS_API_KEY` | empty | Ory Polis admin API and its key. Needed to add or change an SSO connection. |
 | `POLIS_PRODUCT` | `steward` | The Polis product every connection lives under. |
