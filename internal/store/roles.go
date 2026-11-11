@@ -15,7 +15,7 @@ import (
 // roles; reader is implicit and never stored).
 var validRoles = map[string]struct{}{
 	"author": {}, "approver": {},
-	"site-admin": {}, "template-admin": {}, "compliance-admin": {},
+	"site-admin": {}, "template-admin": {}, "compliance-admin": {}, "privacy-officer": {},
 }
 
 // scopedRoles are the roles that REQUIRE a non-empty category; all others
