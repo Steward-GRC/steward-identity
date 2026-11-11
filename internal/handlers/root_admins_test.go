@@ -13,10 +13,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	workloadidentity "github.com/Bugs5382/go-workload-identity"
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
 	"github.com/Steward-GRC/steward-identity/internal/handlers"
 	"github.com/Steward-GRC/steward-identity/internal/store"
-	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 // newRootUser provisions a user, makes them a root admin and gives them
@@ -31,8 +31,8 @@ func newRootUser(t *testing.T, s *store.Store, sub, email string) store.User {
 }
 
 func reportingCtx() context.Context {
-	return workloadauth.ContextWithGrant(context.Background(), workloadauth.Grant{
-		Caller: workloadauth.Caller{Name: "reporting"}, Access: workloadauth.Self,
+	return workloadidentity.ContextWithGrant(context.Background(), workloadidentity.Grant{
+		Caller: workloadidentity.Caller{Name: "reporting"}, Access: workloadidentity.Self,
 	})
 }
 

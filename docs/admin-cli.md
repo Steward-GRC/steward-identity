@@ -12,7 +12,7 @@ them.
 | `user list [--email-contains S] [--enabled \| --disabled] [--limit N]` | Pages through users by email substring |
 | `user show <email-or-id>` | One user |
 | `user enable <email-or-id>`, `user disable <email-or-id>` | Enables or disables a user |
-| `user grant-role <email-or-id> <role>`, `user revoke-role <email-or-id> <role>` | Global roles: admin, site-admin, template-admin, compliance-admin |
+| `user grant-role <email-or-id> <role>`, `user revoke-role <email-or-id> <role>` | Global roles: site-admin, template-admin, compliance-admin, privacy-officer |
 | `group list [--parent ID] [--descendants] [--limit N]` | Root groups, or the groups under a parent |
 | `group show <id>` | One group |
 | `group create <name> [--parent ID]`, `group rename <id> <name>`, `group delete <id>` | Group lifecycle |

@@ -12,9 +12,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
+	workloadidentity "github.com/Bugs5382/go-workload-identity"
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
 	"github.com/Steward-GRC/steward-identity/internal/audit"
-	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 var identityServices = []grpc.ServiceDesc{
@@ -32,10 +32,10 @@ func allMethods() []string {
 }
 
 // requireCallerMethods checks caller is listed with access on exactly want.
-func requireCallerMethods(t *testing.T, caller string, want map[string]workloadauth.Access) {
+func requireCallerMethods(t *testing.T, caller string, want map[string]workloadidentity.Access) {
 	t.Helper()
 	p := CallerPolicy()
-	got := map[string]workloadauth.Access{}
+	got := map[string]workloadidentity.Access{}
 	for _, m := range allMethods() {
 		if a, ok := p.Lookup(m, caller); ok {
 			got[m] = a
@@ -44,10 +44,10 @@ func requireCallerMethods(t *testing.T, caller string, want map[string]workloada
 	require.Equal(t, want, got)
 }
 
-func self(methods ...string) map[string]workloadauth.Access {
-	out := map[string]workloadauth.Access{}
+func self(methods ...string) map[string]workloadidentity.Access {
+	out := map[string]workloadidentity.Access{}
 	for _, m := range methods {
-		out[m] = workloadauth.Self
+		out[m] = workloadidentity.Self
 	}
 	return out
 }
@@ -66,7 +66,7 @@ func TestCallerPolicyListsOnlyMethodsIdentityServes(t *testing.T) {
 func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 	// The methods steward-gateway calls, written out so that dropping or
 	// adding one in callers.go fails here.
-	want := map[string]workloadauth.Access{}
+	want := map[string]workloadidentity.Access{}
 	for _, m := range []string{
 		identityv1.IdentityReadService_BootstrapRoot_FullMethodName,
 		identityv1.IdentityReadService_CheckBreakGlassEligibility_FullMethodName,
@@ -154,7 +154,7 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 		identityv1.IdentitySSOAdminService_UpdateIdPConnection_FullMethodName,
 		identityv1.IdentitySSOAdminService_VerifyDomain_FullMethodName,
 	} {
-		want[m] = workloadauth.OnBehalf
+		want[m] = workloadidentity.OnBehalf
 	}
 	requireCallerMethods(t, CallerGateway, want)
 	for _, m := range []string{
@@ -211,7 +211,7 @@ func TestCallerPolicyListsNoOtherCaller(t *testing.T) {
 		}
 	}
 	for _, c := range []string{"core", "delivery", "ai", "audit"} {
-		requireCallerMethods(t, c, map[string]workloadauth.Access{})
+		requireCallerMethods(t, c, map[string]workloadidentity.Access{})
 	}
 }
 
@@ -225,18 +225,18 @@ func (r *recordingEmitter) EmitAudit(_ context.Context, ev audit.Event) error {
 func TestAuditDenialRecordsTheCallerNotAClaimedUser(t *testing.T) {
 	rec := &recordingEmitter{}
 	hook := AuditDenial(rec, log.Nop())
-	hook(context.Background(), workloadauth.Denial{
-		Method: identityv1.IdentityAdminService_GrantRole_FullMethodName, Code: codes.PermissionDenied, Reason: workloadauth.ReasonMethodNotAllowed,
-		Caller: workloadauth.Caller{Name: "reporting", ServiceAccount: "steward/steward-reporting"},
+	hook(context.Background(), workloadidentity.Denial{
+		Method: identityv1.IdentityAdminService_GrantRole_FullMethodName, Code: codes.PermissionDenied, Reason: workloadidentity.ReasonMethodNotAllowed,
+		Caller: workloadidentity.Caller{Name: "reporting", ServiceAccount: "steward/steward-reporting"},
 	})
-	hook(context.Background(), workloadauth.Denial{Method: "/m", Code: codes.Unauthenticated, Reason: workloadauth.ReasonNoToken})
+	hook(context.Background(), workloadidentity.Denial{Method: "/m", Code: codes.Unauthenticated, Reason: workloadidentity.ReasonNoToken})
 	require.Len(t, rec.evs, 2)
 	require.Equal(t, "rpc.denied", rec.evs[0].EventType)
 	require.Nil(t, rec.evs[0].ActorUserID, "a refused call is never credited to a user")
 	require.Equal(t, "service:reporting", rec.evs[0].ActorExternal)
 	require.Equal(t, map[string]any{
 		"method": identityv1.IdentityAdminService_GrantRole_FullMethodName, "caller": "reporting", "service_account": "steward/steward-reporting",
-		"code": "PermissionDenied", "reason": workloadauth.ReasonMethodNotAllowed,
+		"code": "PermissionDenied", "reason": workloadidentity.ReasonMethodNotAllowed,
 	}, rec.evs[0].Payload)
 	require.Equal(t, "service:unauthenticated", rec.evs[1].ActorExternal)
 }
