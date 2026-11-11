@@ -82,6 +82,7 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 		identityv1.IdentityReadService_ListAllUsers_FullMethodName,
 		identityv1.IdentityReadService_ListGroups_FullMethodName,
 		identityv1.IdentityReadService_ListUserFactors_FullMethodName,
+		identityv1.IdentityReadService_ListUserGroupNames_FullMethodName,
 		identityv1.IdentityReadService_ListUserIdpGroups_FullMethodName,
 		identityv1.IdentityReadService_ListUsersByEmail_FullMethodName,
 		identityv1.IdentityReadService_ListUsersInGroup_FullMethodName,

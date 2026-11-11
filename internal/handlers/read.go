@@ -759,3 +759,40 @@ func (h *ReadHandler) BootstrapRoot(ctx context.Context, req *identityv1.Bootstr
 	emitAccountCreated(ctx, h.acctCreatedPub, u.ID.String())
 	return &identityv1.BootstrapRootResponse{User: userToProto(u)}, nil
 }
+
+// maxGroupNameUsers caps one ListUserGroupNames call: the ack roster for one
+// policy asks once for its whole audience.
+const maxGroupNameUsers = 1000
+
+// ListUserGroupNames returns each requested user's direct group display names,
+// one entry per requested id in request order. See the proto for the order of
+// the names. A user with no groups, or an id nobody has, gets an empty list.
+func (h *ReadHandler) ListUserGroupNames(ctx context.Context, req *identityv1.ListUserGroupNamesRequest) (*identityv1.ListUserGroupNamesResponse, error) {
+	lg := logger.Ctx(ctx)
+	raw := req.GetUserIds()
+	lg.Debug("list user group names: entry", log.F("users", len(raw)))
+	if len(raw) > maxGroupNameUsers {
+		lg.Debug("list user group names: too many ids", log.F("users", len(raw)), log.F("max", maxGroupNameUsers))
+		return nil, status.Errorf(codes.InvalidArgument, "user_ids: at most %d per call", maxGroupNameUsers)
+	}
+	ids := make([]uuid.UUID, 0, len(raw))
+	for _, s := range raw {
+		id, err := parseUUID(s, "user_ids")
+		if err != nil {
+			lg.Debug("list user group names: bad id", log.F("error", errText(err)))
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	names, err := h.store.ListGroupNamesByUser(ctx, ids)
+	if err != nil {
+		lg.Error(err, "list user group names: store read failed", log.F("users", len(ids)))
+		return nil, statusFromStoreErr(err)
+	}
+	out := make([]*identityv1.UserGroupNames, 0, len(ids))
+	for i, id := range ids {
+		out = append(out, &identityv1.UserGroupNames{UserId: raw[i], GroupNames: names[id]})
+	}
+	lg.Debug("list user group names: exit", log.F("users", len(out)))
+	return &identityv1.ListUserGroupNamesResponse{Users: out}, nil
+}

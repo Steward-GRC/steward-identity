@@ -40,6 +40,7 @@ const (
 	IdentityReadService_ListAllUsers_FullMethodName               = "/steward.identity.v1.IdentityReadService/ListAllUsers"
 	IdentityReadService_CountAllUsers_FullMethodName              = "/steward.identity.v1.IdentityReadService/CountAllUsers"
 	IdentityReadService_ListUserIdpGroups_FullMethodName          = "/steward.identity.v1.IdentityReadService/ListUserIdpGroups"
+	IdentityReadService_ListUserGroupNames_FullMethodName         = "/steward.identity.v1.IdentityReadService/ListUserGroupNames"
 	IdentityReadService_RevokeMySessions_FullMethodName           = "/steward.identity.v1.IdentityReadService/RevokeMySessions"
 	IdentityReadService_GetSetupState_FullMethodName              = "/steward.identity.v1.IdentityReadService/GetSetupState"
 	IdentityReadService_BootstrapRoot_FullMethodName              = "/steward.identity.v1.IdentityReadService/BootstrapRoot"
@@ -124,6 +125,12 @@ type IdentityReadServiceClient interface {
 	CountAllUsers(ctx context.Context, in *CountAllUsersRequest, opts ...grpc.CallOption) (*CountAllUsersResponse, error)
 	// ListUserIdpGroups returns one user's identity provider group names.
 	ListUserIdpGroups(ctx context.Context, in *ListUserIdpGroupsRequest, opts ...grpc.CallOption) (*ListUserIdpGroupsResponse, error)
+	// ListUserGroupNames returns, for each named user, the display names of the
+	// platform groups the user is a direct member of: sorted by name without
+	// regard to case, then by group id. One entry per requested id, in request
+	// order; a user with no groups, or an unknown id, gets an empty list. At
+	// most 1000 ids. Display data only: it carries no ids, roles or access.
+	ListUserGroupNames(ctx context.Context, in *ListUserGroupNamesRequest, opts ...grpc.CallOption) (*ListUserGroupNamesResponse, error)
 	// RevokeMySessions revokes every session of the calling user.
 	RevokeMySessions(ctx context.Context, in *RevokeMySessionsRequest, opts ...grpc.CallOption) (*RevokeMySessionsResponse, error)
 	// GetSetupState reports whether first-run setup is still needed (no root
@@ -383,6 +390,16 @@ func (c *identityReadServiceClient) ListUserIdpGroups(ctx context.Context, in *L
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListUserIdpGroupsResponse)
 	err := c.cc.Invoke(ctx, IdentityReadService_ListUserIdpGroups_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *identityReadServiceClient) ListUserGroupNames(ctx context.Context, in *ListUserGroupNamesRequest, opts ...grpc.CallOption) (*ListUserGroupNamesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListUserGroupNamesResponse)
+	err := c.cc.Invoke(ctx, IdentityReadService_ListUserGroupNames_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -696,6 +713,12 @@ type IdentityReadServiceServer interface {
 	CountAllUsers(context.Context, *CountAllUsersRequest) (*CountAllUsersResponse, error)
 	// ListUserIdpGroups returns one user's identity provider group names.
 	ListUserIdpGroups(context.Context, *ListUserIdpGroupsRequest) (*ListUserIdpGroupsResponse, error)
+	// ListUserGroupNames returns, for each named user, the display names of the
+	// platform groups the user is a direct member of: sorted by name without
+	// regard to case, then by group id. One entry per requested id, in request
+	// order; a user with no groups, or an unknown id, gets an empty list. At
+	// most 1000 ids. Display data only: it carries no ids, roles or access.
+	ListUserGroupNames(context.Context, *ListUserGroupNamesRequest) (*ListUserGroupNamesResponse, error)
 	// RevokeMySessions revokes every session of the calling user.
 	RevokeMySessions(context.Context, *RevokeMySessionsRequest) (*RevokeMySessionsResponse, error)
 	// GetSetupState reports whether first-run setup is still needed (no root
@@ -834,6 +857,9 @@ func (UnimplementedIdentityReadServiceServer) CountAllUsers(context.Context, *Co
 }
 func (UnimplementedIdentityReadServiceServer) ListUserIdpGroups(context.Context, *ListUserIdpGroupsRequest) (*ListUserIdpGroupsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListUserIdpGroups not implemented")
+}
+func (UnimplementedIdentityReadServiceServer) ListUserGroupNames(context.Context, *ListUserGroupNamesRequest) (*ListUserGroupNamesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListUserGroupNames not implemented")
 }
 func (UnimplementedIdentityReadServiceServer) RevokeMySessions(context.Context, *RevokeMySessionsRequest) (*RevokeMySessionsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RevokeMySessions not implemented")
@@ -1251,6 +1277,24 @@ func _IdentityReadService_ListUserIdpGroups_Handler(srv interface{}, ctx context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IdentityReadServiceServer).ListUserIdpGroups(ctx, req.(*ListUserIdpGroupsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IdentityReadService_ListUserGroupNames_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserGroupNamesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityReadServiceServer).ListUserGroupNames(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityReadService_ListUserGroupNames_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityReadServiceServer).ListUserGroupNames(ctx, req.(*ListUserGroupNamesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1783,6 +1827,10 @@ var IdentityReadService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListUserIdpGroups",
 			Handler:    _IdentityReadService_ListUserIdpGroups_Handler,
+		},
+		{
+			MethodName: "ListUserGroupNames",
+			Handler:    _IdentityReadService_ListUserGroupNames_Handler,
 		},
 		{
 			MethodName: "RevokeMySessions",
