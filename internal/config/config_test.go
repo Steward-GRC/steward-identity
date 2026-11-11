@@ -31,7 +31,7 @@ func TestLoadDefaults(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "9090", c.GRPCPort)
 	require.Equal(t, "8080", c.ProbePort)
-	require.Equal(t, "localhost:4317", c.OTLPEndpoint)
+	require.Empty(t, c.OTLPEndpoint, "tracing is off unless a collector is set")
 	require.Equal(t, "migrations", c.MigrationsDir)
 	require.Equal(t, dsn, c.MigrateDSN)
 	require.Empty(t, c.RedisAddr, "the cache is off unless configured")
@@ -229,4 +229,26 @@ func TestLoadHardResetWindows(t *testing.T) {
 	m["HARD_RESET_APPROVAL_TTL"] = "0s"
 	_, err = Load(env(m))
 	require.ErrorContains(t, err, "HARD_RESET_APPROVAL_TTL")
+}
+
+func TestLoadOTLPEndpoint(t *testing.T) {
+	for name, tc := range map[string]struct{ set, want string }{
+		"unset": {"", ""},
+		"empty": {"-", ""},
+		"set":   {"otel.example.org:4317", "otel.example.org:4317"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			m := base()
+			switch tc.set {
+			case "":
+			case "-":
+				m["OTEL_EXPORTER_OTLP_ENDPOINT"] = ""
+			default:
+				m["OTEL_EXPORTER_OTLP_ENDPOINT"] = tc.set
+			}
+			c, err := Load(env(m))
+			require.NoError(t, err)
+			require.Equal(t, tc.want, c.OTLPEndpoint, "unset or empty turns tracing off")
+		})
+	}
 }
