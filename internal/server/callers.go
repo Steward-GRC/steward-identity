@@ -8,9 +8,9 @@ import (
 
 	log "github.com/Bugs5382/go-log"
 
+	workloadidentity "github.com/Bugs5382/go-workload-identity"
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
 	"github.com/Steward-GRC/steward-identity/internal/audit"
-	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 // Caller names, from the service accounts steward-<name>.
@@ -153,22 +153,22 @@ var (
 // signed-in user's actor, which the admin services check for site-admin.
 // workflow, obligations, reporting and collab act only as themselves, as does
 // the admin CLI. A method no caller uses is refused to everyone.
-func CallerPolicy() workloadauth.Policy {
-	p := workloadauth.Policy{}
-	grant := func(caller string, a workloadauth.Access, methods []string) {
+func CallerPolicy() workloadidentity.Policy {
+	p := workloadidentity.Policy{}
+	grant := func(caller string, a workloadidentity.Access, methods []string) {
 		for _, m := range methods {
 			if p[m] == nil {
-				p[m] = map[string]workloadauth.Access{}
+				p[m] = map[string]workloadidentity.Access{}
 			}
 			p[m][caller] = a
 		}
 	}
-	grant(CallerGateway, workloadauth.OnBehalf, gatewayMethods)
-	grant(CallerWorkflow, workloadauth.Self, userReader)
-	grant(CallerReporting, workloadauth.Self, reportingMethods)
-	grant(CallerCollab, workloadauth.Self, userReader)
-	grant(CallerObligations, workloadauth.Self, obligationsMethods)
-	grant(CallerAdminCLI, workloadauth.Self, adminCLIMethods)
+	grant(CallerGateway, workloadidentity.OnBehalf, gatewayMethods)
+	grant(CallerWorkflow, workloadidentity.Self, userReader)
+	grant(CallerReporting, workloadidentity.Self, reportingMethods)
+	grant(CallerCollab, workloadidentity.Self, userReader)
+	grant(CallerObligations, workloadidentity.Self, obligationsMethods)
+	grant(CallerAdminCLI, workloadidentity.Self, adminCLIMethods)
 	return p
 }
 
@@ -180,8 +180,8 @@ type AuditEmitter interface {
 // AuditDenial records a call the workload-auth interceptor refused, as
 // rpc.denied. The actor is the authenticated caller (or "unauthenticated"),
 // never a user the call claimed.
-func AuditDenial(emitter AuditEmitter, lg log.Logger) workloadauth.DenyHook {
-	return func(ctx context.Context, d workloadauth.Denial) {
+func AuditDenial(emitter AuditEmitter, lg log.Logger) workloadidentity.DenyHook {
+	return func(ctx context.Context, d workloadidentity.Denial) {
 		caller := d.Caller.Name
 		if caller == "" {
 			caller = "unauthenticated"

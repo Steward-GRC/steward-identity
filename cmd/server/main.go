@@ -44,6 +44,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
+	workloadidentity "github.com/Bugs5382/go-workload-identity"
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
 	corev1 "github.com/Steward-GRC/steward-identity/gen/go/thirdparty/core/v1"
 	obligationsv1 "github.com/Steward-GRC/steward-identity/gen/go/thirdparty/obligations/v1"
@@ -61,7 +62,6 @@ import (
 	"github.com/Steward-GRC/steward-identity/internal/sso/spkeys"
 	"github.com/Steward-GRC/steward-identity/internal/store"
 	"github.com/Steward-GRC/steward-identity/internal/userdelete"
-	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 const serviceName = "identity"
@@ -260,14 +260,14 @@ func run(ctx context.Context, logger log.Logger) error {
 	}
 	var callerAuth *server.Auth
 	if cfg.WorkloadAuthEnabled {
-		v, err := workloadauth.NewVerifier(cfg.WorkloadAuth, logger)
+		v, err := workloadidentity.NewVerifier(cfg.WorkloadAuth, logger)
 		if err != nil {
 			return fmt.Errorf("workload auth: %w", err)
 		}
 		go v.Run(ctx)
 		deps.JWKS = readiness.RecheckEvery(v.Refresh, jwksRecheck, time.Now)
-		callerAuth = &server.Auth{Verifier: v, Policy: server.CallerPolicy(), Options: []workloadauth.Option{
-			workloadauth.WithDenyHook(server.AuditDenial(s, logger)),
+		callerAuth = &server.Auth{Verifier: v, Policy: server.CallerPolicy(), Options: []workloadidentity.Option{
+			workloadidentity.WithDenyHook(server.AuditDenial(s, logger)),
 		}}
 		logger.Info("service-to-service authentication on",
 			log.F("issuer", cfg.WorkloadAuth.Issuer), log.F("audience", cfg.WorkloadAuth.Audience),
@@ -276,7 +276,7 @@ func run(ctx context.Context, logger log.Logger) error {
 			log.F("allowed_serviceaccounts", strings.Join(cfg.WorkloadAuth.AllowedServiceAccounts, ",")))
 	} else {
 		deps.WorkloadAuthDisabled = true
-		go workloadauth.WarnDisabled(ctx, logger, workloadauth.DisabledWarnInterval)
+		go workloadidentity.WarnDisabled(ctx, logger, workloadidentity.DisabledWarnInterval)
 	}
 
 	go every(ctx, cfg.DomainRecheckInterval, func() {
@@ -354,8 +354,8 @@ func dial(addr string, t config.TLS, tokenFile string) (*grpc.ClientConn, error)
 		grpc.WithStatsHandler(gootel.GRPCClientStatsHandler()),
 		grpc.WithChainUnaryInterceptor(grpcactor.UnaryClientInterceptor()),
 		grpc.WithChainStreamInterceptor(grpcactor.StreamClientInterceptor())}
-	token, ok, err := workloadauth.DialOptionFromEnv(func(k string) string {
-		if k == workloadauth.EnvTokenFile {
+	token, ok, err := workloadidentity.DialOptionFromEnv(func(k string) string {
+		if k == workloadidentity.EnvTokenFile {
 			return tokenFile
 		}
 		return ""

@@ -18,8 +18,8 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
+	workloadidentity "github.com/Bugs5382/go-workload-identity"
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
-	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 // AdminDialer returns an IdentityAdminService client and its cleanup.
@@ -74,7 +74,7 @@ func dialIdentity(opt rootCommandOptions) (*grpc.ClientConn, error) {
 	}
 	// In the identity pod WORKLOAD_TOKEN_FILE names the pod's projected token,
 	// which identity's caller authentication needs on every call.
-	token, ok, err := workloadauth.DialOptionFromEnv(opt.envLookup)
+	token, ok, err := workloadidentity.DialOptionFromEnv(opt.envLookup)
 	if err != nil {
 		return nil, err
 	}
