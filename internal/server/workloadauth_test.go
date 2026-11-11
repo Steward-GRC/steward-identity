@@ -32,9 +32,10 @@ import (
 	reflectionpb "google.golang.org/grpc/reflection/grpc_reflection_v1"
 	"google.golang.org/grpc/status"
 
+	workloadidentity "github.com/Bugs5382/go-workload-identity"
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
+	"github.com/Steward-GRC/steward-identity/internal/config"
 	"github.com/Steward-GRC/steward-identity/internal/readiness"
-	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 const testNS = "steward"
@@ -108,15 +109,15 @@ var getSetupState = identityv1.IdentityReadService_GetSetupState_FullMethodName
 func authServe(t *testing.T) (*localIssuer, *grpc.ClientConn, chan bool, func()) {
 	t.Helper()
 	iss := newLocalIssuer(t)
-	v, err := workloadauth.NewVerifier(workloadauth.Config{
-		Issuer: iss.url, CAFile: iss.caFile, Audience: "steward",
+	v, err := workloadidentity.NewVerifier(config.StewardWorkload(workloadidentity.Config{
+		Issuer: iss.url, CAFile: iss.caFile,
 		AllowedServiceAccounts: []string{testNS + "/steward-gateway", testNS + "/steward-workflow", testNS + "/steward-reporting"},
-	}, log.Nop())
+	}), log.Nop())
 	require.NoError(t, err)
 	require.NoError(t, v.Refresh(context.Background()))
 	conn, saw, stop := serve(t, Options{Auth: &Auth{
 		Verifier: v,
-		Policy:   workloadauth.Policy{getSetupState: {CallerGateway: workloadauth.OnBehalf, CallerWorkflow: workloadauth.Self}},
+		Policy:   workloadidentity.Policy{getSetupState: {CallerGateway: workloadidentity.OnBehalf, CallerWorkflow: workloadidentity.Self}},
 	}})
 	return iss, conn, saw, stop
 }
@@ -203,7 +204,7 @@ func TestCallerPolicyAdmitsEachCallerOnlyOnItsMethods(t *testing.T) {
 	for _, c := range []string{CallerGateway, CallerWorkflow, CallerObligations, CallerReporting, CallerCollab, CallerAdminCLI, "delivery"} {
 		sas = append(sas, testNS+"/steward-"+c)
 	}
-	v, err := workloadauth.NewVerifier(workloadauth.Config{Issuer: iss.url, CAFile: iss.caFile, Audience: "steward", AllowedServiceAccounts: sas}, log.Nop())
+	v, err := workloadidentity.NewVerifier(config.StewardWorkload(workloadidentity.Config{Issuer: iss.url, CAFile: iss.caFile, AllowedServiceAccounts: sas}), log.Nop())
 	require.NoError(t, err)
 	require.NoError(t, v.Refresh(context.Background()))
 	conn, _, stop := serve(t, Options{Auth: &Auth{Verifier: v, Policy: CallerPolicy()}})
@@ -253,10 +254,10 @@ func (upBroker) Healthy() bool { return true }
 func TestWorkloadAuthFailsClosedWhileTheJWKSIsRefused(t *testing.T) {
 	iss := newLocalIssuer(t)
 	iss.jwksStatus.Store(http.StatusUnauthorized)
-	v, err := workloadauth.NewVerifier(workloadauth.Config{
-		Issuer: iss.url, CAFile: iss.caFile, Audience: "steward",
+	v, err := workloadidentity.NewVerifier(config.StewardWorkload(workloadidentity.Config{
+		Issuer: iss.url, CAFile: iss.caFile,
 		AllowedServiceAccounts: []string{testNS + "/steward-gateway"},
-	}, log.Nop())
+	}), log.Nop())
 	require.NoError(t, err)
 	require.Error(t, v.Refresh(context.Background()), "a 401 from the JWKS is a failed refresh")
 
@@ -265,7 +266,7 @@ func TestWorkloadAuthFailsClosedWhileTheJWKSIsRefused(t *testing.T) {
 	require.NoError(t, err)
 	conn, saw, stop := serve(t, Options{Checker: checker, CheckInterval: 20 * time.Millisecond, Auth: &Auth{
 		Verifier: v,
-		Policy:   workloadauth.Policy{getSetupState: {CallerGateway: workloadauth.OnBehalf}},
+		Policy:   workloadidentity.Policy{getSetupState: {CallerGateway: workloadidentity.OnBehalf}},
 	}})
 	defer stop()
 
@@ -307,10 +308,10 @@ func TestWorkloadAuthFailsClosedWhileTheJWKSIsRefused(t *testing.T) {
 }
 
 func TestTrustOnBehalfNeedsAnOnBehalfGrant(t *testing.T) {
-	grant := func(a workloadauth.Access) context.Context {
-		return workloadauth.ContextWithGrant(context.Background(), workloadauth.Grant{Caller: workloadauth.Caller{Name: "x"}, Access: a})
+	grant := func(a workloadidentity.Access) context.Context {
+		return workloadidentity.ContextWithGrant(context.Background(), workloadidentity.Grant{Caller: workloadidentity.Caller{Name: "x"}, Access: a})
 	}
-	require.True(t, TrustOnBehalf(grant(workloadauth.OnBehalf), "/m"))
-	require.False(t, TrustOnBehalf(grant(workloadauth.Self), "/m"))
+	require.True(t, TrustOnBehalf(grant(workloadidentity.OnBehalf), "/m"))
+	require.False(t, TrustOnBehalf(grant(workloadidentity.Self), "/m"))
 	require.False(t, TrustOnBehalf(context.Background(), "/m"), "no verified caller, no trust")
 }
