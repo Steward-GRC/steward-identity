@@ -108,4 +108,4 @@ A method no caller uses is refused to everyone.
 | `REDIS_ADDR`, `REDIS_PASSWORD` | empty | Valkey or Redis for the identity provider group cache. Off when unset. |
 | `IDP_GROUPS_CACHE_TTL` | `1m` | How long a user's cached groups are kept. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_TLS`, `SMTP_TLS_INSECURE` | go-email's local defaults | The relay one-time codes go through. |
-| `OTP_DEV_ECHO` | `false` | Logs one-time codes. Local development only. |
+| `OTP_DEV_ECHO` | `false` | Logs one-time codes. Local development only: start-up is refused when `LOG_FORMAT=json`, because every cluster environment logs JSON and local development logs console. |
