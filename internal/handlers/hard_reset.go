@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	workloadidentity "github.com/Bugs5382/go-workload-identity"
 	identityv1 "github.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1"
 	"github.com/Steward-GRC/steward-identity/internal/store"
-	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
 )
 
 // Default hard reset windows: a request waits a day for a second root admin,
@@ -193,8 +193,8 @@ func (h *AdminHandler) ConsumeHardReset(ctx context.Context, req *identityv1.Con
 	if !ok {
 		return nil, status.Error(codes.InvalidArgument, "module must be one that can be hard reset: compliance")
 	}
-	g, ok := workloadauth.GrantFromContext(ctx)
-	if !ok || g.Access != workloadauth.Self || g.Caller.Name != owner {
+	g, ok := workloadidentity.GrantFromContext(ctx)
+	if !ok || g.Access != workloadidentity.Self || g.Caller.Name != owner {
 		return nil, status.Error(codes.PermissionDenied, "only the module's own service can redeem a hard reset")
 	}
 	id, err := parseUUID(req.GetRequestId(), "request_id")

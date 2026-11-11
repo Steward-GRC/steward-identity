@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Steward-GRC/steward-identity/internal/workloadauth"
+	workloadidentity "github.com/Bugs5382/go-workload-identity"
 )
 
 // TLS is the server certificate and the CA client certificates must chain
@@ -71,7 +71,7 @@ type Config struct {
 	TLS TLS
 	// WorkloadAuth verifies the callers' workload tokens; WorkloadAuthEnabled
 	// is false only with WORKLOAD_AUTH=disabled.
-	WorkloadAuth        workloadauth.Config
+	WorkloadAuth        workloadidentity.Config
 	WorkloadAuthEnabled bool
 	// TokenFile is identity's own projected token, sent on its calls to core.
 	// Empty while authentication is off.
@@ -199,11 +199,11 @@ func Load(getenv func(string) string) (Config, error) {
 		errs = append(errs, errors.New("IDENTITY_ADMIN_CLI_ID needs GRPC_TLS_* with client certificates"))
 	}
 	var err error
-	if c.WorkloadAuth, c.WorkloadAuthEnabled, err = workloadauth.ServerConfigFromEnv(getenv); err != nil {
+	if c.WorkloadAuth, c.WorkloadAuthEnabled, err = serverWorkloadConfig(getenv); err != nil {
 		errs = append(errs, err)
 	}
 	if c.WorkloadAuthEnabled {
-		c.TokenFile = or(workloadauth.EnvTokenFile, workloadauth.DefaultTokenFile)
+		c.TokenFile = or(workloadidentity.EnvTokenFile, DefaultTokenFile)
 	}
 	return c, errors.Join(errs...)
 }

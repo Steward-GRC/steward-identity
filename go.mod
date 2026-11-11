@@ -15,6 +15,7 @@ require (
 	github.com/Bugs5382/go-rabbitmq v1.3.0
 	github.com/Bugs5382/go-redis v1.2.0
 	github.com/Bugs5382/go-saga-orchestration v0.7.0
+	github.com/Bugs5382/go-workload-identity v1.0.0
 	github.com/alicebob/miniredis/v2 v2.38.0
 	github.com/go-webauthn/webauthn v0.18.2
 	github.com/golang-jwt/jwt/v5 v5.3.1

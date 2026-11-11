@@ -65,9 +65,10 @@ A method no caller uses is refused to everyone.
 - **Off switch:** with `WORKLOAD_AUTH=disabled` identity logs a warning at start-up and every five
   minutes, trusts no forwarded actor, and readiness reports `workloadauth` degraded. With neither
   `WORKLOAD_OIDC_ISSUER` nor `WORKLOAD_AUTH=disabled`, identity doesn't start.
-- `internal/workloadauth` is a byte-identical copy of steward-core's, pinned by `STEWARD_CORE_REF` in
-  `proto-refs.env` and compared in CI by `scripts/workloadauth-check.sh`; change it in steward-core
-  first.
+- Service-to-service authentication comes from `github.com/Bugs5382/go-workload-identity`, with
+  Steward's audience (`steward`), service-account prefix (`steward-`) and projected-token path
+  supplied in `internal/config` (`config.StewardWorkload`, `config.DefaultTokenFile`). The library
+  also reads `WORKLOAD_SERVICEACCOUNT_PREFIX`; identity ignores it, the prefix is always `steward-`.
 
 ## Sign-in
 
