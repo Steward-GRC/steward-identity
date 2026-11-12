@@ -41,9 +41,9 @@ const (
 	IdentityAdminService_BootstrapInitialAdmin_FullMethodName = "/steward.identity.v1.IdentityAdminService/BootstrapInitialAdmin"
 	IdentityAdminService_SetUserPolicyOverride_FullMethodName = "/steward.identity.v1.IdentityAdminService/SetUserPolicyOverride"
 	IdentityAdminService_RequestStepUpOtp_FullMethodName      = "/steward.identity.v1.IdentityAdminService/RequestStepUpOtp"
+	IdentityAdminService_TransferRoot_FullMethodName          = "/steward.identity.v1.IdentityAdminService/TransferRoot"
 	IdentityAdminService_GrantRoot_FullMethodName             = "/steward.identity.v1.IdentityAdminService/GrantRoot"
 	IdentityAdminService_RevokeRoot_FullMethodName            = "/steward.identity.v1.IdentityAdminService/RevokeRoot"
-	IdentityAdminService_TransferRoot_FullMethodName          = "/steward.identity.v1.IdentityAdminService/TransferRoot"
 	IdentityAdminService_RequestHardReset_FullMethodName      = "/steward.identity.v1.IdentityAdminService/RequestHardReset"
 	IdentityAdminService_ApproveHardReset_FullMethodName      = "/steward.identity.v1.IdentityAdminService/ApproveHardReset"
 	IdentityAdminService_CancelHardReset_FullMethodName       = "/steward.identity.v1.IdentityAdminService/CancelHardReset"
@@ -131,21 +131,24 @@ type IdentityAdminServiceClient interface {
 	// clears it.
 	SetUserPolicyOverride(ctx context.Context, in *SetUserPolicyOverrideRequest, opts ...grpc.CallOption) (*SetUserPolicyOverrideResponse, error)
 	// RequestStepUpOtp emails a step-up code to the calling admin, to confirm
-	// a high-risk action such as GrantRoot or RevokeRoot.
+	// a high-risk action such as TransferRoot.
 	RequestStepUpOtp(ctx context.Context, in *RequestStepUpOtpRequest, opts ...grpc.CallOption) (*RequestStepUpOtpResponse, error)
-	// GrantRoot makes another user a root admin as well; they also get
-	// site-admin. Root only, refused during act-as, and the calling admin's
-	// step-up code is checked first.
-	GrantRoot(ctx context.Context, in *GrantRootRequest, opts ...grpc.CallOption) (*GrantRootResponse, error)
-	// RevokeRoot takes the root role from a user, who keeps site-admin. The
-	// last root admin can't lose it. Same checks as GrantRoot.
-	RevokeRoot(ctx context.Context, in *RevokeRootRequest, opts ...grpc.CallOption) (*RevokeRootResponse, error)
-	// Deprecated: Do not use.
-	// TransferRoot is removed now that more than one user can hold the root
-	// role: it always returns Unimplemented, naming GrantRoot and RevokeRoot.
-	// Kept only so a caller still built against the old shape gets a clear
-	// error instead of a broken RPC.
+	// TransferRoot hands the root role to another user and takes it from the
+	// caller in the same step, so there is always exactly one root. The new
+	// root also gets site-admin and is enabled; the old root keeps site-admin.
+	// Root only, refused during act-as and from the admin CLI, and the calling
+	// admin's step-up code is checked first.
 	TransferRoot(ctx context.Context, in *TransferRootRequest, opts ...grpc.CallOption) (*TransferRootResponse, error)
+	// Deprecated: Do not use.
+	// GrantRoot is removed: there is exactly one root, changed only by
+	// TransferRoot. It always returns Unimplemented. Kept so a caller still
+	// built against the old shape gets a clear error and the proto stays
+	// wire-compatible; use TransferRoot.
+	GrantRoot(ctx context.Context, in *GrantRootRequest, opts ...grpc.CallOption) (*GrantRootResponse, error)
+	// Deprecated: Do not use.
+	// RevokeRoot is removed: there is exactly one root, changed only by
+	// TransferRoot. It always returns Unimplemented; use TransferRoot.
+	RevokeRoot(ctx context.Context, in *RevokeRootRequest, opts ...grpc.CallOption) (*RevokeRootResponse, error)
 	// RequestHardReset starts a two-person hard reset of a module: one root
 	// admin asks, a different root admin approves. The request expires after
 	// HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
@@ -409,6 +412,17 @@ func (c *identityAdminServiceClient) RequestStepUpOtp(ctx context.Context, in *R
 	return out, nil
 }
 
+func (c *identityAdminServiceClient) TransferRoot(ctx context.Context, in *TransferRootRequest, opts ...grpc.CallOption) (*TransferRootResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TransferRootResponse)
+	err := c.cc.Invoke(ctx, IdentityAdminService_TransferRoot_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Deprecated: Do not use.
 func (c *identityAdminServiceClient) GrantRoot(ctx context.Context, in *GrantRootRequest, opts ...grpc.CallOption) (*GrantRootResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GrantRootResponse)
@@ -419,21 +433,11 @@ func (c *identityAdminServiceClient) GrantRoot(ctx context.Context, in *GrantRoo
 	return out, nil
 }
 
+// Deprecated: Do not use.
 func (c *identityAdminServiceClient) RevokeRoot(ctx context.Context, in *RevokeRootRequest, opts ...grpc.CallOption) (*RevokeRootResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RevokeRootResponse)
 	err := c.cc.Invoke(ctx, IdentityAdminService_RevokeRoot_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// Deprecated: Do not use.
-func (c *identityAdminServiceClient) TransferRoot(ctx context.Context, in *TransferRootRequest, opts ...grpc.CallOption) (*TransferRootResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TransferRootResponse)
-	err := c.cc.Invoke(ctx, IdentityAdminService_TransferRoot_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -714,21 +718,24 @@ type IdentityAdminServiceServer interface {
 	// clears it.
 	SetUserPolicyOverride(context.Context, *SetUserPolicyOverrideRequest) (*SetUserPolicyOverrideResponse, error)
 	// RequestStepUpOtp emails a step-up code to the calling admin, to confirm
-	// a high-risk action such as GrantRoot or RevokeRoot.
+	// a high-risk action such as TransferRoot.
 	RequestStepUpOtp(context.Context, *RequestStepUpOtpRequest) (*RequestStepUpOtpResponse, error)
-	// GrantRoot makes another user a root admin as well; they also get
-	// site-admin. Root only, refused during act-as, and the calling admin's
-	// step-up code is checked first.
-	GrantRoot(context.Context, *GrantRootRequest) (*GrantRootResponse, error)
-	// RevokeRoot takes the root role from a user, who keeps site-admin. The
-	// last root admin can't lose it. Same checks as GrantRoot.
-	RevokeRoot(context.Context, *RevokeRootRequest) (*RevokeRootResponse, error)
-	// Deprecated: Do not use.
-	// TransferRoot is removed now that more than one user can hold the root
-	// role: it always returns Unimplemented, naming GrantRoot and RevokeRoot.
-	// Kept only so a caller still built against the old shape gets a clear
-	// error instead of a broken RPC.
+	// TransferRoot hands the root role to another user and takes it from the
+	// caller in the same step, so there is always exactly one root. The new
+	// root also gets site-admin and is enabled; the old root keeps site-admin.
+	// Root only, refused during act-as and from the admin CLI, and the calling
+	// admin's step-up code is checked first.
 	TransferRoot(context.Context, *TransferRootRequest) (*TransferRootResponse, error)
+	// Deprecated: Do not use.
+	// GrantRoot is removed: there is exactly one root, changed only by
+	// TransferRoot. It always returns Unimplemented. Kept so a caller still
+	// built against the old shape gets a clear error and the proto stays
+	// wire-compatible; use TransferRoot.
+	GrantRoot(context.Context, *GrantRootRequest) (*GrantRootResponse, error)
+	// Deprecated: Do not use.
+	// RevokeRoot is removed: there is exactly one root, changed only by
+	// TransferRoot. It always returns Unimplemented; use TransferRoot.
+	RevokeRoot(context.Context, *RevokeRootRequest) (*RevokeRootResponse, error)
 	// RequestHardReset starts a two-person hard reset of a module: one root
 	// admin asks, a different root admin approves. The request expires after
 	// HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
@@ -859,14 +866,14 @@ func (UnimplementedIdentityAdminServiceServer) SetUserPolicyOverride(context.Con
 func (UnimplementedIdentityAdminServiceServer) RequestStepUpOtp(context.Context, *RequestStepUpOtpRequest) (*RequestStepUpOtpResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RequestStepUpOtp not implemented")
 }
+func (UnimplementedIdentityAdminServiceServer) TransferRoot(context.Context, *TransferRootRequest) (*TransferRootResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TransferRoot not implemented")
+}
 func (UnimplementedIdentityAdminServiceServer) GrantRoot(context.Context, *GrantRootRequest) (*GrantRootResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GrantRoot not implemented")
 }
 func (UnimplementedIdentityAdminServiceServer) RevokeRoot(context.Context, *RevokeRootRequest) (*RevokeRootResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RevokeRoot not implemented")
-}
-func (UnimplementedIdentityAdminServiceServer) TransferRoot(context.Context, *TransferRootRequest) (*TransferRootResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method TransferRoot not implemented")
 }
 func (UnimplementedIdentityAdminServiceServer) RequestHardReset(context.Context, *RequestHardResetRequest) (*RequestHardResetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RequestHardReset not implemented")
@@ -1294,6 +1301,24 @@ func _IdentityAdminService_RequestStepUpOtp_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IdentityAdminService_TransferRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransferRootRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityAdminServiceServer).TransferRoot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityAdminService_TransferRoot_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityAdminServiceServer).TransferRoot(ctx, req.(*TransferRootRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IdentityAdminService_GrantRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GrantRootRequest)
 	if err := dec(in); err != nil {
@@ -1326,24 +1351,6 @@ func _IdentityAdminService_RevokeRoot_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IdentityAdminServiceServer).RevokeRoot(ctx, req.(*RevokeRootRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IdentityAdminService_TransferRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TransferRootRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IdentityAdminServiceServer).TransferRoot(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: IdentityAdminService_TransferRoot_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IdentityAdminServiceServer).TransferRoot(ctx, req.(*TransferRootRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1810,16 +1817,16 @@ var IdentityAdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _IdentityAdminService_RequestStepUpOtp_Handler,
 		},
 		{
+			MethodName: "TransferRoot",
+			Handler:    _IdentityAdminService_TransferRoot_Handler,
+		},
+		{
 			MethodName: "GrantRoot",
 			Handler:    _IdentityAdminService_GrantRoot_Handler,
 		},
 		{
 			MethodName: "RevokeRoot",
 			Handler:    _IdentityAdminService_RevokeRoot_Handler,
-		},
-		{
-			MethodName: "TransferRoot",
-			Handler:    _IdentityAdminService_TransferRoot_Handler,
 		},
 		{
 			MethodName: "RequestHardReset",

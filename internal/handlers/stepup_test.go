@@ -90,9 +90,9 @@ func TestRequestStepUpOtpRequiresAuth(t *testing.T) {
 	}
 }
 
-// TestGrantRootRejectsWithoutOtp asserts that a grant with an absent or
+// TestTransferRootRejectsWithoutOtp asserts that a transfer with an absent or
 // wrong step-up code is refused and changes nothing.
-func TestGrantRootRejectsWithoutOtp(t *testing.T) {
+func TestTransferRootRejectsWithoutOtp(t *testing.T) {
 	s := newTestStore(t)
 	ctx := context.Background()
 	actor := newRootUser(t, s, "kc-tr-actor-1", "tractor1@example.example.org")
@@ -104,13 +104,13 @@ func TestGrantRootRejectsWithoutOtp(t *testing.T) {
 		WithOTP(&fakeSender{}, zerolog.Nop(), true)
 
 	// (a) No OTP at all.
-	if _, err := h.GrantRoot(adminCtx(actor.ID.String()),
-		&identityv1.GrantRootRequest{UserId: target.ID.String()}); status.Code(err) != codes.InvalidArgument {
+	if _, err := h.TransferRoot(adminCtx(actor.ID.String()),
+		&identityv1.TransferRootRequest{ToUserId: target.ID.String()}); status.Code(err) != codes.InvalidArgument {
 		t.Fatalf("empty otp: want InvalidArgument, got %v", err)
 	}
 	// (b) Wrong OTP (no code was ever minted for the actor).
-	if _, err := h.GrantRoot(adminCtx(actor.ID.String()),
-		&identityv1.GrantRootRequest{UserId: target.ID.String(), Otp: "000000"}); status.Code(err) != codes.InvalidArgument {
+	if _, err := h.TransferRoot(adminCtx(actor.ID.String()),
+		&identityv1.TransferRootRequest{ToUserId: target.ID.String(), Otp: "000000"}); status.Code(err) != codes.InvalidArgument {
 		t.Fatalf("bad otp: want InvalidArgument, got %v", err)
 	}
 	got, err := s.GetUser(ctx, target.ID)
@@ -122,10 +122,10 @@ func TestGrantRootRejectsWithoutOtp(t *testing.T) {
 	}
 }
 
-// TestGrantRootSucceedsWithValidOtp asserts that a valid, freshly-minted
-// step_up code lets the grant proceed, that both stay root, and that the code
-// is single-use.
-func TestGrantRootSucceedsWithValidOtp(t *testing.T) {
+// TestTransferRootSucceedsWithValidOtp asserts that a valid, freshly-minted
+// step_up code lets the transfer proceed, that root moves, that the old
+// holder keeps site-admin, and that the code is single-use.
+func TestTransferRootSucceedsWithValidOtp(t *testing.T) {
 	s := newTestStore(t)
 	ctx := context.Background()
 	actor := newRootUser(t, s, "kc-tr-actor-2", "tractor2@example.example.org")
@@ -137,25 +137,28 @@ func TestGrantRootSucceedsWithValidOtp(t *testing.T) {
 		WithOTP(&fakeSender{}, zerolog.Nop(), true)
 
 	code := stepUpCodeFor(t, s, actor.ID.String())
-	resp, err := h.GrantRoot(adminCtx(actor.ID.String()),
-		&identityv1.GrantRootRequest{UserId: target.ID.String(), Otp: code})
+	resp, err := h.TransferRoot(adminCtx(actor.ID.String()),
+		&identityv1.TransferRootRequest{ToUserId: target.ID.String(), Otp: code})
 	if err != nil {
-		t.Fatalf("GrantRoot with valid otp: %v", err)
+		t.Fatalf("TransferRoot with valid otp: %v", err)
 	}
-	if !resp.GetUser().GetIsRoot() {
-		t.Fatal("target is not root after a valid grant")
+	if !resp.GetUser().GetIsRoot() || resp.GetUser().GetId() != target.ID.String() {
+		t.Fatal("target is not root after a valid transfer")
 	}
-	still, err := s.GetUser(ctx, actor.ID)
+	old, err := s.GetUser(ctx, actor.ID)
 	if err != nil {
 		t.Fatalf("get actor: %v", err)
 	}
-	if !still.IsRoot {
-		t.Fatal("granting root must not take it from the granter")
+	if old.IsRoot {
+		t.Fatal("the old holder must stop being root")
+	}
+	if !contains(old.Roles, "site-admin") {
+		t.Fatalf("the old holder keeps site-admin: %v", old.Roles)
 	}
 
-	// Single-use: reusing the same code must now fail.
-	if _, err := h.RevokeRoot(adminCtx(actor.ID.String()),
-		&identityv1.RevokeRootRequest{UserId: target.ID.String(), Otp: code}); status.Code(err) != codes.InvalidArgument {
+	// Single-use: the same code can't move root back.
+	if _, err := h.TransferRoot(adminCtx(target.ID.String()),
+		&identityv1.TransferRootRequest{ToUserId: actor.ID.String(), Otp: code}); status.Code(err) != codes.InvalidArgument {
 		t.Fatalf("reused otp: want InvalidArgument, got %v", err)
 	}
 }

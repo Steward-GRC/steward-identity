@@ -1895,6 +1895,7 @@ func (*RequestStepUpOtpResponse) Descriptor() ([]byte, []int) {
 	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{37}
 }
 
+// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
 type GrantRootRequest struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
 	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -1948,6 +1949,7 @@ func (x *GrantRootRequest) GetOtp() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
 type GrantRootResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
@@ -1992,6 +1994,7 @@ func (x *GrantRootResponse) GetUser() *User {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
 type RevokeRootRequest struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
 	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -2045,6 +2048,7 @@ func (x *RevokeRootRequest) GetOtp() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
 type RevokeRootResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
@@ -2089,10 +2093,10 @@ func (x *RevokeRootResponse) GetUser() *User {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
 type TransferRootRequest struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	ToUserId string                 `protobuf:"bytes,1,opt,name=to_user_id,json=toUserId,proto3" json:"to_user_id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The user who becomes the root.
+	ToUserId string `protobuf:"bytes,1,opt,name=to_user_id,json=toUserId,proto3" json:"to_user_id,omitempty"`
 	// The calling admin's step-up code.
 	Otp           string `protobuf:"bytes,2,opt,name=otp,proto3" json:"otp,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2143,10 +2147,10 @@ func (x *TransferRootRequest) GetOtp() string {
 	return ""
 }
 
-// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
 type TransferRootResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The new root.
+	User          *User `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4389,23 +4393,23 @@ const file_steward_identity_v1_admin_proto_rawDesc = "" +
 	"\x1dSetUserPolicyOverrideResponse\x12-\n" +
 	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user\"\x19\n" +
 	"\x17RequestStepUpOtpRequest\"\x1a\n" +
-	"\x18RequestStepUpOtpResponse\"=\n" +
+	"\x18RequestStepUpOtpResponse\"A\n" +
 	"\x10GrantRootRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x10\n" +
-	"\x03otp\x18\x02 \x01(\tR\x03otp\"B\n" +
+	"\x03otp\x18\x02 \x01(\tR\x03otp:\x02\x18\x01\"F\n" +
 	"\x11GrantRootResponse\x12-\n" +
-	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user\">\n" +
+	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user:\x02\x18\x01\"B\n" +
 	"\x11RevokeRootRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x10\n" +
-	"\x03otp\x18\x02 \x01(\tR\x03otp\"C\n" +
+	"\x03otp\x18\x02 \x01(\tR\x03otp:\x02\x18\x01\"G\n" +
 	"\x12RevokeRootResponse\x12-\n" +
-	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user\"I\n" +
+	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user:\x02\x18\x01\"E\n" +
 	"\x13TransferRootRequest\x12\x1c\n" +
 	"\n" +
 	"to_user_id\x18\x01 \x01(\tR\btoUserId\x12\x10\n" +
-	"\x03otp\x18\x02 \x01(\tR\x03otp:\x02\x18\x01\"I\n" +
+	"\x03otp\x18\x02 \x01(\tR\x03otp\"E\n" +
 	"\x14TransferRootResponse\x12-\n" +
-	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user:\x02\x18\x01\"I\n" +
+	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user\"I\n" +
 	"\x17RequestHardResetRequest\x12\x16\n" +
 	"\x06module\x18\x01 \x01(\tR\x06module\x12\x16\n" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\"[\n" +
@@ -4537,7 +4541,7 @@ const file_steward_identity_v1_admin_proto_rawDesc = "" +
 	"\x06locale\x18\x02 \x01(\tH\x00R\x06locale\x88\x01\x01B\t\n" +
 	"\a_locale\"N\n" +
 	"\x1dUpdateUserPreferencesResponse\x12-\n" +
-	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user2\xce%\n" +
+	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user2\xd3%\n" +
 	"\x14IdentityAdminService\x12]\n" +
 	"\n" +
 	"EnableUser\x12&.steward.identity.v1.EnableUserRequest\x1a'.steward.identity.v1.EnableUserResponse\x12`\n" +
@@ -4560,11 +4564,11 @@ const file_steward_identity_v1_admin_proto_rawDesc = "" +
 	"\x0eSetGroupParent\x12*.steward.identity.v1.SetGroupParentRequest\x1a+.steward.identity.v1.SetGroupParentResponse\x12~\n" +
 	"\x15BootstrapInitialAdmin\x121.steward.identity.v1.BootstrapInitialAdminRequest\x1a2.steward.identity.v1.BootstrapInitialAdminResponse\x12~\n" +
 	"\x15SetUserPolicyOverride\x121.steward.identity.v1.SetUserPolicyOverrideRequest\x1a2.steward.identity.v1.SetUserPolicyOverrideResponse\x12o\n" +
-	"\x10RequestStepUpOtp\x12,.steward.identity.v1.RequestStepUpOtpRequest\x1a-.steward.identity.v1.RequestStepUpOtpResponse\x12Z\n" +
-	"\tGrantRoot\x12%.steward.identity.v1.GrantRootRequest\x1a&.steward.identity.v1.GrantRootResponse\x12]\n" +
+	"\x10RequestStepUpOtp\x12,.steward.identity.v1.RequestStepUpOtpRequest\x1a-.steward.identity.v1.RequestStepUpOtpResponse\x12c\n" +
+	"\fTransferRoot\x12(.steward.identity.v1.TransferRootRequest\x1a).steward.identity.v1.TransferRootResponse\x12_\n" +
+	"\tGrantRoot\x12%.steward.identity.v1.GrantRootRequest\x1a&.steward.identity.v1.GrantRootResponse\"\x03\x88\x02\x01\x12b\n" +
 	"\n" +
-	"RevokeRoot\x12&.steward.identity.v1.RevokeRootRequest\x1a'.steward.identity.v1.RevokeRootResponse\x12h\n" +
-	"\fTransferRoot\x12(.steward.identity.v1.TransferRootRequest\x1a).steward.identity.v1.TransferRootResponse\"\x03\x88\x02\x01\x12o\n" +
+	"RevokeRoot\x12&.steward.identity.v1.RevokeRootRequest\x1a'.steward.identity.v1.RevokeRootResponse\"\x03\x88\x02\x01\x12o\n" +
 	"\x10RequestHardReset\x12,.steward.identity.v1.RequestHardResetRequest\x1a-.steward.identity.v1.RequestHardResetResponse\x12o\n" +
 	"\x10ApproveHardReset\x12,.steward.identity.v1.ApproveHardResetRequest\x1a-.steward.identity.v1.ApproveHardResetResponse\x12l\n" +
 	"\x0fCancelHardReset\x12+.steward.identity.v1.CancelHardResetRequest\x1a,.steward.identity.v1.CancelHardResetResponse\x12~\n" +
@@ -4758,9 +4762,9 @@ var file_steward_identity_v1_admin_proto_depIdxs = []int32{
 	32, // 53: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:input_type -> steward.identity.v1.BootstrapInitialAdminRequest
 	34, // 54: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:input_type -> steward.identity.v1.SetUserPolicyOverrideRequest
 	36, // 55: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:input_type -> steward.identity.v1.RequestStepUpOtpRequest
-	38, // 56: steward.identity.v1.IdentityAdminService.GrantRoot:input_type -> steward.identity.v1.GrantRootRequest
-	40, // 57: steward.identity.v1.IdentityAdminService.RevokeRoot:input_type -> steward.identity.v1.RevokeRootRequest
-	42, // 58: steward.identity.v1.IdentityAdminService.TransferRoot:input_type -> steward.identity.v1.TransferRootRequest
+	42, // 56: steward.identity.v1.IdentityAdminService.TransferRoot:input_type -> steward.identity.v1.TransferRootRequest
+	38, // 57: steward.identity.v1.IdentityAdminService.GrantRoot:input_type -> steward.identity.v1.GrantRootRequest
+	40, // 58: steward.identity.v1.IdentityAdminService.RevokeRoot:input_type -> steward.identity.v1.RevokeRootRequest
 	44, // 59: steward.identity.v1.IdentityAdminService.RequestHardReset:input_type -> steward.identity.v1.RequestHardResetRequest
 	46, // 60: steward.identity.v1.IdentityAdminService.ApproveHardReset:input_type -> steward.identity.v1.ApproveHardResetRequest
 	48, // 61: steward.identity.v1.IdentityAdminService.CancelHardReset:input_type -> steward.identity.v1.CancelHardResetRequest
@@ -4801,9 +4805,9 @@ var file_steward_identity_v1_admin_proto_depIdxs = []int32{
 	33, // 96: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:output_type -> steward.identity.v1.BootstrapInitialAdminResponse
 	35, // 97: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:output_type -> steward.identity.v1.SetUserPolicyOverrideResponse
 	37, // 98: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:output_type -> steward.identity.v1.RequestStepUpOtpResponse
-	39, // 99: steward.identity.v1.IdentityAdminService.GrantRoot:output_type -> steward.identity.v1.GrantRootResponse
-	41, // 100: steward.identity.v1.IdentityAdminService.RevokeRoot:output_type -> steward.identity.v1.RevokeRootResponse
-	43, // 101: steward.identity.v1.IdentityAdminService.TransferRoot:output_type -> steward.identity.v1.TransferRootResponse
+	43, // 99: steward.identity.v1.IdentityAdminService.TransferRoot:output_type -> steward.identity.v1.TransferRootResponse
+	39, // 100: steward.identity.v1.IdentityAdminService.GrantRoot:output_type -> steward.identity.v1.GrantRootResponse
+	41, // 101: steward.identity.v1.IdentityAdminService.RevokeRoot:output_type -> steward.identity.v1.RevokeRootResponse
 	45, // 102: steward.identity.v1.IdentityAdminService.RequestHardReset:output_type -> steward.identity.v1.RequestHardResetResponse
 	47, // 103: steward.identity.v1.IdentityAdminService.ApproveHardReset:output_type -> steward.identity.v1.ApproveHardResetResponse
 	49, // 104: steward.identity.v1.IdentityAdminService.CancelHardReset:output_type -> steward.identity.v1.CancelHardResetResponse

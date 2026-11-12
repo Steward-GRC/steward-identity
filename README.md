@@ -5,8 +5,8 @@
 The identity service answers who a user is for every other Steward service, and runs the parts of
 sign-in Steward owns.
 
-- **People:** users, the group tree and its managers, global and category-scoped roles, the root
-  admin, per-policy overrides, break glass, onboarding and profiles.
+- **People:** users, the group tree and its managers, global and category-scoped roles, the single root
+  admin (moved by `TransferRoot`), per-policy overrides, break glass, onboarding and profiles.
 - **Sign-in:** Ory only. Kratos holds local accounts, passwords and sessions; Polis brokers SAML and
   OIDC for each organisation's SSO connection, with domain verification, connection tests, group
   mappings and just-in-time accounts.

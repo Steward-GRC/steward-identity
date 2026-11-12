@@ -1,8 +1,8 @@
 # Data model
 
-The identity service owns one Postgres database. Its schema is one baseline migration,
-`migrations/0001_baseline.up.sql` (and `.down.sql`), applied with go-postgres's `Migrate`. Until
-the first release the baseline stays the only migration.
+The identity service owns one Postgres database. Its schema is the baseline migration,
+`migrations/0001_baseline.up.sql`, plus `0002_single_root` (a unique partial index so only one user
+can have `is_root`), each with a `.down.sql`, applied with go-postgres's `Migrate`.
 
 | Table | Holds |
 | --- | --- |

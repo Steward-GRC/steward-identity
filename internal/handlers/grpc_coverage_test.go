@@ -6,9 +6,9 @@ package handlers
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -31,7 +31,8 @@ import (
 func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
 	// Deferred RPCs, keyed "Service.Method", each with a reason.
 	knownDeferred := map[string]string{
-		"IdentityAdminService.TransferRoot": "removed now that more than one user can hold root; kept in the proto, unimplemented, so a caller still built against the old shape gets Unimplemented naming GrantRoot and RevokeRoot instead of a broken RPC",
+		"IdentityAdminService.GrantRoot":  "removed: there is exactly one root, moved by TransferRoot; kept in the proto as a deprecated stub that answers Unimplemented",
+		"IdentityAdminService.RevokeRoot": "removed: there is exactly one root, moved by TransferRoot; kept in the proto as a deprecated stub that answers Unimplemented",
 	}
 
 	tests := []struct {
@@ -109,14 +110,17 @@ func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
 	}
 }
 
-// TestTransferRoot_RemovedNamesItsReplacement guards the one RPC
-// knownDeferred above excuses: a caller still built against the old
-// single-root shape gets Unimplemented, not a broken call, and the message
-// names GrantRoot and RevokeRoot.
-func TestTransferRoot_RemovedNamesItsReplacement(t *testing.T) {
+// TestGrantAndRevokeRoot_RemovedNameTransferRoot guards the two RPCs
+// knownDeferred excuses: a caller still built against the old shape gets
+// Unimplemented naming TransferRoot, never a change to the root.
+func TestGrantAndRevokeRoot_RemovedNameTransferRoot(t *testing.T) {
 	h := NewAdminHandler(nil, nil)
-	_, err := h.TransferRoot(context.Background(), &identityv1.TransferRootRequest{}) //nolint:staticcheck // exercising the removed RPC's stub
-	require.Equal(t, codes.Unimplemented, status.Code(err))
-	require.Contains(t, err.Error(), "GrantRoot")
-	require.Contains(t, err.Error(), "RevokeRoot")
+	_, err := h.GrantRoot(context.Background(), &identityv1.GrantRootRequest{}) //nolint:staticcheck // exercising the removed RPC's stub
+	if status.Code(err) != codes.Unimplemented || !strings.Contains(err.Error(), "TransferRoot") {
+		t.Fatalf("GrantRoot: want Unimplemented naming TransferRoot, got %v", err)
+	}
+	_, err = h.RevokeRoot(context.Background(), &identityv1.RevokeRootRequest{}) //nolint:staticcheck // exercising the removed RPC's stub
+	if status.Code(err) != codes.Unimplemented || !strings.Contains(err.Error(), "TransferRoot") {
+		t.Fatalf("RevokeRoot: want Unimplemented naming TransferRoot, got %v", err)
+	}
 }
