@@ -4120,6 +4120,104 @@ func (*AdminRenameUserFactorResponse) Descriptor() ([]byte, []int) {
 	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{83}
 }
 
+type UpdateUserPreferencesRequest struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	// A BCP 47 tag such as "en-US", trimmed. Omitted leaves the stored value
+	// unchanged; an empty string clears it.
+	Locale        *string `protobuf:"bytes,2,opt,name=locale,proto3,oneof" json:"locale,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserPreferencesRequest) Reset() {
+	*x = UpdateUserPreferencesRequest{}
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[84]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserPreferencesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserPreferencesRequest) ProtoMessage() {}
+
+func (x *UpdateUserPreferencesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[84]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserPreferencesRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserPreferencesRequest) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{84}
+}
+
+func (x *UpdateUserPreferencesRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UpdateUserPreferencesRequest) GetLocale() string {
+	if x != nil && x.Locale != nil {
+		return *x.Locale
+	}
+	return ""
+}
+
+type UpdateUserPreferencesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserPreferencesResponse) Reset() {
+	*x = UpdateUserPreferencesResponse{}
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[85]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserPreferencesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserPreferencesResponse) ProtoMessage() {}
+
+func (x *UpdateUserPreferencesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[85]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserPreferencesResponse.ProtoReflect.Descriptor instead.
+func (*UpdateUserPreferencesResponse) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{85}
+}
+
+func (x *UpdateUserPreferencesResponse) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
 var File_steward_identity_v1_admin_proto protoreflect.FileDescriptor
 
 const file_steward_identity_v1_admin_proto_rawDesc = "" +
@@ -4364,7 +4462,13 @@ const file_steward_identity_v1_admin_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
 	"\tmethod_id\x18\x02 \x01(\tR\bmethodId\x12\x14\n" +
 	"\x05label\x18\x03 \x01(\tR\x05label\"\x1f\n" +
-	"\x1dAdminRenameUserFactorResponse2\xce$\n" +
+	"\x1dAdminRenameUserFactorResponse\"_\n" +
+	"\x1cUpdateUserPreferencesRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
+	"\x06locale\x18\x02 \x01(\tH\x00R\x06locale\x88\x01\x01B\t\n" +
+	"\a_locale\"N\n" +
+	"\x1dUpdateUserPreferencesResponse\x12-\n" +
+	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user2\xce%\n" +
 	"\x14IdentityAdminService\x12]\n" +
 	"\n" +
 	"EnableUser\x12&.steward.identity.v1.EnableUserRequest\x1a'.steward.identity.v1.EnableUserResponse\x12`\n" +
@@ -4411,7 +4515,8 @@ const file_steward_identity_v1_admin_proto_rawDesc = "" +
 	"\x0fUpdateMyProfile\x12+.steward.identity.v1.UpdateMyProfileRequest\x1a,.steward.identity.v1.UpdateMyProfileResponse\x12{\n" +
 	"\x14AdminListUserFactors\x120.steward.identity.v1.AdminListUserFactorsRequest\x1a1.steward.identity.v1.AdminListUserFactorsResponse\x12~\n" +
 	"\x15AdminRemoveUserFactor\x121.steward.identity.v1.AdminRemoveUserFactorRequest\x1a2.steward.identity.v1.AdminRemoveUserFactorResponse\x12~\n" +
-	"\x15AdminRenameUserFactor\x121.steward.identity.v1.AdminRenameUserFactorRequest\x1a2.steward.identity.v1.AdminRenameUserFactorResponseBOZMgithub.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1;identityv1b\x06proto3"
+	"\x15AdminRenameUserFactor\x121.steward.identity.v1.AdminRenameUserFactorRequest\x1a2.steward.identity.v1.AdminRenameUserFactorResponse\x12~\n" +
+	"\x15UpdateUserPreferences\x121.steward.identity.v1.UpdateUserPreferencesRequest\x1a2.steward.identity.v1.UpdateUserPreferencesResponseBOZMgithub.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1;identityv1b\x06proto3"
 
 var (
 	file_steward_identity_v1_admin_proto_rawDescOnce sync.Once
@@ -4425,7 +4530,7 @@ func file_steward_identity_v1_admin_proto_rawDescGZIP() []byte {
 	return file_steward_identity_v1_admin_proto_rawDescData
 }
 
-var file_steward_identity_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 85)
+var file_steward_identity_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 87)
 var file_steward_identity_v1_admin_proto_goTypes = []any{
 	(*EnableUserRequest)(nil),             // 0: steward.identity.v1.EnableUserRequest
 	(*EnableUserResponse)(nil),            // 1: steward.identity.v1.EnableUserResponse
@@ -4511,144 +4616,149 @@ var file_steward_identity_v1_admin_proto_goTypes = []any{
 	(*AdminRemoveUserFactorResponse)(nil), // 81: steward.identity.v1.AdminRemoveUserFactorResponse
 	(*AdminRenameUserFactorRequest)(nil),  // 82: steward.identity.v1.AdminRenameUserFactorRequest
 	(*AdminRenameUserFactorResponse)(nil), // 83: steward.identity.v1.AdminRenameUserFactorResponse
-	nil,                                   // 84: steward.identity.v1.CreateGroupRequest.MetadataEntry
-	(*User)(nil),                          // 85: steward.identity.v1.User
-	(*UserDeletionPreview)(nil),           // 86: steward.identity.v1.UserDeletionPreview
-	(*AccountMergePreview)(nil),           // 87: steward.identity.v1.AccountMergePreview
-	(MergeStatus)(0),                      // 88: steward.identity.v1.MergeStatus
-	(*MergeCounts)(nil),                   // 89: steward.identity.v1.MergeCounts
-	(*MergeStepResult)(nil),               // 90: steward.identity.v1.MergeStepResult
-	(*Group)(nil),                         // 91: steward.identity.v1.Group
-	(OverrideEffect)(0),                   // 92: steward.identity.v1.OverrideEffect
-	(*HardResetRequest)(nil),              // 93: steward.identity.v1.HardResetRequest
-	(*Session)(nil),                       // 94: steward.identity.v1.Session
-	(*UserFactor)(nil),                    // 95: steward.identity.v1.UserFactor
+	(*UpdateUserPreferencesRequest)(nil),  // 84: steward.identity.v1.UpdateUserPreferencesRequest
+	(*UpdateUserPreferencesResponse)(nil), // 85: steward.identity.v1.UpdateUserPreferencesResponse
+	nil,                                   // 86: steward.identity.v1.CreateGroupRequest.MetadataEntry
+	(*User)(nil),                          // 87: steward.identity.v1.User
+	(*UserDeletionPreview)(nil),           // 88: steward.identity.v1.UserDeletionPreview
+	(*AccountMergePreview)(nil),           // 89: steward.identity.v1.AccountMergePreview
+	(MergeStatus)(0),                      // 90: steward.identity.v1.MergeStatus
+	(*MergeCounts)(nil),                   // 91: steward.identity.v1.MergeCounts
+	(*MergeStepResult)(nil),               // 92: steward.identity.v1.MergeStepResult
+	(*Group)(nil),                         // 93: steward.identity.v1.Group
+	(OverrideEffect)(0),                   // 94: steward.identity.v1.OverrideEffect
+	(*HardResetRequest)(nil),              // 95: steward.identity.v1.HardResetRequest
+	(*Session)(nil),                       // 96: steward.identity.v1.Session
+	(*UserFactor)(nil),                    // 97: steward.identity.v1.UserFactor
 }
 var file_steward_identity_v1_admin_proto_depIdxs = []int32{
-	85, // 0: steward.identity.v1.EnableUserResponse.user:type_name -> steward.identity.v1.User
-	85, // 1: steward.identity.v1.DisableUserResponse.user:type_name -> steward.identity.v1.User
-	86, // 2: steward.identity.v1.PreviewUserDeletionResponse.preview:type_name -> steward.identity.v1.UserDeletionPreview
-	85, // 3: steward.identity.v1.DeleteUserResponse.user:type_name -> steward.identity.v1.User
-	87, // 4: steward.identity.v1.PreviewAccountMergeResponse.preview:type_name -> steward.identity.v1.AccountMergePreview
-	88, // 5: steward.identity.v1.MergeAccountsResponse.status:type_name -> steward.identity.v1.MergeStatus
-	89, // 6: steward.identity.v1.MergeAccountsResponse.counts:type_name -> steward.identity.v1.MergeCounts
-	90, // 7: steward.identity.v1.MergeAccountsResponse.steps:type_name -> steward.identity.v1.MergeStepResult
-	85, // 8: steward.identity.v1.GrantRoleResponse.user:type_name -> steward.identity.v1.User
-	85, // 9: steward.identity.v1.RevokeRoleResponse.user:type_name -> steward.identity.v1.User
-	84, // 10: steward.identity.v1.CreateGroupRequest.metadata:type_name -> steward.identity.v1.CreateGroupRequest.MetadataEntry
-	91, // 11: steward.identity.v1.CreateGroupResponse.group:type_name -> steward.identity.v1.Group
-	91, // 12: steward.identity.v1.RenameGroupResponse.group:type_name -> steward.identity.v1.Group
-	85, // 13: steward.identity.v1.GrantGroupManagerResponse.user:type_name -> steward.identity.v1.User
-	85, // 14: steward.identity.v1.RevokeGroupManagerResponse.user:type_name -> steward.identity.v1.User
-	91, // 15: steward.identity.v1.SetGroupParentResponse.group:type_name -> steward.identity.v1.Group
-	85, // 16: steward.identity.v1.BootstrapInitialAdminResponse.user:type_name -> steward.identity.v1.User
-	92, // 17: steward.identity.v1.SetUserPolicyOverrideRequest.effect:type_name -> steward.identity.v1.OverrideEffect
-	85, // 18: steward.identity.v1.SetUserPolicyOverrideResponse.user:type_name -> steward.identity.v1.User
-	85, // 19: steward.identity.v1.GrantRootResponse.user:type_name -> steward.identity.v1.User
-	85, // 20: steward.identity.v1.RevokeRootResponse.user:type_name -> steward.identity.v1.User
-	85, // 21: steward.identity.v1.TransferRootResponse.user:type_name -> steward.identity.v1.User
-	93, // 22: steward.identity.v1.RequestHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
-	93, // 23: steward.identity.v1.ApproveHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
-	93, // 24: steward.identity.v1.CancelHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
-	93, // 25: steward.identity.v1.ListHardResetRequestsResponse.requests:type_name -> steward.identity.v1.HardResetRequest
-	93, // 26: steward.identity.v1.ConsumeHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
-	94, // 27: steward.identity.v1.ListUserSessionsResponse.sessions:type_name -> steward.identity.v1.Session
-	85, // 28: steward.identity.v1.GrantPermissionResponse.user:type_name -> steward.identity.v1.User
-	85, // 29: steward.identity.v1.RevokePermissionResponse.user:type_name -> steward.identity.v1.User
-	85, // 30: steward.identity.v1.CreateLocalUserResponse.user:type_name -> steward.identity.v1.User
-	85, // 31: steward.identity.v1.UpdateUserProfileResponse.user:type_name -> steward.identity.v1.User
-	85, // 32: steward.identity.v1.CompleteOnboardingResponse.user:type_name -> steward.identity.v1.User
-	85, // 33: steward.identity.v1.UpdateMyProfileResponse.user:type_name -> steward.identity.v1.User
-	95, // 34: steward.identity.v1.AdminListUserFactorsResponse.factors:type_name -> steward.identity.v1.UserFactor
-	0,  // 35: steward.identity.v1.IdentityAdminService.EnableUser:input_type -> steward.identity.v1.EnableUserRequest
-	2,  // 36: steward.identity.v1.IdentityAdminService.DisableUser:input_type -> steward.identity.v1.DisableUserRequest
-	4,  // 37: steward.identity.v1.IdentityAdminService.PreviewUserDeletion:input_type -> steward.identity.v1.PreviewUserDeletionRequest
-	6,  // 38: steward.identity.v1.IdentityAdminService.DeleteUser:input_type -> steward.identity.v1.DeleteUserRequest
-	8,  // 39: steward.identity.v1.IdentityAdminService.PreviewAccountMerge:input_type -> steward.identity.v1.PreviewAccountMergeRequest
-	10, // 40: steward.identity.v1.IdentityAdminService.MergeAccounts:input_type -> steward.identity.v1.MergeAccountsRequest
-	12, // 41: steward.identity.v1.IdentityAdminService.GrantRole:input_type -> steward.identity.v1.GrantRoleRequest
-	14, // 42: steward.identity.v1.IdentityAdminService.RevokeRole:input_type -> steward.identity.v1.RevokeRoleRequest
-	16, // 43: steward.identity.v1.IdentityAdminService.CreateGroup:input_type -> steward.identity.v1.CreateGroupRequest
-	18, // 44: steward.identity.v1.IdentityAdminService.RenameGroup:input_type -> steward.identity.v1.RenameGroupRequest
-	20, // 45: steward.identity.v1.IdentityAdminService.DeleteGroup:input_type -> steward.identity.v1.DeleteGroupRequest
-	22, // 46: steward.identity.v1.IdentityAdminService.AddUserToGroup:input_type -> steward.identity.v1.AddUserToGroupRequest
-	24, // 47: steward.identity.v1.IdentityAdminService.RemoveUserFromGroup:input_type -> steward.identity.v1.RemoveUserFromGroupRequest
-	26, // 48: steward.identity.v1.IdentityAdminService.GrantGroupManager:input_type -> steward.identity.v1.GrantGroupManagerRequest
-	28, // 49: steward.identity.v1.IdentityAdminService.RevokeGroupManager:input_type -> steward.identity.v1.RevokeGroupManagerRequest
-	30, // 50: steward.identity.v1.IdentityAdminService.SetGroupParent:input_type -> steward.identity.v1.SetGroupParentRequest
-	32, // 51: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:input_type -> steward.identity.v1.BootstrapInitialAdminRequest
-	34, // 52: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:input_type -> steward.identity.v1.SetUserPolicyOverrideRequest
-	36, // 53: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:input_type -> steward.identity.v1.RequestStepUpOtpRequest
-	38, // 54: steward.identity.v1.IdentityAdminService.GrantRoot:input_type -> steward.identity.v1.GrantRootRequest
-	40, // 55: steward.identity.v1.IdentityAdminService.RevokeRoot:input_type -> steward.identity.v1.RevokeRootRequest
-	42, // 56: steward.identity.v1.IdentityAdminService.TransferRoot:input_type -> steward.identity.v1.TransferRootRequest
-	44, // 57: steward.identity.v1.IdentityAdminService.RequestHardReset:input_type -> steward.identity.v1.RequestHardResetRequest
-	46, // 58: steward.identity.v1.IdentityAdminService.ApproveHardReset:input_type -> steward.identity.v1.ApproveHardResetRequest
-	48, // 59: steward.identity.v1.IdentityAdminService.CancelHardReset:input_type -> steward.identity.v1.CancelHardResetRequest
-	50, // 60: steward.identity.v1.IdentityAdminService.ListHardResetRequests:input_type -> steward.identity.v1.ListHardResetRequestsRequest
-	52, // 61: steward.identity.v1.IdentityAdminService.ConsumeHardReset:input_type -> steward.identity.v1.ConsumeHardResetRequest
-	54, // 62: steward.identity.v1.IdentityAdminService.RevokeSession:input_type -> steward.identity.v1.RevokeSessionRequest
-	56, // 63: steward.identity.v1.IdentityAdminService.RevokeUserSessions:input_type -> steward.identity.v1.RevokeUserSessionsRequest
-	58, // 64: steward.identity.v1.IdentityAdminService.ListUserSessions:input_type -> steward.identity.v1.ListUserSessionsRequest
-	60, // 65: steward.identity.v1.IdentityAdminService.GrantPermission:input_type -> steward.identity.v1.GrantPermissionRequest
-	62, // 66: steward.identity.v1.IdentityAdminService.RevokePermission:input_type -> steward.identity.v1.RevokePermissionRequest
-	64, // 67: steward.identity.v1.IdentityAdminService.BreakGlassReveal:input_type -> steward.identity.v1.BreakGlassRevealRequest
-	66, // 68: steward.identity.v1.IdentityAdminService.ActiveBreakGlass:input_type -> steward.identity.v1.ActiveBreakGlassRequest
-	68, // 69: steward.identity.v1.IdentityAdminService.CreateLocalUser:input_type -> steward.identity.v1.CreateLocalUserRequest
-	70, // 70: steward.identity.v1.IdentityAdminService.ResetUserPassword:input_type -> steward.identity.v1.ResetUserPasswordRequest
-	72, // 71: steward.identity.v1.IdentityAdminService.UpdateUserProfile:input_type -> steward.identity.v1.UpdateUserProfileRequest
-	74, // 72: steward.identity.v1.IdentityAdminService.CompleteOnboarding:input_type -> steward.identity.v1.CompleteOnboardingRequest
-	76, // 73: steward.identity.v1.IdentityAdminService.UpdateMyProfile:input_type -> steward.identity.v1.UpdateMyProfileRequest
-	78, // 74: steward.identity.v1.IdentityAdminService.AdminListUserFactors:input_type -> steward.identity.v1.AdminListUserFactorsRequest
-	80, // 75: steward.identity.v1.IdentityAdminService.AdminRemoveUserFactor:input_type -> steward.identity.v1.AdminRemoveUserFactorRequest
-	82, // 76: steward.identity.v1.IdentityAdminService.AdminRenameUserFactor:input_type -> steward.identity.v1.AdminRenameUserFactorRequest
-	1,  // 77: steward.identity.v1.IdentityAdminService.EnableUser:output_type -> steward.identity.v1.EnableUserResponse
-	3,  // 78: steward.identity.v1.IdentityAdminService.DisableUser:output_type -> steward.identity.v1.DisableUserResponse
-	5,  // 79: steward.identity.v1.IdentityAdminService.PreviewUserDeletion:output_type -> steward.identity.v1.PreviewUserDeletionResponse
-	7,  // 80: steward.identity.v1.IdentityAdminService.DeleteUser:output_type -> steward.identity.v1.DeleteUserResponse
-	9,  // 81: steward.identity.v1.IdentityAdminService.PreviewAccountMerge:output_type -> steward.identity.v1.PreviewAccountMergeResponse
-	11, // 82: steward.identity.v1.IdentityAdminService.MergeAccounts:output_type -> steward.identity.v1.MergeAccountsResponse
-	13, // 83: steward.identity.v1.IdentityAdminService.GrantRole:output_type -> steward.identity.v1.GrantRoleResponse
-	15, // 84: steward.identity.v1.IdentityAdminService.RevokeRole:output_type -> steward.identity.v1.RevokeRoleResponse
-	17, // 85: steward.identity.v1.IdentityAdminService.CreateGroup:output_type -> steward.identity.v1.CreateGroupResponse
-	19, // 86: steward.identity.v1.IdentityAdminService.RenameGroup:output_type -> steward.identity.v1.RenameGroupResponse
-	21, // 87: steward.identity.v1.IdentityAdminService.DeleteGroup:output_type -> steward.identity.v1.DeleteGroupResponse
-	23, // 88: steward.identity.v1.IdentityAdminService.AddUserToGroup:output_type -> steward.identity.v1.AddUserToGroupResponse
-	25, // 89: steward.identity.v1.IdentityAdminService.RemoveUserFromGroup:output_type -> steward.identity.v1.RemoveUserFromGroupResponse
-	27, // 90: steward.identity.v1.IdentityAdminService.GrantGroupManager:output_type -> steward.identity.v1.GrantGroupManagerResponse
-	29, // 91: steward.identity.v1.IdentityAdminService.RevokeGroupManager:output_type -> steward.identity.v1.RevokeGroupManagerResponse
-	31, // 92: steward.identity.v1.IdentityAdminService.SetGroupParent:output_type -> steward.identity.v1.SetGroupParentResponse
-	33, // 93: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:output_type -> steward.identity.v1.BootstrapInitialAdminResponse
-	35, // 94: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:output_type -> steward.identity.v1.SetUserPolicyOverrideResponse
-	37, // 95: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:output_type -> steward.identity.v1.RequestStepUpOtpResponse
-	39, // 96: steward.identity.v1.IdentityAdminService.GrantRoot:output_type -> steward.identity.v1.GrantRootResponse
-	41, // 97: steward.identity.v1.IdentityAdminService.RevokeRoot:output_type -> steward.identity.v1.RevokeRootResponse
-	43, // 98: steward.identity.v1.IdentityAdminService.TransferRoot:output_type -> steward.identity.v1.TransferRootResponse
-	45, // 99: steward.identity.v1.IdentityAdminService.RequestHardReset:output_type -> steward.identity.v1.RequestHardResetResponse
-	47, // 100: steward.identity.v1.IdentityAdminService.ApproveHardReset:output_type -> steward.identity.v1.ApproveHardResetResponse
-	49, // 101: steward.identity.v1.IdentityAdminService.CancelHardReset:output_type -> steward.identity.v1.CancelHardResetResponse
-	51, // 102: steward.identity.v1.IdentityAdminService.ListHardResetRequests:output_type -> steward.identity.v1.ListHardResetRequestsResponse
-	53, // 103: steward.identity.v1.IdentityAdminService.ConsumeHardReset:output_type -> steward.identity.v1.ConsumeHardResetResponse
-	55, // 104: steward.identity.v1.IdentityAdminService.RevokeSession:output_type -> steward.identity.v1.RevokeSessionResponse
-	57, // 105: steward.identity.v1.IdentityAdminService.RevokeUserSessions:output_type -> steward.identity.v1.RevokeUserSessionsResponse
-	59, // 106: steward.identity.v1.IdentityAdminService.ListUserSessions:output_type -> steward.identity.v1.ListUserSessionsResponse
-	61, // 107: steward.identity.v1.IdentityAdminService.GrantPermission:output_type -> steward.identity.v1.GrantPermissionResponse
-	63, // 108: steward.identity.v1.IdentityAdminService.RevokePermission:output_type -> steward.identity.v1.RevokePermissionResponse
-	65, // 109: steward.identity.v1.IdentityAdminService.BreakGlassReveal:output_type -> steward.identity.v1.BreakGlassRevealResponse
-	67, // 110: steward.identity.v1.IdentityAdminService.ActiveBreakGlass:output_type -> steward.identity.v1.ActiveBreakGlassResponse
-	69, // 111: steward.identity.v1.IdentityAdminService.CreateLocalUser:output_type -> steward.identity.v1.CreateLocalUserResponse
-	71, // 112: steward.identity.v1.IdentityAdminService.ResetUserPassword:output_type -> steward.identity.v1.ResetUserPasswordResponse
-	73, // 113: steward.identity.v1.IdentityAdminService.UpdateUserProfile:output_type -> steward.identity.v1.UpdateUserProfileResponse
-	75, // 114: steward.identity.v1.IdentityAdminService.CompleteOnboarding:output_type -> steward.identity.v1.CompleteOnboardingResponse
-	77, // 115: steward.identity.v1.IdentityAdminService.UpdateMyProfile:output_type -> steward.identity.v1.UpdateMyProfileResponse
-	79, // 116: steward.identity.v1.IdentityAdminService.AdminListUserFactors:output_type -> steward.identity.v1.AdminListUserFactorsResponse
-	81, // 117: steward.identity.v1.IdentityAdminService.AdminRemoveUserFactor:output_type -> steward.identity.v1.AdminRemoveUserFactorResponse
-	83, // 118: steward.identity.v1.IdentityAdminService.AdminRenameUserFactor:output_type -> steward.identity.v1.AdminRenameUserFactorResponse
-	77, // [77:119] is the sub-list for method output_type
-	35, // [35:77] is the sub-list for method input_type
-	35, // [35:35] is the sub-list for extension type_name
-	35, // [35:35] is the sub-list for extension extendee
-	0,  // [0:35] is the sub-list for field type_name
+	87, // 0: steward.identity.v1.EnableUserResponse.user:type_name -> steward.identity.v1.User
+	87, // 1: steward.identity.v1.DisableUserResponse.user:type_name -> steward.identity.v1.User
+	88, // 2: steward.identity.v1.PreviewUserDeletionResponse.preview:type_name -> steward.identity.v1.UserDeletionPreview
+	87, // 3: steward.identity.v1.DeleteUserResponse.user:type_name -> steward.identity.v1.User
+	89, // 4: steward.identity.v1.PreviewAccountMergeResponse.preview:type_name -> steward.identity.v1.AccountMergePreview
+	90, // 5: steward.identity.v1.MergeAccountsResponse.status:type_name -> steward.identity.v1.MergeStatus
+	91, // 6: steward.identity.v1.MergeAccountsResponse.counts:type_name -> steward.identity.v1.MergeCounts
+	92, // 7: steward.identity.v1.MergeAccountsResponse.steps:type_name -> steward.identity.v1.MergeStepResult
+	87, // 8: steward.identity.v1.GrantRoleResponse.user:type_name -> steward.identity.v1.User
+	87, // 9: steward.identity.v1.RevokeRoleResponse.user:type_name -> steward.identity.v1.User
+	86, // 10: steward.identity.v1.CreateGroupRequest.metadata:type_name -> steward.identity.v1.CreateGroupRequest.MetadataEntry
+	93, // 11: steward.identity.v1.CreateGroupResponse.group:type_name -> steward.identity.v1.Group
+	93, // 12: steward.identity.v1.RenameGroupResponse.group:type_name -> steward.identity.v1.Group
+	87, // 13: steward.identity.v1.GrantGroupManagerResponse.user:type_name -> steward.identity.v1.User
+	87, // 14: steward.identity.v1.RevokeGroupManagerResponse.user:type_name -> steward.identity.v1.User
+	93, // 15: steward.identity.v1.SetGroupParentResponse.group:type_name -> steward.identity.v1.Group
+	87, // 16: steward.identity.v1.BootstrapInitialAdminResponse.user:type_name -> steward.identity.v1.User
+	94, // 17: steward.identity.v1.SetUserPolicyOverrideRequest.effect:type_name -> steward.identity.v1.OverrideEffect
+	87, // 18: steward.identity.v1.SetUserPolicyOverrideResponse.user:type_name -> steward.identity.v1.User
+	87, // 19: steward.identity.v1.GrantRootResponse.user:type_name -> steward.identity.v1.User
+	87, // 20: steward.identity.v1.RevokeRootResponse.user:type_name -> steward.identity.v1.User
+	87, // 21: steward.identity.v1.TransferRootResponse.user:type_name -> steward.identity.v1.User
+	95, // 22: steward.identity.v1.RequestHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
+	95, // 23: steward.identity.v1.ApproveHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
+	95, // 24: steward.identity.v1.CancelHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
+	95, // 25: steward.identity.v1.ListHardResetRequestsResponse.requests:type_name -> steward.identity.v1.HardResetRequest
+	95, // 26: steward.identity.v1.ConsumeHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
+	96, // 27: steward.identity.v1.ListUserSessionsResponse.sessions:type_name -> steward.identity.v1.Session
+	87, // 28: steward.identity.v1.GrantPermissionResponse.user:type_name -> steward.identity.v1.User
+	87, // 29: steward.identity.v1.RevokePermissionResponse.user:type_name -> steward.identity.v1.User
+	87, // 30: steward.identity.v1.CreateLocalUserResponse.user:type_name -> steward.identity.v1.User
+	87, // 31: steward.identity.v1.UpdateUserProfileResponse.user:type_name -> steward.identity.v1.User
+	87, // 32: steward.identity.v1.CompleteOnboardingResponse.user:type_name -> steward.identity.v1.User
+	87, // 33: steward.identity.v1.UpdateMyProfileResponse.user:type_name -> steward.identity.v1.User
+	97, // 34: steward.identity.v1.AdminListUserFactorsResponse.factors:type_name -> steward.identity.v1.UserFactor
+	87, // 35: steward.identity.v1.UpdateUserPreferencesResponse.user:type_name -> steward.identity.v1.User
+	0,  // 36: steward.identity.v1.IdentityAdminService.EnableUser:input_type -> steward.identity.v1.EnableUserRequest
+	2,  // 37: steward.identity.v1.IdentityAdminService.DisableUser:input_type -> steward.identity.v1.DisableUserRequest
+	4,  // 38: steward.identity.v1.IdentityAdminService.PreviewUserDeletion:input_type -> steward.identity.v1.PreviewUserDeletionRequest
+	6,  // 39: steward.identity.v1.IdentityAdminService.DeleteUser:input_type -> steward.identity.v1.DeleteUserRequest
+	8,  // 40: steward.identity.v1.IdentityAdminService.PreviewAccountMerge:input_type -> steward.identity.v1.PreviewAccountMergeRequest
+	10, // 41: steward.identity.v1.IdentityAdminService.MergeAccounts:input_type -> steward.identity.v1.MergeAccountsRequest
+	12, // 42: steward.identity.v1.IdentityAdminService.GrantRole:input_type -> steward.identity.v1.GrantRoleRequest
+	14, // 43: steward.identity.v1.IdentityAdminService.RevokeRole:input_type -> steward.identity.v1.RevokeRoleRequest
+	16, // 44: steward.identity.v1.IdentityAdminService.CreateGroup:input_type -> steward.identity.v1.CreateGroupRequest
+	18, // 45: steward.identity.v1.IdentityAdminService.RenameGroup:input_type -> steward.identity.v1.RenameGroupRequest
+	20, // 46: steward.identity.v1.IdentityAdminService.DeleteGroup:input_type -> steward.identity.v1.DeleteGroupRequest
+	22, // 47: steward.identity.v1.IdentityAdminService.AddUserToGroup:input_type -> steward.identity.v1.AddUserToGroupRequest
+	24, // 48: steward.identity.v1.IdentityAdminService.RemoveUserFromGroup:input_type -> steward.identity.v1.RemoveUserFromGroupRequest
+	26, // 49: steward.identity.v1.IdentityAdminService.GrantGroupManager:input_type -> steward.identity.v1.GrantGroupManagerRequest
+	28, // 50: steward.identity.v1.IdentityAdminService.RevokeGroupManager:input_type -> steward.identity.v1.RevokeGroupManagerRequest
+	30, // 51: steward.identity.v1.IdentityAdminService.SetGroupParent:input_type -> steward.identity.v1.SetGroupParentRequest
+	32, // 52: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:input_type -> steward.identity.v1.BootstrapInitialAdminRequest
+	34, // 53: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:input_type -> steward.identity.v1.SetUserPolicyOverrideRequest
+	36, // 54: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:input_type -> steward.identity.v1.RequestStepUpOtpRequest
+	38, // 55: steward.identity.v1.IdentityAdminService.GrantRoot:input_type -> steward.identity.v1.GrantRootRequest
+	40, // 56: steward.identity.v1.IdentityAdminService.RevokeRoot:input_type -> steward.identity.v1.RevokeRootRequest
+	42, // 57: steward.identity.v1.IdentityAdminService.TransferRoot:input_type -> steward.identity.v1.TransferRootRequest
+	44, // 58: steward.identity.v1.IdentityAdminService.RequestHardReset:input_type -> steward.identity.v1.RequestHardResetRequest
+	46, // 59: steward.identity.v1.IdentityAdminService.ApproveHardReset:input_type -> steward.identity.v1.ApproveHardResetRequest
+	48, // 60: steward.identity.v1.IdentityAdminService.CancelHardReset:input_type -> steward.identity.v1.CancelHardResetRequest
+	50, // 61: steward.identity.v1.IdentityAdminService.ListHardResetRequests:input_type -> steward.identity.v1.ListHardResetRequestsRequest
+	52, // 62: steward.identity.v1.IdentityAdminService.ConsumeHardReset:input_type -> steward.identity.v1.ConsumeHardResetRequest
+	54, // 63: steward.identity.v1.IdentityAdminService.RevokeSession:input_type -> steward.identity.v1.RevokeSessionRequest
+	56, // 64: steward.identity.v1.IdentityAdminService.RevokeUserSessions:input_type -> steward.identity.v1.RevokeUserSessionsRequest
+	58, // 65: steward.identity.v1.IdentityAdminService.ListUserSessions:input_type -> steward.identity.v1.ListUserSessionsRequest
+	60, // 66: steward.identity.v1.IdentityAdminService.GrantPermission:input_type -> steward.identity.v1.GrantPermissionRequest
+	62, // 67: steward.identity.v1.IdentityAdminService.RevokePermission:input_type -> steward.identity.v1.RevokePermissionRequest
+	64, // 68: steward.identity.v1.IdentityAdminService.BreakGlassReveal:input_type -> steward.identity.v1.BreakGlassRevealRequest
+	66, // 69: steward.identity.v1.IdentityAdminService.ActiveBreakGlass:input_type -> steward.identity.v1.ActiveBreakGlassRequest
+	68, // 70: steward.identity.v1.IdentityAdminService.CreateLocalUser:input_type -> steward.identity.v1.CreateLocalUserRequest
+	70, // 71: steward.identity.v1.IdentityAdminService.ResetUserPassword:input_type -> steward.identity.v1.ResetUserPasswordRequest
+	72, // 72: steward.identity.v1.IdentityAdminService.UpdateUserProfile:input_type -> steward.identity.v1.UpdateUserProfileRequest
+	74, // 73: steward.identity.v1.IdentityAdminService.CompleteOnboarding:input_type -> steward.identity.v1.CompleteOnboardingRequest
+	76, // 74: steward.identity.v1.IdentityAdminService.UpdateMyProfile:input_type -> steward.identity.v1.UpdateMyProfileRequest
+	78, // 75: steward.identity.v1.IdentityAdminService.AdminListUserFactors:input_type -> steward.identity.v1.AdminListUserFactorsRequest
+	80, // 76: steward.identity.v1.IdentityAdminService.AdminRemoveUserFactor:input_type -> steward.identity.v1.AdminRemoveUserFactorRequest
+	82, // 77: steward.identity.v1.IdentityAdminService.AdminRenameUserFactor:input_type -> steward.identity.v1.AdminRenameUserFactorRequest
+	84, // 78: steward.identity.v1.IdentityAdminService.UpdateUserPreferences:input_type -> steward.identity.v1.UpdateUserPreferencesRequest
+	1,  // 79: steward.identity.v1.IdentityAdminService.EnableUser:output_type -> steward.identity.v1.EnableUserResponse
+	3,  // 80: steward.identity.v1.IdentityAdminService.DisableUser:output_type -> steward.identity.v1.DisableUserResponse
+	5,  // 81: steward.identity.v1.IdentityAdminService.PreviewUserDeletion:output_type -> steward.identity.v1.PreviewUserDeletionResponse
+	7,  // 82: steward.identity.v1.IdentityAdminService.DeleteUser:output_type -> steward.identity.v1.DeleteUserResponse
+	9,  // 83: steward.identity.v1.IdentityAdminService.PreviewAccountMerge:output_type -> steward.identity.v1.PreviewAccountMergeResponse
+	11, // 84: steward.identity.v1.IdentityAdminService.MergeAccounts:output_type -> steward.identity.v1.MergeAccountsResponse
+	13, // 85: steward.identity.v1.IdentityAdminService.GrantRole:output_type -> steward.identity.v1.GrantRoleResponse
+	15, // 86: steward.identity.v1.IdentityAdminService.RevokeRole:output_type -> steward.identity.v1.RevokeRoleResponse
+	17, // 87: steward.identity.v1.IdentityAdminService.CreateGroup:output_type -> steward.identity.v1.CreateGroupResponse
+	19, // 88: steward.identity.v1.IdentityAdminService.RenameGroup:output_type -> steward.identity.v1.RenameGroupResponse
+	21, // 89: steward.identity.v1.IdentityAdminService.DeleteGroup:output_type -> steward.identity.v1.DeleteGroupResponse
+	23, // 90: steward.identity.v1.IdentityAdminService.AddUserToGroup:output_type -> steward.identity.v1.AddUserToGroupResponse
+	25, // 91: steward.identity.v1.IdentityAdminService.RemoveUserFromGroup:output_type -> steward.identity.v1.RemoveUserFromGroupResponse
+	27, // 92: steward.identity.v1.IdentityAdminService.GrantGroupManager:output_type -> steward.identity.v1.GrantGroupManagerResponse
+	29, // 93: steward.identity.v1.IdentityAdminService.RevokeGroupManager:output_type -> steward.identity.v1.RevokeGroupManagerResponse
+	31, // 94: steward.identity.v1.IdentityAdminService.SetGroupParent:output_type -> steward.identity.v1.SetGroupParentResponse
+	33, // 95: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:output_type -> steward.identity.v1.BootstrapInitialAdminResponse
+	35, // 96: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:output_type -> steward.identity.v1.SetUserPolicyOverrideResponse
+	37, // 97: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:output_type -> steward.identity.v1.RequestStepUpOtpResponse
+	39, // 98: steward.identity.v1.IdentityAdminService.GrantRoot:output_type -> steward.identity.v1.GrantRootResponse
+	41, // 99: steward.identity.v1.IdentityAdminService.RevokeRoot:output_type -> steward.identity.v1.RevokeRootResponse
+	43, // 100: steward.identity.v1.IdentityAdminService.TransferRoot:output_type -> steward.identity.v1.TransferRootResponse
+	45, // 101: steward.identity.v1.IdentityAdminService.RequestHardReset:output_type -> steward.identity.v1.RequestHardResetResponse
+	47, // 102: steward.identity.v1.IdentityAdminService.ApproveHardReset:output_type -> steward.identity.v1.ApproveHardResetResponse
+	49, // 103: steward.identity.v1.IdentityAdminService.CancelHardReset:output_type -> steward.identity.v1.CancelHardResetResponse
+	51, // 104: steward.identity.v1.IdentityAdminService.ListHardResetRequests:output_type -> steward.identity.v1.ListHardResetRequestsResponse
+	53, // 105: steward.identity.v1.IdentityAdminService.ConsumeHardReset:output_type -> steward.identity.v1.ConsumeHardResetResponse
+	55, // 106: steward.identity.v1.IdentityAdminService.RevokeSession:output_type -> steward.identity.v1.RevokeSessionResponse
+	57, // 107: steward.identity.v1.IdentityAdminService.RevokeUserSessions:output_type -> steward.identity.v1.RevokeUserSessionsResponse
+	59, // 108: steward.identity.v1.IdentityAdminService.ListUserSessions:output_type -> steward.identity.v1.ListUserSessionsResponse
+	61, // 109: steward.identity.v1.IdentityAdminService.GrantPermission:output_type -> steward.identity.v1.GrantPermissionResponse
+	63, // 110: steward.identity.v1.IdentityAdminService.RevokePermission:output_type -> steward.identity.v1.RevokePermissionResponse
+	65, // 111: steward.identity.v1.IdentityAdminService.BreakGlassReveal:output_type -> steward.identity.v1.BreakGlassRevealResponse
+	67, // 112: steward.identity.v1.IdentityAdminService.ActiveBreakGlass:output_type -> steward.identity.v1.ActiveBreakGlassResponse
+	69, // 113: steward.identity.v1.IdentityAdminService.CreateLocalUser:output_type -> steward.identity.v1.CreateLocalUserResponse
+	71, // 114: steward.identity.v1.IdentityAdminService.ResetUserPassword:output_type -> steward.identity.v1.ResetUserPasswordResponse
+	73, // 115: steward.identity.v1.IdentityAdminService.UpdateUserProfile:output_type -> steward.identity.v1.UpdateUserProfileResponse
+	75, // 116: steward.identity.v1.IdentityAdminService.CompleteOnboarding:output_type -> steward.identity.v1.CompleteOnboardingResponse
+	77, // 117: steward.identity.v1.IdentityAdminService.UpdateMyProfile:output_type -> steward.identity.v1.UpdateMyProfileResponse
+	79, // 118: steward.identity.v1.IdentityAdminService.AdminListUserFactors:output_type -> steward.identity.v1.AdminListUserFactorsResponse
+	81, // 119: steward.identity.v1.IdentityAdminService.AdminRemoveUserFactor:output_type -> steward.identity.v1.AdminRemoveUserFactorResponse
+	83, // 120: steward.identity.v1.IdentityAdminService.AdminRenameUserFactor:output_type -> steward.identity.v1.AdminRenameUserFactorResponse
+	85, // 121: steward.identity.v1.IdentityAdminService.UpdateUserPreferences:output_type -> steward.identity.v1.UpdateUserPreferencesResponse
+	79, // [79:122] is the sub-list for method output_type
+	36, // [36:79] is the sub-list for method input_type
+	36, // [36:36] is the sub-list for extension type_name
+	36, // [36:36] is the sub-list for extension extendee
+	0,  // [0:36] is the sub-list for field type_name
 }
 
 func init() { file_steward_identity_v1_admin_proto_init() }
@@ -4659,13 +4769,14 @@ func file_steward_identity_v1_admin_proto_init() {
 	file_steward_identity_v1_types_proto_init()
 	file_steward_identity_v1_admin_proto_msgTypes[74].OneofWrappers = []any{}
 	file_steward_identity_v1_admin_proto_msgTypes[76].OneofWrappers = []any{}
+	file_steward_identity_v1_admin_proto_msgTypes[84].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_steward_identity_v1_admin_proto_rawDesc), len(file_steward_identity_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   85,
+			NumMessages:   87,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
