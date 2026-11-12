@@ -68,6 +68,7 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 	// adding one in callers.go fails here.
 	want := map[string]workloadidentity.Access{}
 	for _, m := range []string{
+		identityv1.IdentityReadService_ChangeMyPassword_FullMethodName,
 		identityv1.IdentityReadService_BootstrapRoot_FullMethodName,
 		identityv1.IdentityReadService_CheckBreakGlassEligibility_FullMethodName,
 		identityv1.IdentityReadService_Discover_FullMethodName,

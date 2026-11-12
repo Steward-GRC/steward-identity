@@ -180,6 +180,11 @@ func run(ctx context.Context, logger log.Logger) error {
 	if cfg.KratosAdminURL != "" {
 		k := kratos.New(cfg.KratosAdminURL, kratos.DefaultTimeout, kratos.WithSchemaID(cfg.KratosSchemaID))
 		readH.WithSignIn(k)
+		if cfg.KratosPublicURL != "" {
+			readH.WithPasswordChanger(kratos.NewPublic(cfg.KratosPublicURL, kratos.DefaultTimeout))
+		} else {
+			logger.Warn("KRATOS_PUBLIC_URL is not set: changing your own password is unavailable")
+		}
 		adminH.WithSignIn(k).WithCredentialRevoker(k).WithCredentialFinder(userdelete.NewKratosCredentialFinder(k))
 		sessions = accountSessions{s: s, k: k}
 	} else {

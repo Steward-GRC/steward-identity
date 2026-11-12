@@ -45,6 +45,7 @@ const (
 	IdentityReadService_RevokeMySessions_FullMethodName           = "/steward.identity.v1.IdentityReadService/RevokeMySessions"
 	IdentityReadService_ListMySessions_FullMethodName             = "/steward.identity.v1.IdentityReadService/ListMySessions"
 	IdentityReadService_RevokeMySession_FullMethodName            = "/steward.identity.v1.IdentityReadService/RevokeMySession"
+	IdentityReadService_ChangeMyPassword_FullMethodName           = "/steward.identity.v1.IdentityReadService/ChangeMyPassword"
 	IdentityReadService_GetSetupState_FullMethodName              = "/steward.identity.v1.IdentityReadService/GetSetupState"
 	IdentityReadService_BootstrapRoot_FullMethodName              = "/steward.identity.v1.IdentityReadService/BootstrapRoot"
 	IdentityReadService_GetAuthConfig_FullMethodName              = "/steward.identity.v1.IdentityReadService/GetAuthConfig"
@@ -152,6 +153,11 @@ type IdentityReadServiceClient interface {
 	// end everything) and a session that isn't the caller's (NotFound, the same
 	// as an unknown one). Audited as session.revoked.
 	RevokeMySession(ctx context.Context, in *RevokeMySessionRequest, opts ...grpc.CallOption) (*RevokeMySessionResponse, error)
+	// ChangeMyPassword changes the calling user's own password. It checks the
+	// current password through the sign-in service and applies the new one
+	// under that service's password policy. A wrong current password, a weak
+	// new one and an account with no local password each answer a coded error.
+	ChangeMyPassword(ctx context.Context, in *ChangeMyPasswordRequest, opts ...grpc.CallOption) (*ChangeMyPasswordResponse, error)
 	// GetSetupState reports whether first-run setup is still needed (no root
 	// admin exists).
 	GetSetupState(ctx context.Context, in *GetSetupStateRequest, opts ...grpc.CallOption) (*GetSetupStateResponse, error)
@@ -459,6 +465,16 @@ func (c *identityReadServiceClient) RevokeMySession(ctx context.Context, in *Rev
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RevokeMySessionResponse)
 	err := c.cc.Invoke(ctx, IdentityReadService_RevokeMySession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *identityReadServiceClient) ChangeMyPassword(ctx context.Context, in *ChangeMyPasswordRequest, opts ...grpc.CallOption) (*ChangeMyPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChangeMyPasswordResponse)
+	err := c.cc.Invoke(ctx, IdentityReadService_ChangeMyPassword_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -786,6 +802,11 @@ type IdentityReadServiceServer interface {
 	// end everything) and a session that isn't the caller's (NotFound, the same
 	// as an unknown one). Audited as session.revoked.
 	RevokeMySession(context.Context, *RevokeMySessionRequest) (*RevokeMySessionResponse, error)
+	// ChangeMyPassword changes the calling user's own password. It checks the
+	// current password through the sign-in service and applies the new one
+	// under that service's password policy. A wrong current password, a weak
+	// new one and an account with no local password each answer a coded error.
+	ChangeMyPassword(context.Context, *ChangeMyPasswordRequest) (*ChangeMyPasswordResponse, error)
 	// GetSetupState reports whether first-run setup is still needed (no root
 	// admin exists).
 	GetSetupState(context.Context, *GetSetupStateRequest) (*GetSetupStateResponse, error)
@@ -937,6 +958,9 @@ func (UnimplementedIdentityReadServiceServer) ListMySessions(context.Context, *L
 }
 func (UnimplementedIdentityReadServiceServer) RevokeMySession(context.Context, *RevokeMySessionRequest) (*RevokeMySessionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RevokeMySession not implemented")
+}
+func (UnimplementedIdentityReadServiceServer) ChangeMyPassword(context.Context, *ChangeMyPasswordRequest) (*ChangeMyPasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangeMyPassword not implemented")
 }
 func (UnimplementedIdentityReadServiceServer) GetSetupState(context.Context, *GetSetupStateRequest) (*GetSetupStateResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSetupState not implemented")
@@ -1441,6 +1465,24 @@ func _IdentityReadService_RevokeMySession_Handler(srv interface{}, ctx context.C
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IdentityReadServiceServer).RevokeMySession(ctx, req.(*RevokeMySessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IdentityReadService_ChangeMyPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeMyPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityReadServiceServer).ChangeMyPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityReadService_ChangeMyPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityReadServiceServer).ChangeMyPassword(ctx, req.(*ChangeMyPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1975,6 +2017,10 @@ var IdentityReadService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RevokeMySession",
 			Handler:    _IdentityReadService_RevokeMySession_Handler,
+		},
+		{
+			MethodName: "ChangeMyPassword",
+			Handler:    _IdentityReadService_ChangeMyPassword_Handler,
 		},
 		{
 			MethodName: "GetSetupState",

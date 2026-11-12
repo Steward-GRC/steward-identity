@@ -29,6 +29,7 @@ const (
 // gatewayMethods are the methods the gateway calls, each for the signed-in
 // user (or, before sign-in, for nobody).
 var gatewayMethods = []string{
+	identityv1.IdentityReadService_ChangeMyPassword_FullMethodName,
 	identityv1.IdentityReadService_BootstrapRoot_FullMethodName,
 	identityv1.IdentityReadService_CheckBreakGlassEligibility_FullMethodName,
 	identityv1.IdentityReadService_Discover_FullMethodName,

@@ -32,6 +32,10 @@ const (
 	CodeUserHasPendingApprovals     = 5008
 	CodeUserDeleteChecksUnavailable = 5009
 	CodeActAsForbidden              = 5010
+	CodeCurrentPasswordWrong        = 5011
+	CodePasswordTooWeak             = 5012
+	CodeNoLocalPassword             = 5013
+	CodePasswordChangeUnavailable   = 5014
 )
 
 // Entries returns the registry entries.
@@ -69,6 +73,18 @@ func Entries() []apperr.Entry {
 		{Code: CodeActAsForbidden, Symbol: "ACT_AS_FORBIDDEN", Category: apperr.CategoryPermissionDenied,
 			Title: "act-as", Cause: "an admin acting as another user tried a password, second-factor, delete, role or permission change",
 			UserSafe: true, Message: "This action isn't available while you're acting as another user. Stop acting as them first."},
+		{Code: CodeCurrentPasswordWrong, Symbol: "CURRENT_PASSWORD_WRONG", Category: apperr.CategoryInvalid,
+			Title: "change password", Cause: "the current password given with a password change did not match the account's password",
+			UserSafe: true, Message: "The current password is wrong."},
+		{Code: CodePasswordTooWeak, Symbol: "PASSWORD_TOO_WEAK", Category: apperr.CategoryInvalid,
+			Title: "change password", Cause: "the sign-in service's password policy refused the new password",
+			UserSafe: true, Message: "That password doesn't meet the password rules. Choose a longer password that isn't common or easy to guess."},
+		{Code: CodeNoLocalPassword, Symbol: "NO_LOCAL_PASSWORD", Category: apperr.CategoryFailedPrecondition,
+			Title: "change password", Cause: "the account signs in through an identity provider and has no local password to change",
+			UserSafe: true, Message: "This account signs in through your organisation and has no Steward password to change."},
+		{Code: CodePasswordChangeUnavailable, Symbol: "PASSWORD_CHANGE_UNAVAILABLE", Category: apperr.CategoryFailedPrecondition,
+			Title: "change password", Cause: "the sign-in service's public or admin API isn't configured or didn't answer, so the password was not changed",
+			UserSafe: true, Message: "The password can't be changed right now, so nothing was changed. Try again shortly."},
 	}
 }
 
@@ -110,6 +126,9 @@ var (
 	errLocalAccount = errors.New("identity: the sign-in service admin API isn't configured")
 	errPending      = errors.New("identity: the account holds pending approvals")
 	errActAs        = errors.New("identity: refused while acting as another user")
+	errWrongCurrent = errors.New("identity: the current password is wrong")
+	errWeak         = errors.New("identity: the new password does not meet the password policy")
+	errNoPassword   = errors.New("identity: the account has no local password")
 )
 
 // SSOProviderUnreachable codes a failed call to the SSO broker; org names the
@@ -160,6 +179,23 @@ func UserDeleteChecksUnavailable(step string, cause error) error {
 
 // ActAsForbidden codes an action refused during act-as.
 func ActAsForbidden() error { return apperr.Coded(CodeActAsForbidden, errActAs) }
+
+// CurrentPasswordWrong codes a password change whose current password was
+// not the account's.
+func CurrentPasswordWrong() error { return apperr.Coded(CodeCurrentPasswordWrong, errWrongCurrent) }
+
+// PasswordTooWeak codes a new password the password policy refused.
+func PasswordTooWeak() error { return apperr.Coded(CodePasswordTooWeak, errWeak) }
+
+// NoLocalPassword codes a password change on an account with no local
+// password, such as an SSO-only one.
+func NoLocalPassword() error { return apperr.Coded(CodeNoLocalPassword, errNoPassword) }
+
+// PasswordChangeUnavailable codes a password change the sign-in service
+// couldn't carry out; cause stays server-side.
+func PasswordChangeUnavailable(cause error) error {
+	return apperr.Coded(CodePasswordChangeUnavailable, cause)
+}
 
 type logSink struct{ l log.Logger }
 

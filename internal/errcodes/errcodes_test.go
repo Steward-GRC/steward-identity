@@ -70,6 +70,10 @@ func TestEveryUserSafeCodeKeepsItsGRPCCode(t *testing.T) {
 		{errcodes.SessionRevokeUnavailable(errors.New("down")), codes.FailedPrecondition, "SESSION_REVOKE_UNAVAILABLE"},
 		{errcodes.LocalAccountsUnavailable(), codes.FailedPrecondition, "LOCAL_ACCOUNTS_UNAVAILABLE"},
 		{errcodes.ActAsForbidden(), codes.PermissionDenied, "ACT_AS_FORBIDDEN"},
+		{errcodes.CurrentPasswordWrong(), codes.InvalidArgument, "CURRENT_PASSWORD_WRONG"},
+		{errcodes.PasswordTooWeak(), codes.InvalidArgument, "PASSWORD_TOO_WEAK"},
+		{errcodes.NoLocalPassword(), codes.FailedPrecondition, "NO_LOCAL_PASSWORD"},
+		{errcodes.PasswordChangeUnavailable(errors.New("down")), codes.FailedPrecondition, "PASSWORD_CHANGE_UNAVAILABLE"},
 	} {
 		st := status.Convert(errcodes.Error(context.Background(), tc.err))
 		require.Equal(t, tc.code, st.Code(), tc.sym)
