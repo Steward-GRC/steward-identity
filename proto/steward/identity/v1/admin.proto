@@ -77,6 +77,18 @@ service IdentityAdminService {
   // Root only, refused during act-as and from the admin CLI, and the calling
   // admin's step-up code is checked first.
   rpc TransferRoot(TransferRootRequest) returns (TransferRootResponse);
+  // GrantRoot is removed: there is exactly one root, changed only by
+  // TransferRoot. It always returns Unimplemented. Kept so a caller still
+  // built against the old shape gets a clear error and the proto stays
+  // wire-compatible; use TransferRoot.
+  rpc GrantRoot(GrantRootRequest) returns (GrantRootResponse) {
+    option deprecated = true;
+  };
+  // RevokeRoot is removed: there is exactly one root, changed only by
+  // TransferRoot. It always returns Unimplemented; use TransferRoot.
+  rpc RevokeRoot(RevokeRootRequest) returns (RevokeRootResponse) {
+    option deprecated = true;
+  };
   // RequestHardReset starts a two-person hard reset of a module: one root
   // admin asks, a different root admin approves. The request expires after
   // HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
@@ -322,6 +334,30 @@ message SetUserPolicyOverrideResponse {
 message RequestStepUpOtpRequest {}
 
 message RequestStepUpOtpResponse {}
+
+message GrantRootRequest {
+  option deprecated = true;
+  string user_id = 1;
+  // The calling admin's step-up code.
+  string otp = 2;
+}
+
+message GrantRootResponse {
+  option deprecated = true;
+  User user = 1;
+}
+
+message RevokeRootRequest {
+  option deprecated = true;
+  string user_id = 1;
+  // The calling admin's step-up code.
+  string otp = 2;
+}
+
+message RevokeRootResponse {
+  option deprecated = true;
+  User user = 1;
+}
 
 message TransferRootRequest {
   // The user who becomes the root.

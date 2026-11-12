@@ -6,6 +6,7 @@ package handlers
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 
 	"google.golang.org/grpc/codes"
@@ -29,7 +30,10 @@ import (
 // automatically.
 func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
 	// Deferred RPCs, keyed "Service.Method", each with a reason.
-	knownDeferred := map[string]string{}
+	knownDeferred := map[string]string{
+		"IdentityAdminService.GrantRoot":  "removed: there is exactly one root, moved by TransferRoot; kept in the proto as a deprecated stub that answers Unimplemented",
+		"IdentityAdminService.RevokeRoot": "removed: there is exactly one root, moved by TransferRoot; kept in the proto as a deprecated stub that answers Unimplemented",
+	}
 
 	tests := []struct {
 		service     string
@@ -103,5 +107,20 @@ func TestGRPCHandlers_EveryRPCImplemented(t *testing.T) {
 				t.Fatalf("expected to check the full %s RPC surface, only invoked %d — reflection/filter is wrong", tc.service, checked)
 			}
 		})
+	}
+}
+
+// TestGrantAndRevokeRoot_RemovedNameTransferRoot guards the two RPCs
+// knownDeferred excuses: a caller still built against the old shape gets
+// Unimplemented naming TransferRoot, never a change to the root.
+func TestGrantAndRevokeRoot_RemovedNameTransferRoot(t *testing.T) {
+	h := NewAdminHandler(nil, nil)
+	_, err := h.GrantRoot(context.Background(), &identityv1.GrantRootRequest{}) //nolint:staticcheck // exercising the removed RPC's stub
+	if status.Code(err) != codes.Unimplemented || !strings.Contains(err.Error(), "TransferRoot") {
+		t.Fatalf("GrantRoot: want Unimplemented naming TransferRoot, got %v", err)
+	}
+	_, err = h.RevokeRoot(context.Background(), &identityv1.RevokeRootRequest{}) //nolint:staticcheck // exercising the removed RPC's stub
+	if status.Code(err) != codes.Unimplemented || !strings.Contains(err.Error(), "TransferRoot") {
+		t.Fatalf("RevokeRoot: want Unimplemented naming TransferRoot, got %v", err)
 	}
 }

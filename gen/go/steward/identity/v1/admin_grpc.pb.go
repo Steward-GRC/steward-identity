@@ -42,6 +42,8 @@ const (
 	IdentityAdminService_SetUserPolicyOverride_FullMethodName = "/steward.identity.v1.IdentityAdminService/SetUserPolicyOverride"
 	IdentityAdminService_RequestStepUpOtp_FullMethodName      = "/steward.identity.v1.IdentityAdminService/RequestStepUpOtp"
 	IdentityAdminService_TransferRoot_FullMethodName          = "/steward.identity.v1.IdentityAdminService/TransferRoot"
+	IdentityAdminService_GrantRoot_FullMethodName             = "/steward.identity.v1.IdentityAdminService/GrantRoot"
+	IdentityAdminService_RevokeRoot_FullMethodName            = "/steward.identity.v1.IdentityAdminService/RevokeRoot"
 	IdentityAdminService_RequestHardReset_FullMethodName      = "/steward.identity.v1.IdentityAdminService/RequestHardReset"
 	IdentityAdminService_ApproveHardReset_FullMethodName      = "/steward.identity.v1.IdentityAdminService/ApproveHardReset"
 	IdentityAdminService_CancelHardReset_FullMethodName       = "/steward.identity.v1.IdentityAdminService/CancelHardReset"
@@ -137,6 +139,16 @@ type IdentityAdminServiceClient interface {
 	// Root only, refused during act-as and from the admin CLI, and the calling
 	// admin's step-up code is checked first.
 	TransferRoot(ctx context.Context, in *TransferRootRequest, opts ...grpc.CallOption) (*TransferRootResponse, error)
+	// Deprecated: Do not use.
+	// GrantRoot is removed: there is exactly one root, changed only by
+	// TransferRoot. It always returns Unimplemented. Kept so a caller still
+	// built against the old shape gets a clear error and the proto stays
+	// wire-compatible; use TransferRoot.
+	GrantRoot(ctx context.Context, in *GrantRootRequest, opts ...grpc.CallOption) (*GrantRootResponse, error)
+	// Deprecated: Do not use.
+	// RevokeRoot is removed: there is exactly one root, changed only by
+	// TransferRoot. It always returns Unimplemented; use TransferRoot.
+	RevokeRoot(ctx context.Context, in *RevokeRootRequest, opts ...grpc.CallOption) (*RevokeRootResponse, error)
 	// RequestHardReset starts a two-person hard reset of a module: one root
 	// admin asks, a different root admin approves. The request expires after
 	// HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
@@ -404,6 +416,28 @@ func (c *identityAdminServiceClient) TransferRoot(ctx context.Context, in *Trans
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TransferRootResponse)
 	err := c.cc.Invoke(ctx, IdentityAdminService_TransferRoot_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Deprecated: Do not use.
+func (c *identityAdminServiceClient) GrantRoot(ctx context.Context, in *GrantRootRequest, opts ...grpc.CallOption) (*GrantRootResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GrantRootResponse)
+	err := c.cc.Invoke(ctx, IdentityAdminService_GrantRoot_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Deprecated: Do not use.
+func (c *identityAdminServiceClient) RevokeRoot(ctx context.Context, in *RevokeRootRequest, opts ...grpc.CallOption) (*RevokeRootResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RevokeRootResponse)
+	err := c.cc.Invoke(ctx, IdentityAdminService_RevokeRoot_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -692,6 +726,16 @@ type IdentityAdminServiceServer interface {
 	// Root only, refused during act-as and from the admin CLI, and the calling
 	// admin's step-up code is checked first.
 	TransferRoot(context.Context, *TransferRootRequest) (*TransferRootResponse, error)
+	// Deprecated: Do not use.
+	// GrantRoot is removed: there is exactly one root, changed only by
+	// TransferRoot. It always returns Unimplemented. Kept so a caller still
+	// built against the old shape gets a clear error and the proto stays
+	// wire-compatible; use TransferRoot.
+	GrantRoot(context.Context, *GrantRootRequest) (*GrantRootResponse, error)
+	// Deprecated: Do not use.
+	// RevokeRoot is removed: there is exactly one root, changed only by
+	// TransferRoot. It always returns Unimplemented; use TransferRoot.
+	RevokeRoot(context.Context, *RevokeRootRequest) (*RevokeRootResponse, error)
 	// RequestHardReset starts a two-person hard reset of a module: one root
 	// admin asks, a different root admin approves. The request expires after
 	// HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
@@ -824,6 +868,12 @@ func (UnimplementedIdentityAdminServiceServer) RequestStepUpOtp(context.Context,
 }
 func (UnimplementedIdentityAdminServiceServer) TransferRoot(context.Context, *TransferRootRequest) (*TransferRootResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method TransferRoot not implemented")
+}
+func (UnimplementedIdentityAdminServiceServer) GrantRoot(context.Context, *GrantRootRequest) (*GrantRootResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GrantRoot not implemented")
+}
+func (UnimplementedIdentityAdminServiceServer) RevokeRoot(context.Context, *RevokeRootRequest) (*RevokeRootResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevokeRoot not implemented")
 }
 func (UnimplementedIdentityAdminServiceServer) RequestHardReset(context.Context, *RequestHardResetRequest) (*RequestHardResetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RequestHardReset not implemented")
@@ -1265,6 +1315,42 @@ func _IdentityAdminService_TransferRoot_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IdentityAdminServiceServer).TransferRoot(ctx, req.(*TransferRootRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IdentityAdminService_GrantRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GrantRootRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityAdminServiceServer).GrantRoot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityAdminService_GrantRoot_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityAdminServiceServer).GrantRoot(ctx, req.(*GrantRootRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IdentityAdminService_RevokeRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeRootRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityAdminServiceServer).RevokeRoot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityAdminService_RevokeRoot_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityAdminServiceServer).RevokeRoot(ctx, req.(*RevokeRootRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1733,6 +1819,14 @@ var IdentityAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TransferRoot",
 			Handler:    _IdentityAdminService_TransferRoot_Handler,
+		},
+		{
+			MethodName: "GrantRoot",
+			Handler:    _IdentityAdminService_GrantRoot_Handler,
+		},
+		{
+			MethodName: "RevokeRoot",
+			Handler:    _IdentityAdminService_RevokeRoot_Handler,
 		},
 		{
 			MethodName: "RequestHardReset",

@@ -1895,6 +1895,204 @@ func (*RequestStepUpOtpResponse) Descriptor() ([]byte, []int) {
 	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{37}
 }
 
+// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
+type GrantRootRequest struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	// The calling admin's step-up code.
+	Otp           string `protobuf:"bytes,2,opt,name=otp,proto3" json:"otp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GrantRootRequest) Reset() {
+	*x = GrantRootRequest{}
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GrantRootRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrantRootRequest) ProtoMessage() {}
+
+func (x *GrantRootRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrantRootRequest.ProtoReflect.Descriptor instead.
+func (*GrantRootRequest) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GrantRootRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *GrantRootRequest) GetOtp() string {
+	if x != nil {
+		return x.Otp
+	}
+	return ""
+}
+
+// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
+type GrantRootResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GrantRootResponse) Reset() {
+	*x = GrantRootResponse{}
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GrantRootResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrantRootResponse) ProtoMessage() {}
+
+func (x *GrantRootResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrantRootResponse.ProtoReflect.Descriptor instead.
+func (*GrantRootResponse) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *GrantRootResponse) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
+type RevokeRootRequest struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	// The calling admin's step-up code.
+	Otp           string `protobuf:"bytes,2,opt,name=otp,proto3" json:"otp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevokeRootRequest) Reset() {
+	*x = RevokeRootRequest{}
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevokeRootRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevokeRootRequest) ProtoMessage() {}
+
+func (x *RevokeRootRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevokeRootRequest.ProtoReflect.Descriptor instead.
+func (*RevokeRootRequest) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *RevokeRootRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *RevokeRootRequest) GetOtp() string {
+	if x != nil {
+		return x.Otp
+	}
+	return ""
+}
+
+// Deprecated: Marked as deprecated in steward/identity/v1/admin.proto.
+type RevokeRootResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevokeRootResponse) Reset() {
+	*x = RevokeRootResponse{}
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevokeRootResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevokeRootResponse) ProtoMessage() {}
+
+func (x *RevokeRootResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevokeRootResponse.ProtoReflect.Descriptor instead.
+func (*RevokeRootResponse) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *RevokeRootResponse) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
 type TransferRootRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The user who becomes the root.
@@ -1907,7 +2105,7 @@ type TransferRootRequest struct {
 
 func (x *TransferRootRequest) Reset() {
 	*x = TransferRootRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[38]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1919,7 +2117,7 @@ func (x *TransferRootRequest) String() string {
 func (*TransferRootRequest) ProtoMessage() {}
 
 func (x *TransferRootRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[38]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1932,7 +2130,7 @@ func (x *TransferRootRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransferRootRequest.ProtoReflect.Descriptor instead.
 func (*TransferRootRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{38}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *TransferRootRequest) GetToUserId() string {
@@ -1959,7 +2157,7 @@ type TransferRootResponse struct {
 
 func (x *TransferRootResponse) Reset() {
 	*x = TransferRootResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[39]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1971,7 +2169,7 @@ func (x *TransferRootResponse) String() string {
 func (*TransferRootResponse) ProtoMessage() {}
 
 func (x *TransferRootResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[39]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1984,7 +2182,7 @@ func (x *TransferRootResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransferRootResponse.ProtoReflect.Descriptor instead.
 func (*TransferRootResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{39}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *TransferRootResponse) GetUser() *User {
@@ -2006,7 +2204,7 @@ type RequestHardResetRequest struct {
 
 func (x *RequestHardResetRequest) Reset() {
 	*x = RequestHardResetRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[40]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2018,7 +2216,7 @@ func (x *RequestHardResetRequest) String() string {
 func (*RequestHardResetRequest) ProtoMessage() {}
 
 func (x *RequestHardResetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[40]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2031,7 +2229,7 @@ func (x *RequestHardResetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestHardResetRequest.ProtoReflect.Descriptor instead.
 func (*RequestHardResetRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{40}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *RequestHardResetRequest) GetModule() string {
@@ -2057,7 +2255,7 @@ type RequestHardResetResponse struct {
 
 func (x *RequestHardResetResponse) Reset() {
 	*x = RequestHardResetResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[41]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2069,7 +2267,7 @@ func (x *RequestHardResetResponse) String() string {
 func (*RequestHardResetResponse) ProtoMessage() {}
 
 func (x *RequestHardResetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[41]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2082,7 +2280,7 @@ func (x *RequestHardResetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestHardResetResponse.ProtoReflect.Descriptor instead.
 func (*RequestHardResetResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{41}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *RequestHardResetResponse) GetRequest() *HardResetRequest {
@@ -2101,7 +2299,7 @@ type ApproveHardResetRequest struct {
 
 func (x *ApproveHardResetRequest) Reset() {
 	*x = ApproveHardResetRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[42]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2113,7 +2311,7 @@ func (x *ApproveHardResetRequest) String() string {
 func (*ApproveHardResetRequest) ProtoMessage() {}
 
 func (x *ApproveHardResetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[42]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2126,7 +2324,7 @@ func (x *ApproveHardResetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApproveHardResetRequest.ProtoReflect.Descriptor instead.
 func (*ApproveHardResetRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{42}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *ApproveHardResetRequest) GetRequestId() string {
@@ -2145,7 +2343,7 @@ type ApproveHardResetResponse struct {
 
 func (x *ApproveHardResetResponse) Reset() {
 	*x = ApproveHardResetResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[43]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2157,7 +2355,7 @@ func (x *ApproveHardResetResponse) String() string {
 func (*ApproveHardResetResponse) ProtoMessage() {}
 
 func (x *ApproveHardResetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[43]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2170,7 +2368,7 @@ func (x *ApproveHardResetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApproveHardResetResponse.ProtoReflect.Descriptor instead.
 func (*ApproveHardResetResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{43}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *ApproveHardResetResponse) GetRequest() *HardResetRequest {
@@ -2189,7 +2387,7 @@ type CancelHardResetRequest struct {
 
 func (x *CancelHardResetRequest) Reset() {
 	*x = CancelHardResetRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[44]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2201,7 +2399,7 @@ func (x *CancelHardResetRequest) String() string {
 func (*CancelHardResetRequest) ProtoMessage() {}
 
 func (x *CancelHardResetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[44]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2214,7 +2412,7 @@ func (x *CancelHardResetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelHardResetRequest.ProtoReflect.Descriptor instead.
 func (*CancelHardResetRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{44}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *CancelHardResetRequest) GetRequestId() string {
@@ -2233,7 +2431,7 @@ type CancelHardResetResponse struct {
 
 func (x *CancelHardResetResponse) Reset() {
 	*x = CancelHardResetResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[45]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2245,7 +2443,7 @@ func (x *CancelHardResetResponse) String() string {
 func (*CancelHardResetResponse) ProtoMessage() {}
 
 func (x *CancelHardResetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[45]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2258,7 +2456,7 @@ func (x *CancelHardResetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelHardResetResponse.ProtoReflect.Descriptor instead.
 func (*CancelHardResetResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{45}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *CancelHardResetResponse) GetRequest() *HardResetRequest {
@@ -2278,7 +2476,7 @@ type ListHardResetRequestsRequest struct {
 
 func (x *ListHardResetRequestsRequest) Reset() {
 	*x = ListHardResetRequestsRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[46]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2290,7 +2488,7 @@ func (x *ListHardResetRequestsRequest) String() string {
 func (*ListHardResetRequestsRequest) ProtoMessage() {}
 
 func (x *ListHardResetRequestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[46]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2303,7 +2501,7 @@ func (x *ListHardResetRequestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListHardResetRequestsRequest.ProtoReflect.Descriptor instead.
 func (*ListHardResetRequestsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{46}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *ListHardResetRequestsRequest) GetModule() string {
@@ -2322,7 +2520,7 @@ type ListHardResetRequestsResponse struct {
 
 func (x *ListHardResetRequestsResponse) Reset() {
 	*x = ListHardResetRequestsResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[47]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2334,7 +2532,7 @@ func (x *ListHardResetRequestsResponse) String() string {
 func (*ListHardResetRequestsResponse) ProtoMessage() {}
 
 func (x *ListHardResetRequestsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[47]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2347,7 +2545,7 @@ func (x *ListHardResetRequestsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListHardResetRequestsResponse.ProtoReflect.Descriptor instead.
 func (*ListHardResetRequestsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{47}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *ListHardResetRequestsResponse) GetRequests() []*HardResetRequest {
@@ -2368,7 +2566,7 @@ type ConsumeHardResetRequest struct {
 
 func (x *ConsumeHardResetRequest) Reset() {
 	*x = ConsumeHardResetRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[48]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2380,7 +2578,7 @@ func (x *ConsumeHardResetRequest) String() string {
 func (*ConsumeHardResetRequest) ProtoMessage() {}
 
 func (x *ConsumeHardResetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[48]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2393,7 +2591,7 @@ func (x *ConsumeHardResetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsumeHardResetRequest.ProtoReflect.Descriptor instead.
 func (*ConsumeHardResetRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{48}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *ConsumeHardResetRequest) GetRequestId() string {
@@ -2420,7 +2618,7 @@ type ConsumeHardResetResponse struct {
 
 func (x *ConsumeHardResetResponse) Reset() {
 	*x = ConsumeHardResetResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[49]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2432,7 +2630,7 @@ func (x *ConsumeHardResetResponse) String() string {
 func (*ConsumeHardResetResponse) ProtoMessage() {}
 
 func (x *ConsumeHardResetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[49]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2445,7 +2643,7 @@ func (x *ConsumeHardResetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsumeHardResetResponse.ProtoReflect.Descriptor instead.
 func (*ConsumeHardResetResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{49}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *ConsumeHardResetResponse) GetRequest() *HardResetRequest {
@@ -2466,7 +2664,7 @@ type RevokeSessionRequest struct {
 
 func (x *RevokeSessionRequest) Reset() {
 	*x = RevokeSessionRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[50]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2478,7 +2676,7 @@ func (x *RevokeSessionRequest) String() string {
 func (*RevokeSessionRequest) ProtoMessage() {}
 
 func (x *RevokeSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[50]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2491,7 +2689,7 @@ func (x *RevokeSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeSessionRequest.ProtoReflect.Descriptor instead.
 func (*RevokeSessionRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{50}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *RevokeSessionRequest) GetSessionId() string {
@@ -2517,7 +2715,7 @@ type RevokeSessionResponse struct {
 
 func (x *RevokeSessionResponse) Reset() {
 	*x = RevokeSessionResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[51]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2529,7 +2727,7 @@ func (x *RevokeSessionResponse) String() string {
 func (*RevokeSessionResponse) ProtoMessage() {}
 
 func (x *RevokeSessionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[51]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2542,7 +2740,7 @@ func (x *RevokeSessionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeSessionResponse.ProtoReflect.Descriptor instead.
 func (*RevokeSessionResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{51}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *RevokeSessionResponse) GetRevoked() int32 {
@@ -2562,7 +2760,7 @@ type RevokeUserSessionsRequest struct {
 
 func (x *RevokeUserSessionsRequest) Reset() {
 	*x = RevokeUserSessionsRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[52]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2574,7 +2772,7 @@ func (x *RevokeUserSessionsRequest) String() string {
 func (*RevokeUserSessionsRequest) ProtoMessage() {}
 
 func (x *RevokeUserSessionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[52]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2587,7 +2785,7 @@ func (x *RevokeUserSessionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeUserSessionsRequest.ProtoReflect.Descriptor instead.
 func (*RevokeUserSessionsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{52}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *RevokeUserSessionsRequest) GetUserId() string {
@@ -2613,7 +2811,7 @@ type RevokeUserSessionsResponse struct {
 
 func (x *RevokeUserSessionsResponse) Reset() {
 	*x = RevokeUserSessionsResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[53]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2625,7 +2823,7 @@ func (x *RevokeUserSessionsResponse) String() string {
 func (*RevokeUserSessionsResponse) ProtoMessage() {}
 
 func (x *RevokeUserSessionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[53]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2638,7 +2836,7 @@ func (x *RevokeUserSessionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeUserSessionsResponse.ProtoReflect.Descriptor instead.
 func (*RevokeUserSessionsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{53}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *RevokeUserSessionsResponse) GetRevoked() int32 {
@@ -2657,7 +2855,7 @@ type ListUserSessionsRequest struct {
 
 func (x *ListUserSessionsRequest) Reset() {
 	*x = ListUserSessionsRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[54]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2669,7 +2867,7 @@ func (x *ListUserSessionsRequest) String() string {
 func (*ListUserSessionsRequest) ProtoMessage() {}
 
 func (x *ListUserSessionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[54]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2682,7 +2880,7 @@ func (x *ListUserSessionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserSessionsRequest.ProtoReflect.Descriptor instead.
 func (*ListUserSessionsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{54}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *ListUserSessionsRequest) GetUserId() string {
@@ -2701,7 +2899,7 @@ type ListUserSessionsResponse struct {
 
 func (x *ListUserSessionsResponse) Reset() {
 	*x = ListUserSessionsResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[55]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2713,7 +2911,7 @@ func (x *ListUserSessionsResponse) String() string {
 func (*ListUserSessionsResponse) ProtoMessage() {}
 
 func (x *ListUserSessionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[55]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2726,7 +2924,7 @@ func (x *ListUserSessionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserSessionsResponse.ProtoReflect.Descriptor instead.
 func (*ListUserSessionsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{55}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *ListUserSessionsResponse) GetSessions() []*Session {
@@ -2746,7 +2944,7 @@ type GrantPermissionRequest struct {
 
 func (x *GrantPermissionRequest) Reset() {
 	*x = GrantPermissionRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[56]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2758,7 +2956,7 @@ func (x *GrantPermissionRequest) String() string {
 func (*GrantPermissionRequest) ProtoMessage() {}
 
 func (x *GrantPermissionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[56]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2771,7 +2969,7 @@ func (x *GrantPermissionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GrantPermissionRequest.ProtoReflect.Descriptor instead.
 func (*GrantPermissionRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{56}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *GrantPermissionRequest) GetUserId() string {
@@ -2797,7 +2995,7 @@ type GrantPermissionResponse struct {
 
 func (x *GrantPermissionResponse) Reset() {
 	*x = GrantPermissionResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[57]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2809,7 +3007,7 @@ func (x *GrantPermissionResponse) String() string {
 func (*GrantPermissionResponse) ProtoMessage() {}
 
 func (x *GrantPermissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[57]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2822,7 +3020,7 @@ func (x *GrantPermissionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GrantPermissionResponse.ProtoReflect.Descriptor instead.
 func (*GrantPermissionResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{57}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *GrantPermissionResponse) GetUser() *User {
@@ -2842,7 +3040,7 @@ type RevokePermissionRequest struct {
 
 func (x *RevokePermissionRequest) Reset() {
 	*x = RevokePermissionRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[58]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2854,7 +3052,7 @@ func (x *RevokePermissionRequest) String() string {
 func (*RevokePermissionRequest) ProtoMessage() {}
 
 func (x *RevokePermissionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[58]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2867,7 +3065,7 @@ func (x *RevokePermissionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokePermissionRequest.ProtoReflect.Descriptor instead.
 func (*RevokePermissionRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{58}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *RevokePermissionRequest) GetUserId() string {
@@ -2893,7 +3091,7 @@ type RevokePermissionResponse struct {
 
 func (x *RevokePermissionResponse) Reset() {
 	*x = RevokePermissionResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[59]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2905,7 +3103,7 @@ func (x *RevokePermissionResponse) String() string {
 func (*RevokePermissionResponse) ProtoMessage() {}
 
 func (x *RevokePermissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[59]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2918,7 +3116,7 @@ func (x *RevokePermissionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokePermissionResponse.ProtoReflect.Descriptor instead.
 func (*RevokePermissionResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{59}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *RevokePermissionResponse) GetUser() *User {
@@ -2938,7 +3136,7 @@ type BreakGlassRevealRequest struct {
 
 func (x *BreakGlassRevealRequest) Reset() {
 	*x = BreakGlassRevealRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[60]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2950,7 +3148,7 @@ func (x *BreakGlassRevealRequest) String() string {
 func (*BreakGlassRevealRequest) ProtoMessage() {}
 
 func (x *BreakGlassRevealRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[60]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2963,7 +3161,7 @@ func (x *BreakGlassRevealRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BreakGlassRevealRequest.ProtoReflect.Descriptor instead.
 func (*BreakGlassRevealRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{60}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *BreakGlassRevealRequest) GetPolicyNumber() string {
@@ -2990,7 +3188,7 @@ type BreakGlassRevealResponse struct {
 
 func (x *BreakGlassRevealResponse) Reset() {
 	*x = BreakGlassRevealResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[61]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3002,7 +3200,7 @@ func (x *BreakGlassRevealResponse) String() string {
 func (*BreakGlassRevealResponse) ProtoMessage() {}
 
 func (x *BreakGlassRevealResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[61]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3015,7 +3213,7 @@ func (x *BreakGlassRevealResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BreakGlassRevealResponse.ProtoReflect.Descriptor instead.
 func (*BreakGlassRevealResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{61}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *BreakGlassRevealResponse) GetGrantedUntil() string {
@@ -3033,7 +3231,7 @@ type ActiveBreakGlassRequest struct {
 
 func (x *ActiveBreakGlassRequest) Reset() {
 	*x = ActiveBreakGlassRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[62]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3045,7 +3243,7 @@ func (x *ActiveBreakGlassRequest) String() string {
 func (*ActiveBreakGlassRequest) ProtoMessage() {}
 
 func (x *ActiveBreakGlassRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[62]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3058,7 +3256,7 @@ func (x *ActiveBreakGlassRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActiveBreakGlassRequest.ProtoReflect.Descriptor instead.
 func (*ActiveBreakGlassRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{62}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{66}
 }
 
 type ActiveBreakGlassResponse struct {
@@ -3073,7 +3271,7 @@ type ActiveBreakGlassResponse struct {
 
 func (x *ActiveBreakGlassResponse) Reset() {
 	*x = ActiveBreakGlassResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[63]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3085,7 +3283,7 @@ func (x *ActiveBreakGlassResponse) String() string {
 func (*ActiveBreakGlassResponse) ProtoMessage() {}
 
 func (x *ActiveBreakGlassResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[63]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3098,7 +3296,7 @@ func (x *ActiveBreakGlassResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActiveBreakGlassResponse.ProtoReflect.Descriptor instead.
 func (*ActiveBreakGlassResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{63}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *ActiveBreakGlassResponse) GetPolicyNumbers() []string {
@@ -3127,7 +3325,7 @@ type ActiveBreakGlassGrant struct {
 
 func (x *ActiveBreakGlassGrant) Reset() {
 	*x = ActiveBreakGlassGrant{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[64]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3139,7 +3337,7 @@ func (x *ActiveBreakGlassGrant) String() string {
 func (*ActiveBreakGlassGrant) ProtoMessage() {}
 
 func (x *ActiveBreakGlassGrant) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[64]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3152,7 +3350,7 @@ func (x *ActiveBreakGlassGrant) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActiveBreakGlassGrant.ProtoReflect.Descriptor instead.
 func (*ActiveBreakGlassGrant) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{64}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *ActiveBreakGlassGrant) GetPolicyNumber() string {
@@ -3181,7 +3379,7 @@ type CreateLocalUserRequest struct {
 
 func (x *CreateLocalUserRequest) Reset() {
 	*x = CreateLocalUserRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[65]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3193,7 +3391,7 @@ func (x *CreateLocalUserRequest) String() string {
 func (*CreateLocalUserRequest) ProtoMessage() {}
 
 func (x *CreateLocalUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[65]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3206,7 +3404,7 @@ func (x *CreateLocalUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateLocalUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateLocalUserRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{65}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *CreateLocalUserRequest) GetUsername() string {
@@ -3246,7 +3444,7 @@ type CreateLocalUserResponse struct {
 
 func (x *CreateLocalUserResponse) Reset() {
 	*x = CreateLocalUserResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[66]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3258,7 +3456,7 @@ func (x *CreateLocalUserResponse) String() string {
 func (*CreateLocalUserResponse) ProtoMessage() {}
 
 func (x *CreateLocalUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[66]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3271,7 +3469,7 @@ func (x *CreateLocalUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateLocalUserResponse.ProtoReflect.Descriptor instead.
 func (*CreateLocalUserResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{66}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *CreateLocalUserResponse) GetUser() *User {
@@ -3291,7 +3489,7 @@ type ResetUserPasswordRequest struct {
 
 func (x *ResetUserPasswordRequest) Reset() {
 	*x = ResetUserPasswordRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[67]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3303,7 +3501,7 @@ func (x *ResetUserPasswordRequest) String() string {
 func (*ResetUserPasswordRequest) ProtoMessage() {}
 
 func (x *ResetUserPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[67]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3316,7 +3514,7 @@ func (x *ResetUserPasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetUserPasswordRequest.ProtoReflect.Descriptor instead.
 func (*ResetUserPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{67}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *ResetUserPasswordRequest) GetUserId() string {
@@ -3341,7 +3539,7 @@ type ResetUserPasswordResponse struct {
 
 func (x *ResetUserPasswordResponse) Reset() {
 	*x = ResetUserPasswordResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[68]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3353,7 +3551,7 @@ func (x *ResetUserPasswordResponse) String() string {
 func (*ResetUserPasswordResponse) ProtoMessage() {}
 
 func (x *ResetUserPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[68]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3366,7 +3564,7 @@ func (x *ResetUserPasswordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetUserPasswordResponse.ProtoReflect.Descriptor instead.
 func (*ResetUserPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{68}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{72}
 }
 
 type UpdateUserProfileRequest struct {
@@ -3380,7 +3578,7 @@ type UpdateUserProfileRequest struct {
 
 func (x *UpdateUserProfileRequest) Reset() {
 	*x = UpdateUserProfileRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[69]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3392,7 +3590,7 @@ func (x *UpdateUserProfileRequest) String() string {
 func (*UpdateUserProfileRequest) ProtoMessage() {}
 
 func (x *UpdateUserProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[69]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3405,7 +3603,7 @@ func (x *UpdateUserProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserProfileRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserProfileRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{69}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *UpdateUserProfileRequest) GetUserId() string {
@@ -3438,7 +3636,7 @@ type UpdateUserProfileResponse struct {
 
 func (x *UpdateUserProfileResponse) Reset() {
 	*x = UpdateUserProfileResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[70]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3450,7 +3648,7 @@ func (x *UpdateUserProfileResponse) String() string {
 func (*UpdateUserProfileResponse) ProtoMessage() {}
 
 func (x *UpdateUserProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[70]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3463,7 +3661,7 @@ func (x *UpdateUserProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserProfileResponse.ProtoReflect.Descriptor instead.
 func (*UpdateUserProfileResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{70}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *UpdateUserProfileResponse) GetUser() *User {
@@ -3489,7 +3687,7 @@ type CompleteOnboardingRequest struct {
 
 func (x *CompleteOnboardingRequest) Reset() {
 	*x = CompleteOnboardingRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[71]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3501,7 +3699,7 @@ func (x *CompleteOnboardingRequest) String() string {
 func (*CompleteOnboardingRequest) ProtoMessage() {}
 
 func (x *CompleteOnboardingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[71]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3514,7 +3712,7 @@ func (x *CompleteOnboardingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteOnboardingRequest.ProtoReflect.Descriptor instead.
 func (*CompleteOnboardingRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{71}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *CompleteOnboardingRequest) GetName() string {
@@ -3568,7 +3766,7 @@ type CompleteOnboardingResponse struct {
 
 func (x *CompleteOnboardingResponse) Reset() {
 	*x = CompleteOnboardingResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[72]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3580,7 +3778,7 @@ func (x *CompleteOnboardingResponse) String() string {
 func (*CompleteOnboardingResponse) ProtoMessage() {}
 
 func (x *CompleteOnboardingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[72]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3593,7 +3791,7 @@ func (x *CompleteOnboardingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteOnboardingResponse.ProtoReflect.Descriptor instead.
 func (*CompleteOnboardingResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{72}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *CompleteOnboardingResponse) GetUser() *User {
@@ -3617,7 +3815,7 @@ type UpdateMyProfileRequest struct {
 
 func (x *UpdateMyProfileRequest) Reset() {
 	*x = UpdateMyProfileRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[73]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3629,7 +3827,7 @@ func (x *UpdateMyProfileRequest) String() string {
 func (*UpdateMyProfileRequest) ProtoMessage() {}
 
 func (x *UpdateMyProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[73]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3642,7 +3840,7 @@ func (x *UpdateMyProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMyProfileRequest.ProtoReflect.Descriptor instead.
 func (*UpdateMyProfileRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{73}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *UpdateMyProfileRequest) GetFirstName() string {
@@ -3682,7 +3880,7 @@ type UpdateMyProfileResponse struct {
 
 func (x *UpdateMyProfileResponse) Reset() {
 	*x = UpdateMyProfileResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[74]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3694,7 +3892,7 @@ func (x *UpdateMyProfileResponse) String() string {
 func (*UpdateMyProfileResponse) ProtoMessage() {}
 
 func (x *UpdateMyProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[74]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3707,7 +3905,7 @@ func (x *UpdateMyProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMyProfileResponse.ProtoReflect.Descriptor instead.
 func (*UpdateMyProfileResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{74}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *UpdateMyProfileResponse) GetUser() *User {
@@ -3726,7 +3924,7 @@ type AdminListUserFactorsRequest struct {
 
 func (x *AdminListUserFactorsRequest) Reset() {
 	*x = AdminListUserFactorsRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[75]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3738,7 +3936,7 @@ func (x *AdminListUserFactorsRequest) String() string {
 func (*AdminListUserFactorsRequest) ProtoMessage() {}
 
 func (x *AdminListUserFactorsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[75]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3751,7 +3949,7 @@ func (x *AdminListUserFactorsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminListUserFactorsRequest.ProtoReflect.Descriptor instead.
 func (*AdminListUserFactorsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{75}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *AdminListUserFactorsRequest) GetUserId() string {
@@ -3770,7 +3968,7 @@ type AdminListUserFactorsResponse struct {
 
 func (x *AdminListUserFactorsResponse) Reset() {
 	*x = AdminListUserFactorsResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[76]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3782,7 +3980,7 @@ func (x *AdminListUserFactorsResponse) String() string {
 func (*AdminListUserFactorsResponse) ProtoMessage() {}
 
 func (x *AdminListUserFactorsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[76]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3795,7 +3993,7 @@ func (x *AdminListUserFactorsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminListUserFactorsResponse.ProtoReflect.Descriptor instead.
 func (*AdminListUserFactorsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{76}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *AdminListUserFactorsResponse) GetFactors() []*UserFactor {
@@ -3816,7 +4014,7 @@ type AdminRemoveUserFactorRequest struct {
 
 func (x *AdminRemoveUserFactorRequest) Reset() {
 	*x = AdminRemoveUserFactorRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[77]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3828,7 +4026,7 @@ func (x *AdminRemoveUserFactorRequest) String() string {
 func (*AdminRemoveUserFactorRequest) ProtoMessage() {}
 
 func (x *AdminRemoveUserFactorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[77]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3841,7 +4039,7 @@ func (x *AdminRemoveUserFactorRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminRemoveUserFactorRequest.ProtoReflect.Descriptor instead.
 func (*AdminRemoveUserFactorRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{77}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{81}
 }
 
 func (x *AdminRemoveUserFactorRequest) GetUserId() string {
@@ -3866,7 +4064,7 @@ type AdminRemoveUserFactorResponse struct {
 
 func (x *AdminRemoveUserFactorResponse) Reset() {
 	*x = AdminRemoveUserFactorResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[78]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3878,7 +4076,7 @@ func (x *AdminRemoveUserFactorResponse) String() string {
 func (*AdminRemoveUserFactorResponse) ProtoMessage() {}
 
 func (x *AdminRemoveUserFactorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[78]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3891,7 +4089,7 @@ func (x *AdminRemoveUserFactorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminRemoveUserFactorResponse.ProtoReflect.Descriptor instead.
 func (*AdminRemoveUserFactorResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{78}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{82}
 }
 
 type AdminRenameUserFactorRequest struct {
@@ -3905,7 +4103,7 @@ type AdminRenameUserFactorRequest struct {
 
 func (x *AdminRenameUserFactorRequest) Reset() {
 	*x = AdminRenameUserFactorRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[79]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3917,7 +4115,7 @@ func (x *AdminRenameUserFactorRequest) String() string {
 func (*AdminRenameUserFactorRequest) ProtoMessage() {}
 
 func (x *AdminRenameUserFactorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[79]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3930,7 +4128,7 @@ func (x *AdminRenameUserFactorRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminRenameUserFactorRequest.ProtoReflect.Descriptor instead.
 func (*AdminRenameUserFactorRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{79}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *AdminRenameUserFactorRequest) GetUserId() string {
@@ -3962,7 +4160,7 @@ type AdminRenameUserFactorResponse struct {
 
 func (x *AdminRenameUserFactorResponse) Reset() {
 	*x = AdminRenameUserFactorResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[80]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3974,7 +4172,7 @@ func (x *AdminRenameUserFactorResponse) String() string {
 func (*AdminRenameUserFactorResponse) ProtoMessage() {}
 
 func (x *AdminRenameUserFactorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[80]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3987,7 +4185,7 @@ func (x *AdminRenameUserFactorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminRenameUserFactorResponse.ProtoReflect.Descriptor instead.
 func (*AdminRenameUserFactorResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{80}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{84}
 }
 
 type UpdateUserPreferencesRequest struct {
@@ -4002,7 +4200,7 @@ type UpdateUserPreferencesRequest struct {
 
 func (x *UpdateUserPreferencesRequest) Reset() {
 	*x = UpdateUserPreferencesRequest{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[81]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4014,7 +4212,7 @@ func (x *UpdateUserPreferencesRequest) String() string {
 func (*UpdateUserPreferencesRequest) ProtoMessage() {}
 
 func (x *UpdateUserPreferencesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[81]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4027,7 +4225,7 @@ func (x *UpdateUserPreferencesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserPreferencesRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserPreferencesRequest) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{81}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{85}
 }
 
 func (x *UpdateUserPreferencesRequest) GetUserId() string {
@@ -4053,7 +4251,7 @@ type UpdateUserPreferencesResponse struct {
 
 func (x *UpdateUserPreferencesResponse) Reset() {
 	*x = UpdateUserPreferencesResponse{}
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[82]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4065,7 +4263,7 @@ func (x *UpdateUserPreferencesResponse) String() string {
 func (*UpdateUserPreferencesResponse) ProtoMessage() {}
 
 func (x *UpdateUserPreferencesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_identity_v1_admin_proto_msgTypes[82]
+	mi := &file_steward_identity_v1_admin_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4078,7 +4276,7 @@ func (x *UpdateUserPreferencesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserPreferencesResponse.ProtoReflect.Descriptor instead.
 func (*UpdateUserPreferencesResponse) Descriptor() ([]byte, []int) {
-	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{82}
+	return file_steward_identity_v1_admin_proto_rawDescGZIP(), []int{86}
 }
 
 func (x *UpdateUserPreferencesResponse) GetUser() *User {
@@ -4195,7 +4393,17 @@ const file_steward_identity_v1_admin_proto_rawDesc = "" +
 	"\x1dSetUserPolicyOverrideResponse\x12-\n" +
 	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user\"\x19\n" +
 	"\x17RequestStepUpOtpRequest\"\x1a\n" +
-	"\x18RequestStepUpOtpResponse\"E\n" +
+	"\x18RequestStepUpOtpResponse\"A\n" +
+	"\x10GrantRootRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x10\n" +
+	"\x03otp\x18\x02 \x01(\tR\x03otp:\x02\x18\x01\"F\n" +
+	"\x11GrantRootResponse\x12-\n" +
+	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user:\x02\x18\x01\"B\n" +
+	"\x11RevokeRootRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x10\n" +
+	"\x03otp\x18\x02 \x01(\tR\x03otp:\x02\x18\x01\"G\n" +
+	"\x12RevokeRootResponse\x12-\n" +
+	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user:\x02\x18\x01\"E\n" +
 	"\x13TransferRootRequest\x12\x1c\n" +
 	"\n" +
 	"to_user_id\x18\x01 \x01(\tR\btoUserId\x12\x10\n" +
@@ -4333,7 +4541,7 @@ const file_steward_identity_v1_admin_proto_rawDesc = "" +
 	"\x06locale\x18\x02 \x01(\tH\x00R\x06locale\x88\x01\x01B\t\n" +
 	"\a_locale\"N\n" +
 	"\x1dUpdateUserPreferencesResponse\x12-\n" +
-	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user2\x8e$\n" +
+	"\x04user\x18\x01 \x01(\v2\x19.steward.identity.v1.UserR\x04user2\xd3%\n" +
 	"\x14IdentityAdminService\x12]\n" +
 	"\n" +
 	"EnableUser\x12&.steward.identity.v1.EnableUserRequest\x1a'.steward.identity.v1.EnableUserResponse\x12`\n" +
@@ -4357,7 +4565,10 @@ const file_steward_identity_v1_admin_proto_rawDesc = "" +
 	"\x15BootstrapInitialAdmin\x121.steward.identity.v1.BootstrapInitialAdminRequest\x1a2.steward.identity.v1.BootstrapInitialAdminResponse\x12~\n" +
 	"\x15SetUserPolicyOverride\x121.steward.identity.v1.SetUserPolicyOverrideRequest\x1a2.steward.identity.v1.SetUserPolicyOverrideResponse\x12o\n" +
 	"\x10RequestStepUpOtp\x12,.steward.identity.v1.RequestStepUpOtpRequest\x1a-.steward.identity.v1.RequestStepUpOtpResponse\x12c\n" +
-	"\fTransferRoot\x12(.steward.identity.v1.TransferRootRequest\x1a).steward.identity.v1.TransferRootResponse\x12o\n" +
+	"\fTransferRoot\x12(.steward.identity.v1.TransferRootRequest\x1a).steward.identity.v1.TransferRootResponse\x12_\n" +
+	"\tGrantRoot\x12%.steward.identity.v1.GrantRootRequest\x1a&.steward.identity.v1.GrantRootResponse\"\x03\x88\x02\x01\x12b\n" +
+	"\n" +
+	"RevokeRoot\x12&.steward.identity.v1.RevokeRootRequest\x1a'.steward.identity.v1.RevokeRootResponse\"\x03\x88\x02\x01\x12o\n" +
 	"\x10RequestHardReset\x12,.steward.identity.v1.RequestHardResetRequest\x1a-.steward.identity.v1.RequestHardResetResponse\x12o\n" +
 	"\x10ApproveHardReset\x12,.steward.identity.v1.ApproveHardResetRequest\x1a-.steward.identity.v1.ApproveHardResetResponse\x12l\n" +
 	"\x0fCancelHardReset\x12+.steward.identity.v1.CancelHardResetRequest\x1a,.steward.identity.v1.CancelHardResetResponse\x12~\n" +
@@ -4392,7 +4603,7 @@ func file_steward_identity_v1_admin_proto_rawDescGZIP() []byte {
 	return file_steward_identity_v1_admin_proto_rawDescData
 }
 
-var file_steward_identity_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 84)
+var file_steward_identity_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 88)
 var file_steward_identity_v1_admin_proto_goTypes = []any{
 	(*EnableUserRequest)(nil),             // 0: steward.identity.v1.EnableUserRequest
 	(*EnableUserResponse)(nil),            // 1: steward.identity.v1.EnableUserResponse
@@ -4432,187 +4643,197 @@ var file_steward_identity_v1_admin_proto_goTypes = []any{
 	(*SetUserPolicyOverrideResponse)(nil), // 35: steward.identity.v1.SetUserPolicyOverrideResponse
 	(*RequestStepUpOtpRequest)(nil),       // 36: steward.identity.v1.RequestStepUpOtpRequest
 	(*RequestStepUpOtpResponse)(nil),      // 37: steward.identity.v1.RequestStepUpOtpResponse
-	(*TransferRootRequest)(nil),           // 38: steward.identity.v1.TransferRootRequest
-	(*TransferRootResponse)(nil),          // 39: steward.identity.v1.TransferRootResponse
-	(*RequestHardResetRequest)(nil),       // 40: steward.identity.v1.RequestHardResetRequest
-	(*RequestHardResetResponse)(nil),      // 41: steward.identity.v1.RequestHardResetResponse
-	(*ApproveHardResetRequest)(nil),       // 42: steward.identity.v1.ApproveHardResetRequest
-	(*ApproveHardResetResponse)(nil),      // 43: steward.identity.v1.ApproveHardResetResponse
-	(*CancelHardResetRequest)(nil),        // 44: steward.identity.v1.CancelHardResetRequest
-	(*CancelHardResetResponse)(nil),       // 45: steward.identity.v1.CancelHardResetResponse
-	(*ListHardResetRequestsRequest)(nil),  // 46: steward.identity.v1.ListHardResetRequestsRequest
-	(*ListHardResetRequestsResponse)(nil), // 47: steward.identity.v1.ListHardResetRequestsResponse
-	(*ConsumeHardResetRequest)(nil),       // 48: steward.identity.v1.ConsumeHardResetRequest
-	(*ConsumeHardResetResponse)(nil),      // 49: steward.identity.v1.ConsumeHardResetResponse
-	(*RevokeSessionRequest)(nil),          // 50: steward.identity.v1.RevokeSessionRequest
-	(*RevokeSessionResponse)(nil),         // 51: steward.identity.v1.RevokeSessionResponse
-	(*RevokeUserSessionsRequest)(nil),     // 52: steward.identity.v1.RevokeUserSessionsRequest
-	(*RevokeUserSessionsResponse)(nil),    // 53: steward.identity.v1.RevokeUserSessionsResponse
-	(*ListUserSessionsRequest)(nil),       // 54: steward.identity.v1.ListUserSessionsRequest
-	(*ListUserSessionsResponse)(nil),      // 55: steward.identity.v1.ListUserSessionsResponse
-	(*GrantPermissionRequest)(nil),        // 56: steward.identity.v1.GrantPermissionRequest
-	(*GrantPermissionResponse)(nil),       // 57: steward.identity.v1.GrantPermissionResponse
-	(*RevokePermissionRequest)(nil),       // 58: steward.identity.v1.RevokePermissionRequest
-	(*RevokePermissionResponse)(nil),      // 59: steward.identity.v1.RevokePermissionResponse
-	(*BreakGlassRevealRequest)(nil),       // 60: steward.identity.v1.BreakGlassRevealRequest
-	(*BreakGlassRevealResponse)(nil),      // 61: steward.identity.v1.BreakGlassRevealResponse
-	(*ActiveBreakGlassRequest)(nil),       // 62: steward.identity.v1.ActiveBreakGlassRequest
-	(*ActiveBreakGlassResponse)(nil),      // 63: steward.identity.v1.ActiveBreakGlassResponse
-	(*ActiveBreakGlassGrant)(nil),         // 64: steward.identity.v1.ActiveBreakGlassGrant
-	(*CreateLocalUserRequest)(nil),        // 65: steward.identity.v1.CreateLocalUserRequest
-	(*CreateLocalUserResponse)(nil),       // 66: steward.identity.v1.CreateLocalUserResponse
-	(*ResetUserPasswordRequest)(nil),      // 67: steward.identity.v1.ResetUserPasswordRequest
-	(*ResetUserPasswordResponse)(nil),     // 68: steward.identity.v1.ResetUserPasswordResponse
-	(*UpdateUserProfileRequest)(nil),      // 69: steward.identity.v1.UpdateUserProfileRequest
-	(*UpdateUserProfileResponse)(nil),     // 70: steward.identity.v1.UpdateUserProfileResponse
-	(*CompleteOnboardingRequest)(nil),     // 71: steward.identity.v1.CompleteOnboardingRequest
-	(*CompleteOnboardingResponse)(nil),    // 72: steward.identity.v1.CompleteOnboardingResponse
-	(*UpdateMyProfileRequest)(nil),        // 73: steward.identity.v1.UpdateMyProfileRequest
-	(*UpdateMyProfileResponse)(nil),       // 74: steward.identity.v1.UpdateMyProfileResponse
-	(*AdminListUserFactorsRequest)(nil),   // 75: steward.identity.v1.AdminListUserFactorsRequest
-	(*AdminListUserFactorsResponse)(nil),  // 76: steward.identity.v1.AdminListUserFactorsResponse
-	(*AdminRemoveUserFactorRequest)(nil),  // 77: steward.identity.v1.AdminRemoveUserFactorRequest
-	(*AdminRemoveUserFactorResponse)(nil), // 78: steward.identity.v1.AdminRemoveUserFactorResponse
-	(*AdminRenameUserFactorRequest)(nil),  // 79: steward.identity.v1.AdminRenameUserFactorRequest
-	(*AdminRenameUserFactorResponse)(nil), // 80: steward.identity.v1.AdminRenameUserFactorResponse
-	(*UpdateUserPreferencesRequest)(nil),  // 81: steward.identity.v1.UpdateUserPreferencesRequest
-	(*UpdateUserPreferencesResponse)(nil), // 82: steward.identity.v1.UpdateUserPreferencesResponse
-	nil,                                   // 83: steward.identity.v1.CreateGroupRequest.MetadataEntry
-	(*User)(nil),                          // 84: steward.identity.v1.User
-	(*UserDeletionPreview)(nil),           // 85: steward.identity.v1.UserDeletionPreview
-	(*AccountMergePreview)(nil),           // 86: steward.identity.v1.AccountMergePreview
-	(MergeStatus)(0),                      // 87: steward.identity.v1.MergeStatus
-	(*MergeCounts)(nil),                   // 88: steward.identity.v1.MergeCounts
-	(*MergeStepResult)(nil),               // 89: steward.identity.v1.MergeStepResult
-	(*Group)(nil),                         // 90: steward.identity.v1.Group
-	(OverrideEffect)(0),                   // 91: steward.identity.v1.OverrideEffect
-	(*HardResetRequest)(nil),              // 92: steward.identity.v1.HardResetRequest
-	(*Session)(nil),                       // 93: steward.identity.v1.Session
-	(*UserFactor)(nil),                    // 94: steward.identity.v1.UserFactor
+	(*GrantRootRequest)(nil),              // 38: steward.identity.v1.GrantRootRequest
+	(*GrantRootResponse)(nil),             // 39: steward.identity.v1.GrantRootResponse
+	(*RevokeRootRequest)(nil),             // 40: steward.identity.v1.RevokeRootRequest
+	(*RevokeRootResponse)(nil),            // 41: steward.identity.v1.RevokeRootResponse
+	(*TransferRootRequest)(nil),           // 42: steward.identity.v1.TransferRootRequest
+	(*TransferRootResponse)(nil),          // 43: steward.identity.v1.TransferRootResponse
+	(*RequestHardResetRequest)(nil),       // 44: steward.identity.v1.RequestHardResetRequest
+	(*RequestHardResetResponse)(nil),      // 45: steward.identity.v1.RequestHardResetResponse
+	(*ApproveHardResetRequest)(nil),       // 46: steward.identity.v1.ApproveHardResetRequest
+	(*ApproveHardResetResponse)(nil),      // 47: steward.identity.v1.ApproveHardResetResponse
+	(*CancelHardResetRequest)(nil),        // 48: steward.identity.v1.CancelHardResetRequest
+	(*CancelHardResetResponse)(nil),       // 49: steward.identity.v1.CancelHardResetResponse
+	(*ListHardResetRequestsRequest)(nil),  // 50: steward.identity.v1.ListHardResetRequestsRequest
+	(*ListHardResetRequestsResponse)(nil), // 51: steward.identity.v1.ListHardResetRequestsResponse
+	(*ConsumeHardResetRequest)(nil),       // 52: steward.identity.v1.ConsumeHardResetRequest
+	(*ConsumeHardResetResponse)(nil),      // 53: steward.identity.v1.ConsumeHardResetResponse
+	(*RevokeSessionRequest)(nil),          // 54: steward.identity.v1.RevokeSessionRequest
+	(*RevokeSessionResponse)(nil),         // 55: steward.identity.v1.RevokeSessionResponse
+	(*RevokeUserSessionsRequest)(nil),     // 56: steward.identity.v1.RevokeUserSessionsRequest
+	(*RevokeUserSessionsResponse)(nil),    // 57: steward.identity.v1.RevokeUserSessionsResponse
+	(*ListUserSessionsRequest)(nil),       // 58: steward.identity.v1.ListUserSessionsRequest
+	(*ListUserSessionsResponse)(nil),      // 59: steward.identity.v1.ListUserSessionsResponse
+	(*GrantPermissionRequest)(nil),        // 60: steward.identity.v1.GrantPermissionRequest
+	(*GrantPermissionResponse)(nil),       // 61: steward.identity.v1.GrantPermissionResponse
+	(*RevokePermissionRequest)(nil),       // 62: steward.identity.v1.RevokePermissionRequest
+	(*RevokePermissionResponse)(nil),      // 63: steward.identity.v1.RevokePermissionResponse
+	(*BreakGlassRevealRequest)(nil),       // 64: steward.identity.v1.BreakGlassRevealRequest
+	(*BreakGlassRevealResponse)(nil),      // 65: steward.identity.v1.BreakGlassRevealResponse
+	(*ActiveBreakGlassRequest)(nil),       // 66: steward.identity.v1.ActiveBreakGlassRequest
+	(*ActiveBreakGlassResponse)(nil),      // 67: steward.identity.v1.ActiveBreakGlassResponse
+	(*ActiveBreakGlassGrant)(nil),         // 68: steward.identity.v1.ActiveBreakGlassGrant
+	(*CreateLocalUserRequest)(nil),        // 69: steward.identity.v1.CreateLocalUserRequest
+	(*CreateLocalUserResponse)(nil),       // 70: steward.identity.v1.CreateLocalUserResponse
+	(*ResetUserPasswordRequest)(nil),      // 71: steward.identity.v1.ResetUserPasswordRequest
+	(*ResetUserPasswordResponse)(nil),     // 72: steward.identity.v1.ResetUserPasswordResponse
+	(*UpdateUserProfileRequest)(nil),      // 73: steward.identity.v1.UpdateUserProfileRequest
+	(*UpdateUserProfileResponse)(nil),     // 74: steward.identity.v1.UpdateUserProfileResponse
+	(*CompleteOnboardingRequest)(nil),     // 75: steward.identity.v1.CompleteOnboardingRequest
+	(*CompleteOnboardingResponse)(nil),    // 76: steward.identity.v1.CompleteOnboardingResponse
+	(*UpdateMyProfileRequest)(nil),        // 77: steward.identity.v1.UpdateMyProfileRequest
+	(*UpdateMyProfileResponse)(nil),       // 78: steward.identity.v1.UpdateMyProfileResponse
+	(*AdminListUserFactorsRequest)(nil),   // 79: steward.identity.v1.AdminListUserFactorsRequest
+	(*AdminListUserFactorsResponse)(nil),  // 80: steward.identity.v1.AdminListUserFactorsResponse
+	(*AdminRemoveUserFactorRequest)(nil),  // 81: steward.identity.v1.AdminRemoveUserFactorRequest
+	(*AdminRemoveUserFactorResponse)(nil), // 82: steward.identity.v1.AdminRemoveUserFactorResponse
+	(*AdminRenameUserFactorRequest)(nil),  // 83: steward.identity.v1.AdminRenameUserFactorRequest
+	(*AdminRenameUserFactorResponse)(nil), // 84: steward.identity.v1.AdminRenameUserFactorResponse
+	(*UpdateUserPreferencesRequest)(nil),  // 85: steward.identity.v1.UpdateUserPreferencesRequest
+	(*UpdateUserPreferencesResponse)(nil), // 86: steward.identity.v1.UpdateUserPreferencesResponse
+	nil,                                   // 87: steward.identity.v1.CreateGroupRequest.MetadataEntry
+	(*User)(nil),                          // 88: steward.identity.v1.User
+	(*UserDeletionPreview)(nil),           // 89: steward.identity.v1.UserDeletionPreview
+	(*AccountMergePreview)(nil),           // 90: steward.identity.v1.AccountMergePreview
+	(MergeStatus)(0),                      // 91: steward.identity.v1.MergeStatus
+	(*MergeCounts)(nil),                   // 92: steward.identity.v1.MergeCounts
+	(*MergeStepResult)(nil),               // 93: steward.identity.v1.MergeStepResult
+	(*Group)(nil),                         // 94: steward.identity.v1.Group
+	(OverrideEffect)(0),                   // 95: steward.identity.v1.OverrideEffect
+	(*HardResetRequest)(nil),              // 96: steward.identity.v1.HardResetRequest
+	(*Session)(nil),                       // 97: steward.identity.v1.Session
+	(*UserFactor)(nil),                    // 98: steward.identity.v1.UserFactor
 }
 var file_steward_identity_v1_admin_proto_depIdxs = []int32{
-	84, // 0: steward.identity.v1.EnableUserResponse.user:type_name -> steward.identity.v1.User
-	84, // 1: steward.identity.v1.DisableUserResponse.user:type_name -> steward.identity.v1.User
-	85, // 2: steward.identity.v1.PreviewUserDeletionResponse.preview:type_name -> steward.identity.v1.UserDeletionPreview
-	84, // 3: steward.identity.v1.DeleteUserResponse.user:type_name -> steward.identity.v1.User
-	86, // 4: steward.identity.v1.PreviewAccountMergeResponse.preview:type_name -> steward.identity.v1.AccountMergePreview
-	87, // 5: steward.identity.v1.MergeAccountsResponse.status:type_name -> steward.identity.v1.MergeStatus
-	88, // 6: steward.identity.v1.MergeAccountsResponse.counts:type_name -> steward.identity.v1.MergeCounts
-	89, // 7: steward.identity.v1.MergeAccountsResponse.steps:type_name -> steward.identity.v1.MergeStepResult
-	84, // 8: steward.identity.v1.GrantRoleResponse.user:type_name -> steward.identity.v1.User
-	84, // 9: steward.identity.v1.RevokeRoleResponse.user:type_name -> steward.identity.v1.User
-	83, // 10: steward.identity.v1.CreateGroupRequest.metadata:type_name -> steward.identity.v1.CreateGroupRequest.MetadataEntry
-	90, // 11: steward.identity.v1.CreateGroupResponse.group:type_name -> steward.identity.v1.Group
-	90, // 12: steward.identity.v1.RenameGroupResponse.group:type_name -> steward.identity.v1.Group
-	84, // 13: steward.identity.v1.GrantGroupManagerResponse.user:type_name -> steward.identity.v1.User
-	84, // 14: steward.identity.v1.RevokeGroupManagerResponse.user:type_name -> steward.identity.v1.User
-	90, // 15: steward.identity.v1.SetGroupParentResponse.group:type_name -> steward.identity.v1.Group
-	84, // 16: steward.identity.v1.BootstrapInitialAdminResponse.user:type_name -> steward.identity.v1.User
-	91, // 17: steward.identity.v1.SetUserPolicyOverrideRequest.effect:type_name -> steward.identity.v1.OverrideEffect
-	84, // 18: steward.identity.v1.SetUserPolicyOverrideResponse.user:type_name -> steward.identity.v1.User
-	84, // 19: steward.identity.v1.TransferRootResponse.user:type_name -> steward.identity.v1.User
-	92, // 20: steward.identity.v1.RequestHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
-	92, // 21: steward.identity.v1.ApproveHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
-	92, // 22: steward.identity.v1.CancelHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
-	92, // 23: steward.identity.v1.ListHardResetRequestsResponse.requests:type_name -> steward.identity.v1.HardResetRequest
-	92, // 24: steward.identity.v1.ConsumeHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
-	93, // 25: steward.identity.v1.ListUserSessionsResponse.sessions:type_name -> steward.identity.v1.Session
-	84, // 26: steward.identity.v1.GrantPermissionResponse.user:type_name -> steward.identity.v1.User
-	84, // 27: steward.identity.v1.RevokePermissionResponse.user:type_name -> steward.identity.v1.User
-	64, // 28: steward.identity.v1.ActiveBreakGlassResponse.grants:type_name -> steward.identity.v1.ActiveBreakGlassGrant
-	84, // 29: steward.identity.v1.CreateLocalUserResponse.user:type_name -> steward.identity.v1.User
-	84, // 30: steward.identity.v1.UpdateUserProfileResponse.user:type_name -> steward.identity.v1.User
-	84, // 31: steward.identity.v1.CompleteOnboardingResponse.user:type_name -> steward.identity.v1.User
-	84, // 32: steward.identity.v1.UpdateMyProfileResponse.user:type_name -> steward.identity.v1.User
-	94, // 33: steward.identity.v1.AdminListUserFactorsResponse.factors:type_name -> steward.identity.v1.UserFactor
-	84, // 34: steward.identity.v1.UpdateUserPreferencesResponse.user:type_name -> steward.identity.v1.User
-	0,  // 35: steward.identity.v1.IdentityAdminService.EnableUser:input_type -> steward.identity.v1.EnableUserRequest
-	2,  // 36: steward.identity.v1.IdentityAdminService.DisableUser:input_type -> steward.identity.v1.DisableUserRequest
-	4,  // 37: steward.identity.v1.IdentityAdminService.PreviewUserDeletion:input_type -> steward.identity.v1.PreviewUserDeletionRequest
-	6,  // 38: steward.identity.v1.IdentityAdminService.DeleteUser:input_type -> steward.identity.v1.DeleteUserRequest
-	8,  // 39: steward.identity.v1.IdentityAdminService.PreviewAccountMerge:input_type -> steward.identity.v1.PreviewAccountMergeRequest
-	10, // 40: steward.identity.v1.IdentityAdminService.MergeAccounts:input_type -> steward.identity.v1.MergeAccountsRequest
-	12, // 41: steward.identity.v1.IdentityAdminService.GrantRole:input_type -> steward.identity.v1.GrantRoleRequest
-	14, // 42: steward.identity.v1.IdentityAdminService.RevokeRole:input_type -> steward.identity.v1.RevokeRoleRequest
-	16, // 43: steward.identity.v1.IdentityAdminService.CreateGroup:input_type -> steward.identity.v1.CreateGroupRequest
-	18, // 44: steward.identity.v1.IdentityAdminService.RenameGroup:input_type -> steward.identity.v1.RenameGroupRequest
-	20, // 45: steward.identity.v1.IdentityAdminService.DeleteGroup:input_type -> steward.identity.v1.DeleteGroupRequest
-	22, // 46: steward.identity.v1.IdentityAdminService.AddUserToGroup:input_type -> steward.identity.v1.AddUserToGroupRequest
-	24, // 47: steward.identity.v1.IdentityAdminService.RemoveUserFromGroup:input_type -> steward.identity.v1.RemoveUserFromGroupRequest
-	26, // 48: steward.identity.v1.IdentityAdminService.GrantGroupManager:input_type -> steward.identity.v1.GrantGroupManagerRequest
-	28, // 49: steward.identity.v1.IdentityAdminService.RevokeGroupManager:input_type -> steward.identity.v1.RevokeGroupManagerRequest
-	30, // 50: steward.identity.v1.IdentityAdminService.SetGroupParent:input_type -> steward.identity.v1.SetGroupParentRequest
-	32, // 51: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:input_type -> steward.identity.v1.BootstrapInitialAdminRequest
-	34, // 52: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:input_type -> steward.identity.v1.SetUserPolicyOverrideRequest
-	36, // 53: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:input_type -> steward.identity.v1.RequestStepUpOtpRequest
-	38, // 54: steward.identity.v1.IdentityAdminService.TransferRoot:input_type -> steward.identity.v1.TransferRootRequest
-	40, // 55: steward.identity.v1.IdentityAdminService.RequestHardReset:input_type -> steward.identity.v1.RequestHardResetRequest
-	42, // 56: steward.identity.v1.IdentityAdminService.ApproveHardReset:input_type -> steward.identity.v1.ApproveHardResetRequest
-	44, // 57: steward.identity.v1.IdentityAdminService.CancelHardReset:input_type -> steward.identity.v1.CancelHardResetRequest
-	46, // 58: steward.identity.v1.IdentityAdminService.ListHardResetRequests:input_type -> steward.identity.v1.ListHardResetRequestsRequest
-	48, // 59: steward.identity.v1.IdentityAdminService.ConsumeHardReset:input_type -> steward.identity.v1.ConsumeHardResetRequest
-	50, // 60: steward.identity.v1.IdentityAdminService.RevokeSession:input_type -> steward.identity.v1.RevokeSessionRequest
-	52, // 61: steward.identity.v1.IdentityAdminService.RevokeUserSessions:input_type -> steward.identity.v1.RevokeUserSessionsRequest
-	54, // 62: steward.identity.v1.IdentityAdminService.ListUserSessions:input_type -> steward.identity.v1.ListUserSessionsRequest
-	56, // 63: steward.identity.v1.IdentityAdminService.GrantPermission:input_type -> steward.identity.v1.GrantPermissionRequest
-	58, // 64: steward.identity.v1.IdentityAdminService.RevokePermission:input_type -> steward.identity.v1.RevokePermissionRequest
-	60, // 65: steward.identity.v1.IdentityAdminService.BreakGlassReveal:input_type -> steward.identity.v1.BreakGlassRevealRequest
-	62, // 66: steward.identity.v1.IdentityAdminService.ActiveBreakGlass:input_type -> steward.identity.v1.ActiveBreakGlassRequest
-	65, // 67: steward.identity.v1.IdentityAdminService.CreateLocalUser:input_type -> steward.identity.v1.CreateLocalUserRequest
-	67, // 68: steward.identity.v1.IdentityAdminService.ResetUserPassword:input_type -> steward.identity.v1.ResetUserPasswordRequest
-	69, // 69: steward.identity.v1.IdentityAdminService.UpdateUserProfile:input_type -> steward.identity.v1.UpdateUserProfileRequest
-	71, // 70: steward.identity.v1.IdentityAdminService.CompleteOnboarding:input_type -> steward.identity.v1.CompleteOnboardingRequest
-	73, // 71: steward.identity.v1.IdentityAdminService.UpdateMyProfile:input_type -> steward.identity.v1.UpdateMyProfileRequest
-	75, // 72: steward.identity.v1.IdentityAdminService.AdminListUserFactors:input_type -> steward.identity.v1.AdminListUserFactorsRequest
-	77, // 73: steward.identity.v1.IdentityAdminService.AdminRemoveUserFactor:input_type -> steward.identity.v1.AdminRemoveUserFactorRequest
-	79, // 74: steward.identity.v1.IdentityAdminService.AdminRenameUserFactor:input_type -> steward.identity.v1.AdminRenameUserFactorRequest
-	81, // 75: steward.identity.v1.IdentityAdminService.UpdateUserPreferences:input_type -> steward.identity.v1.UpdateUserPreferencesRequest
-	1,  // 76: steward.identity.v1.IdentityAdminService.EnableUser:output_type -> steward.identity.v1.EnableUserResponse
-	3,  // 77: steward.identity.v1.IdentityAdminService.DisableUser:output_type -> steward.identity.v1.DisableUserResponse
-	5,  // 78: steward.identity.v1.IdentityAdminService.PreviewUserDeletion:output_type -> steward.identity.v1.PreviewUserDeletionResponse
-	7,  // 79: steward.identity.v1.IdentityAdminService.DeleteUser:output_type -> steward.identity.v1.DeleteUserResponse
-	9,  // 80: steward.identity.v1.IdentityAdminService.PreviewAccountMerge:output_type -> steward.identity.v1.PreviewAccountMergeResponse
-	11, // 81: steward.identity.v1.IdentityAdminService.MergeAccounts:output_type -> steward.identity.v1.MergeAccountsResponse
-	13, // 82: steward.identity.v1.IdentityAdminService.GrantRole:output_type -> steward.identity.v1.GrantRoleResponse
-	15, // 83: steward.identity.v1.IdentityAdminService.RevokeRole:output_type -> steward.identity.v1.RevokeRoleResponse
-	17, // 84: steward.identity.v1.IdentityAdminService.CreateGroup:output_type -> steward.identity.v1.CreateGroupResponse
-	19, // 85: steward.identity.v1.IdentityAdminService.RenameGroup:output_type -> steward.identity.v1.RenameGroupResponse
-	21, // 86: steward.identity.v1.IdentityAdminService.DeleteGroup:output_type -> steward.identity.v1.DeleteGroupResponse
-	23, // 87: steward.identity.v1.IdentityAdminService.AddUserToGroup:output_type -> steward.identity.v1.AddUserToGroupResponse
-	25, // 88: steward.identity.v1.IdentityAdminService.RemoveUserFromGroup:output_type -> steward.identity.v1.RemoveUserFromGroupResponse
-	27, // 89: steward.identity.v1.IdentityAdminService.GrantGroupManager:output_type -> steward.identity.v1.GrantGroupManagerResponse
-	29, // 90: steward.identity.v1.IdentityAdminService.RevokeGroupManager:output_type -> steward.identity.v1.RevokeGroupManagerResponse
-	31, // 91: steward.identity.v1.IdentityAdminService.SetGroupParent:output_type -> steward.identity.v1.SetGroupParentResponse
-	33, // 92: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:output_type -> steward.identity.v1.BootstrapInitialAdminResponse
-	35, // 93: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:output_type -> steward.identity.v1.SetUserPolicyOverrideResponse
-	37, // 94: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:output_type -> steward.identity.v1.RequestStepUpOtpResponse
-	39, // 95: steward.identity.v1.IdentityAdminService.TransferRoot:output_type -> steward.identity.v1.TransferRootResponse
-	41, // 96: steward.identity.v1.IdentityAdminService.RequestHardReset:output_type -> steward.identity.v1.RequestHardResetResponse
-	43, // 97: steward.identity.v1.IdentityAdminService.ApproveHardReset:output_type -> steward.identity.v1.ApproveHardResetResponse
-	45, // 98: steward.identity.v1.IdentityAdminService.CancelHardReset:output_type -> steward.identity.v1.CancelHardResetResponse
-	47, // 99: steward.identity.v1.IdentityAdminService.ListHardResetRequests:output_type -> steward.identity.v1.ListHardResetRequestsResponse
-	49, // 100: steward.identity.v1.IdentityAdminService.ConsumeHardReset:output_type -> steward.identity.v1.ConsumeHardResetResponse
-	51, // 101: steward.identity.v1.IdentityAdminService.RevokeSession:output_type -> steward.identity.v1.RevokeSessionResponse
-	53, // 102: steward.identity.v1.IdentityAdminService.RevokeUserSessions:output_type -> steward.identity.v1.RevokeUserSessionsResponse
-	55, // 103: steward.identity.v1.IdentityAdminService.ListUserSessions:output_type -> steward.identity.v1.ListUserSessionsResponse
-	57, // 104: steward.identity.v1.IdentityAdminService.GrantPermission:output_type -> steward.identity.v1.GrantPermissionResponse
-	59, // 105: steward.identity.v1.IdentityAdminService.RevokePermission:output_type -> steward.identity.v1.RevokePermissionResponse
-	61, // 106: steward.identity.v1.IdentityAdminService.BreakGlassReveal:output_type -> steward.identity.v1.BreakGlassRevealResponse
-	63, // 107: steward.identity.v1.IdentityAdminService.ActiveBreakGlass:output_type -> steward.identity.v1.ActiveBreakGlassResponse
-	66, // 108: steward.identity.v1.IdentityAdminService.CreateLocalUser:output_type -> steward.identity.v1.CreateLocalUserResponse
-	68, // 109: steward.identity.v1.IdentityAdminService.ResetUserPassword:output_type -> steward.identity.v1.ResetUserPasswordResponse
-	70, // 110: steward.identity.v1.IdentityAdminService.UpdateUserProfile:output_type -> steward.identity.v1.UpdateUserProfileResponse
-	72, // 111: steward.identity.v1.IdentityAdminService.CompleteOnboarding:output_type -> steward.identity.v1.CompleteOnboardingResponse
-	74, // 112: steward.identity.v1.IdentityAdminService.UpdateMyProfile:output_type -> steward.identity.v1.UpdateMyProfileResponse
-	76, // 113: steward.identity.v1.IdentityAdminService.AdminListUserFactors:output_type -> steward.identity.v1.AdminListUserFactorsResponse
-	78, // 114: steward.identity.v1.IdentityAdminService.AdminRemoveUserFactor:output_type -> steward.identity.v1.AdminRemoveUserFactorResponse
-	80, // 115: steward.identity.v1.IdentityAdminService.AdminRenameUserFactor:output_type -> steward.identity.v1.AdminRenameUserFactorResponse
-	82, // 116: steward.identity.v1.IdentityAdminService.UpdateUserPreferences:output_type -> steward.identity.v1.UpdateUserPreferencesResponse
-	76, // [76:117] is the sub-list for method output_type
-	35, // [35:76] is the sub-list for method input_type
-	35, // [35:35] is the sub-list for extension type_name
-	35, // [35:35] is the sub-list for extension extendee
-	0,  // [0:35] is the sub-list for field type_name
+	88, // 0: steward.identity.v1.EnableUserResponse.user:type_name -> steward.identity.v1.User
+	88, // 1: steward.identity.v1.DisableUserResponse.user:type_name -> steward.identity.v1.User
+	89, // 2: steward.identity.v1.PreviewUserDeletionResponse.preview:type_name -> steward.identity.v1.UserDeletionPreview
+	88, // 3: steward.identity.v1.DeleteUserResponse.user:type_name -> steward.identity.v1.User
+	90, // 4: steward.identity.v1.PreviewAccountMergeResponse.preview:type_name -> steward.identity.v1.AccountMergePreview
+	91, // 5: steward.identity.v1.MergeAccountsResponse.status:type_name -> steward.identity.v1.MergeStatus
+	92, // 6: steward.identity.v1.MergeAccountsResponse.counts:type_name -> steward.identity.v1.MergeCounts
+	93, // 7: steward.identity.v1.MergeAccountsResponse.steps:type_name -> steward.identity.v1.MergeStepResult
+	88, // 8: steward.identity.v1.GrantRoleResponse.user:type_name -> steward.identity.v1.User
+	88, // 9: steward.identity.v1.RevokeRoleResponse.user:type_name -> steward.identity.v1.User
+	87, // 10: steward.identity.v1.CreateGroupRequest.metadata:type_name -> steward.identity.v1.CreateGroupRequest.MetadataEntry
+	94, // 11: steward.identity.v1.CreateGroupResponse.group:type_name -> steward.identity.v1.Group
+	94, // 12: steward.identity.v1.RenameGroupResponse.group:type_name -> steward.identity.v1.Group
+	88, // 13: steward.identity.v1.GrantGroupManagerResponse.user:type_name -> steward.identity.v1.User
+	88, // 14: steward.identity.v1.RevokeGroupManagerResponse.user:type_name -> steward.identity.v1.User
+	94, // 15: steward.identity.v1.SetGroupParentResponse.group:type_name -> steward.identity.v1.Group
+	88, // 16: steward.identity.v1.BootstrapInitialAdminResponse.user:type_name -> steward.identity.v1.User
+	95, // 17: steward.identity.v1.SetUserPolicyOverrideRequest.effect:type_name -> steward.identity.v1.OverrideEffect
+	88, // 18: steward.identity.v1.SetUserPolicyOverrideResponse.user:type_name -> steward.identity.v1.User
+	88, // 19: steward.identity.v1.GrantRootResponse.user:type_name -> steward.identity.v1.User
+	88, // 20: steward.identity.v1.RevokeRootResponse.user:type_name -> steward.identity.v1.User
+	88, // 21: steward.identity.v1.TransferRootResponse.user:type_name -> steward.identity.v1.User
+	96, // 22: steward.identity.v1.RequestHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
+	96, // 23: steward.identity.v1.ApproveHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
+	96, // 24: steward.identity.v1.CancelHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
+	96, // 25: steward.identity.v1.ListHardResetRequestsResponse.requests:type_name -> steward.identity.v1.HardResetRequest
+	96, // 26: steward.identity.v1.ConsumeHardResetResponse.request:type_name -> steward.identity.v1.HardResetRequest
+	97, // 27: steward.identity.v1.ListUserSessionsResponse.sessions:type_name -> steward.identity.v1.Session
+	88, // 28: steward.identity.v1.GrantPermissionResponse.user:type_name -> steward.identity.v1.User
+	88, // 29: steward.identity.v1.RevokePermissionResponse.user:type_name -> steward.identity.v1.User
+	68, // 30: steward.identity.v1.ActiveBreakGlassResponse.grants:type_name -> steward.identity.v1.ActiveBreakGlassGrant
+	88, // 31: steward.identity.v1.CreateLocalUserResponse.user:type_name -> steward.identity.v1.User
+	88, // 32: steward.identity.v1.UpdateUserProfileResponse.user:type_name -> steward.identity.v1.User
+	88, // 33: steward.identity.v1.CompleteOnboardingResponse.user:type_name -> steward.identity.v1.User
+	88, // 34: steward.identity.v1.UpdateMyProfileResponse.user:type_name -> steward.identity.v1.User
+	98, // 35: steward.identity.v1.AdminListUserFactorsResponse.factors:type_name -> steward.identity.v1.UserFactor
+	88, // 36: steward.identity.v1.UpdateUserPreferencesResponse.user:type_name -> steward.identity.v1.User
+	0,  // 37: steward.identity.v1.IdentityAdminService.EnableUser:input_type -> steward.identity.v1.EnableUserRequest
+	2,  // 38: steward.identity.v1.IdentityAdminService.DisableUser:input_type -> steward.identity.v1.DisableUserRequest
+	4,  // 39: steward.identity.v1.IdentityAdminService.PreviewUserDeletion:input_type -> steward.identity.v1.PreviewUserDeletionRequest
+	6,  // 40: steward.identity.v1.IdentityAdminService.DeleteUser:input_type -> steward.identity.v1.DeleteUserRequest
+	8,  // 41: steward.identity.v1.IdentityAdminService.PreviewAccountMerge:input_type -> steward.identity.v1.PreviewAccountMergeRequest
+	10, // 42: steward.identity.v1.IdentityAdminService.MergeAccounts:input_type -> steward.identity.v1.MergeAccountsRequest
+	12, // 43: steward.identity.v1.IdentityAdminService.GrantRole:input_type -> steward.identity.v1.GrantRoleRequest
+	14, // 44: steward.identity.v1.IdentityAdminService.RevokeRole:input_type -> steward.identity.v1.RevokeRoleRequest
+	16, // 45: steward.identity.v1.IdentityAdminService.CreateGroup:input_type -> steward.identity.v1.CreateGroupRequest
+	18, // 46: steward.identity.v1.IdentityAdminService.RenameGroup:input_type -> steward.identity.v1.RenameGroupRequest
+	20, // 47: steward.identity.v1.IdentityAdminService.DeleteGroup:input_type -> steward.identity.v1.DeleteGroupRequest
+	22, // 48: steward.identity.v1.IdentityAdminService.AddUserToGroup:input_type -> steward.identity.v1.AddUserToGroupRequest
+	24, // 49: steward.identity.v1.IdentityAdminService.RemoveUserFromGroup:input_type -> steward.identity.v1.RemoveUserFromGroupRequest
+	26, // 50: steward.identity.v1.IdentityAdminService.GrantGroupManager:input_type -> steward.identity.v1.GrantGroupManagerRequest
+	28, // 51: steward.identity.v1.IdentityAdminService.RevokeGroupManager:input_type -> steward.identity.v1.RevokeGroupManagerRequest
+	30, // 52: steward.identity.v1.IdentityAdminService.SetGroupParent:input_type -> steward.identity.v1.SetGroupParentRequest
+	32, // 53: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:input_type -> steward.identity.v1.BootstrapInitialAdminRequest
+	34, // 54: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:input_type -> steward.identity.v1.SetUserPolicyOverrideRequest
+	36, // 55: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:input_type -> steward.identity.v1.RequestStepUpOtpRequest
+	42, // 56: steward.identity.v1.IdentityAdminService.TransferRoot:input_type -> steward.identity.v1.TransferRootRequest
+	38, // 57: steward.identity.v1.IdentityAdminService.GrantRoot:input_type -> steward.identity.v1.GrantRootRequest
+	40, // 58: steward.identity.v1.IdentityAdminService.RevokeRoot:input_type -> steward.identity.v1.RevokeRootRequest
+	44, // 59: steward.identity.v1.IdentityAdminService.RequestHardReset:input_type -> steward.identity.v1.RequestHardResetRequest
+	46, // 60: steward.identity.v1.IdentityAdminService.ApproveHardReset:input_type -> steward.identity.v1.ApproveHardResetRequest
+	48, // 61: steward.identity.v1.IdentityAdminService.CancelHardReset:input_type -> steward.identity.v1.CancelHardResetRequest
+	50, // 62: steward.identity.v1.IdentityAdminService.ListHardResetRequests:input_type -> steward.identity.v1.ListHardResetRequestsRequest
+	52, // 63: steward.identity.v1.IdentityAdminService.ConsumeHardReset:input_type -> steward.identity.v1.ConsumeHardResetRequest
+	54, // 64: steward.identity.v1.IdentityAdminService.RevokeSession:input_type -> steward.identity.v1.RevokeSessionRequest
+	56, // 65: steward.identity.v1.IdentityAdminService.RevokeUserSessions:input_type -> steward.identity.v1.RevokeUserSessionsRequest
+	58, // 66: steward.identity.v1.IdentityAdminService.ListUserSessions:input_type -> steward.identity.v1.ListUserSessionsRequest
+	60, // 67: steward.identity.v1.IdentityAdminService.GrantPermission:input_type -> steward.identity.v1.GrantPermissionRequest
+	62, // 68: steward.identity.v1.IdentityAdminService.RevokePermission:input_type -> steward.identity.v1.RevokePermissionRequest
+	64, // 69: steward.identity.v1.IdentityAdminService.BreakGlassReveal:input_type -> steward.identity.v1.BreakGlassRevealRequest
+	66, // 70: steward.identity.v1.IdentityAdminService.ActiveBreakGlass:input_type -> steward.identity.v1.ActiveBreakGlassRequest
+	69, // 71: steward.identity.v1.IdentityAdminService.CreateLocalUser:input_type -> steward.identity.v1.CreateLocalUserRequest
+	71, // 72: steward.identity.v1.IdentityAdminService.ResetUserPassword:input_type -> steward.identity.v1.ResetUserPasswordRequest
+	73, // 73: steward.identity.v1.IdentityAdminService.UpdateUserProfile:input_type -> steward.identity.v1.UpdateUserProfileRequest
+	75, // 74: steward.identity.v1.IdentityAdminService.CompleteOnboarding:input_type -> steward.identity.v1.CompleteOnboardingRequest
+	77, // 75: steward.identity.v1.IdentityAdminService.UpdateMyProfile:input_type -> steward.identity.v1.UpdateMyProfileRequest
+	79, // 76: steward.identity.v1.IdentityAdminService.AdminListUserFactors:input_type -> steward.identity.v1.AdminListUserFactorsRequest
+	81, // 77: steward.identity.v1.IdentityAdminService.AdminRemoveUserFactor:input_type -> steward.identity.v1.AdminRemoveUserFactorRequest
+	83, // 78: steward.identity.v1.IdentityAdminService.AdminRenameUserFactor:input_type -> steward.identity.v1.AdminRenameUserFactorRequest
+	85, // 79: steward.identity.v1.IdentityAdminService.UpdateUserPreferences:input_type -> steward.identity.v1.UpdateUserPreferencesRequest
+	1,  // 80: steward.identity.v1.IdentityAdminService.EnableUser:output_type -> steward.identity.v1.EnableUserResponse
+	3,  // 81: steward.identity.v1.IdentityAdminService.DisableUser:output_type -> steward.identity.v1.DisableUserResponse
+	5,  // 82: steward.identity.v1.IdentityAdminService.PreviewUserDeletion:output_type -> steward.identity.v1.PreviewUserDeletionResponse
+	7,  // 83: steward.identity.v1.IdentityAdminService.DeleteUser:output_type -> steward.identity.v1.DeleteUserResponse
+	9,  // 84: steward.identity.v1.IdentityAdminService.PreviewAccountMerge:output_type -> steward.identity.v1.PreviewAccountMergeResponse
+	11, // 85: steward.identity.v1.IdentityAdminService.MergeAccounts:output_type -> steward.identity.v1.MergeAccountsResponse
+	13, // 86: steward.identity.v1.IdentityAdminService.GrantRole:output_type -> steward.identity.v1.GrantRoleResponse
+	15, // 87: steward.identity.v1.IdentityAdminService.RevokeRole:output_type -> steward.identity.v1.RevokeRoleResponse
+	17, // 88: steward.identity.v1.IdentityAdminService.CreateGroup:output_type -> steward.identity.v1.CreateGroupResponse
+	19, // 89: steward.identity.v1.IdentityAdminService.RenameGroup:output_type -> steward.identity.v1.RenameGroupResponse
+	21, // 90: steward.identity.v1.IdentityAdminService.DeleteGroup:output_type -> steward.identity.v1.DeleteGroupResponse
+	23, // 91: steward.identity.v1.IdentityAdminService.AddUserToGroup:output_type -> steward.identity.v1.AddUserToGroupResponse
+	25, // 92: steward.identity.v1.IdentityAdminService.RemoveUserFromGroup:output_type -> steward.identity.v1.RemoveUserFromGroupResponse
+	27, // 93: steward.identity.v1.IdentityAdminService.GrantGroupManager:output_type -> steward.identity.v1.GrantGroupManagerResponse
+	29, // 94: steward.identity.v1.IdentityAdminService.RevokeGroupManager:output_type -> steward.identity.v1.RevokeGroupManagerResponse
+	31, // 95: steward.identity.v1.IdentityAdminService.SetGroupParent:output_type -> steward.identity.v1.SetGroupParentResponse
+	33, // 96: steward.identity.v1.IdentityAdminService.BootstrapInitialAdmin:output_type -> steward.identity.v1.BootstrapInitialAdminResponse
+	35, // 97: steward.identity.v1.IdentityAdminService.SetUserPolicyOverride:output_type -> steward.identity.v1.SetUserPolicyOverrideResponse
+	37, // 98: steward.identity.v1.IdentityAdminService.RequestStepUpOtp:output_type -> steward.identity.v1.RequestStepUpOtpResponse
+	43, // 99: steward.identity.v1.IdentityAdminService.TransferRoot:output_type -> steward.identity.v1.TransferRootResponse
+	39, // 100: steward.identity.v1.IdentityAdminService.GrantRoot:output_type -> steward.identity.v1.GrantRootResponse
+	41, // 101: steward.identity.v1.IdentityAdminService.RevokeRoot:output_type -> steward.identity.v1.RevokeRootResponse
+	45, // 102: steward.identity.v1.IdentityAdminService.RequestHardReset:output_type -> steward.identity.v1.RequestHardResetResponse
+	47, // 103: steward.identity.v1.IdentityAdminService.ApproveHardReset:output_type -> steward.identity.v1.ApproveHardResetResponse
+	49, // 104: steward.identity.v1.IdentityAdminService.CancelHardReset:output_type -> steward.identity.v1.CancelHardResetResponse
+	51, // 105: steward.identity.v1.IdentityAdminService.ListHardResetRequests:output_type -> steward.identity.v1.ListHardResetRequestsResponse
+	53, // 106: steward.identity.v1.IdentityAdminService.ConsumeHardReset:output_type -> steward.identity.v1.ConsumeHardResetResponse
+	55, // 107: steward.identity.v1.IdentityAdminService.RevokeSession:output_type -> steward.identity.v1.RevokeSessionResponse
+	57, // 108: steward.identity.v1.IdentityAdminService.RevokeUserSessions:output_type -> steward.identity.v1.RevokeUserSessionsResponse
+	59, // 109: steward.identity.v1.IdentityAdminService.ListUserSessions:output_type -> steward.identity.v1.ListUserSessionsResponse
+	61, // 110: steward.identity.v1.IdentityAdminService.GrantPermission:output_type -> steward.identity.v1.GrantPermissionResponse
+	63, // 111: steward.identity.v1.IdentityAdminService.RevokePermission:output_type -> steward.identity.v1.RevokePermissionResponse
+	65, // 112: steward.identity.v1.IdentityAdminService.BreakGlassReveal:output_type -> steward.identity.v1.BreakGlassRevealResponse
+	67, // 113: steward.identity.v1.IdentityAdminService.ActiveBreakGlass:output_type -> steward.identity.v1.ActiveBreakGlassResponse
+	70, // 114: steward.identity.v1.IdentityAdminService.CreateLocalUser:output_type -> steward.identity.v1.CreateLocalUserResponse
+	72, // 115: steward.identity.v1.IdentityAdminService.ResetUserPassword:output_type -> steward.identity.v1.ResetUserPasswordResponse
+	74, // 116: steward.identity.v1.IdentityAdminService.UpdateUserProfile:output_type -> steward.identity.v1.UpdateUserProfileResponse
+	76, // 117: steward.identity.v1.IdentityAdminService.CompleteOnboarding:output_type -> steward.identity.v1.CompleteOnboardingResponse
+	78, // 118: steward.identity.v1.IdentityAdminService.UpdateMyProfile:output_type -> steward.identity.v1.UpdateMyProfileResponse
+	80, // 119: steward.identity.v1.IdentityAdminService.AdminListUserFactors:output_type -> steward.identity.v1.AdminListUserFactorsResponse
+	82, // 120: steward.identity.v1.IdentityAdminService.AdminRemoveUserFactor:output_type -> steward.identity.v1.AdminRemoveUserFactorResponse
+	84, // 121: steward.identity.v1.IdentityAdminService.AdminRenameUserFactor:output_type -> steward.identity.v1.AdminRenameUserFactorResponse
+	86, // 122: steward.identity.v1.IdentityAdminService.UpdateUserPreferences:output_type -> steward.identity.v1.UpdateUserPreferencesResponse
+	80, // [80:123] is the sub-list for method output_type
+	37, // [37:80] is the sub-list for method input_type
+	37, // [37:37] is the sub-list for extension type_name
+	37, // [37:37] is the sub-list for extension extendee
+	0,  // [0:37] is the sub-list for field type_name
 }
 
 func init() { file_steward_identity_v1_admin_proto_init() }
@@ -4621,16 +4842,16 @@ func file_steward_identity_v1_admin_proto_init() {
 		return
 	}
 	file_steward_identity_v1_types_proto_init()
-	file_steward_identity_v1_admin_proto_msgTypes[71].OneofWrappers = []any{}
-	file_steward_identity_v1_admin_proto_msgTypes[73].OneofWrappers = []any{}
-	file_steward_identity_v1_admin_proto_msgTypes[81].OneofWrappers = []any{}
+	file_steward_identity_v1_admin_proto_msgTypes[75].OneofWrappers = []any{}
+	file_steward_identity_v1_admin_proto_msgTypes[77].OneofWrappers = []any{}
+	file_steward_identity_v1_admin_proto_msgTypes[85].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_steward_identity_v1_admin_proto_rawDesc), len(file_steward_identity_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   84,
+			NumMessages:   88,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -62,7 +62,7 @@ caller. The audit event is `root.transferred` (actor: the old root, subject: the
 `from_user_id` in the payload). The root can't be disabled, deleted, merged away or stripped of
 site-admin; to retire the account, transfer root first. `BootstrapRoot` makes only the first.
 
-`GrantRoot` and `RevokeRoot` are removed.
+`GrantRoot` and `RevokeRoot` are deprecated stubs, kept so the proto stays wire-compatible. They change nothing and always answer `UNIMPLEMENTED`; `TransferRoot` is the only way to change the root.
 
 Migration `0002_single_root` keeps one root where an older database had several (the oldest
 site-admin grant, else the oldest account) and clears `is_root` on the rest, who stay site-admins.

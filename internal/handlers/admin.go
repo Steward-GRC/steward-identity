@@ -995,6 +995,18 @@ func (h *AdminHandler) TransferRoot(ctx context.Context, req *identityv1.Transfe
 	return &identityv1.TransferRootResponse{User: userToProto(u)}, nil
 }
 
+// GrantRoot is removed: there is exactly one root, changed only by
+// TransferRoot. It always returns Unimplemented so a caller still built against
+// the old shape gets a clear error. The proto keeps the RPC only for that.
+func (h *AdminHandler) GrantRoot(context.Context, *identityv1.GrantRootRequest) (*identityv1.GrantRootResponse, error) { //nolint:staticcheck // the removed RPC's own request/response types, kept only for this stub
+	return nil, status.Error(codes.Unimplemented, "GrantRoot is removed; use TransferRoot")
+}
+
+// RevokeRoot is removed, like GrantRoot: use TransferRoot.
+func (h *AdminHandler) RevokeRoot(context.Context, *identityv1.RevokeRootRequest) (*identityv1.RevokeRootResponse, error) { //nolint:staticcheck // the removed RPC's own request/response types, kept only for this stub
+	return nil, status.Error(codes.Unimplemented, "RevokeRoot is removed; use TransferRoot")
+}
+
 // authorizeRootChange runs the checks a change of root needs: a site-admin
 // caller, no act-as, a caller who is a user (the admin CLI has no actor and
 // can't transfer root), the root itself, then the step-up code.
