@@ -35,6 +35,7 @@ const (
 	IdentityReadService_ListUserGroups_FullMethodName             = "/steward.identity.v1.IdentityReadService/ListUserGroups"
 	IdentityReadService_ListUsersByEmail_FullMethodName           = "/steward.identity.v1.IdentityReadService/ListUsersByEmail"
 	IdentityReadService_ListGroups_FullMethodName                 = "/steward.identity.v1.IdentityReadService/ListGroups"
+	IdentityReadService_SearchGroups_FullMethodName               = "/steward.identity.v1.IdentityReadService/SearchGroups"
 	IdentityReadService_ListUsersByIdpGroups_FullMethodName       = "/steward.identity.v1.IdentityReadService/ListUsersByIdpGroups"
 	IdentityReadService_CountUsersByIdpGroups_FullMethodName      = "/steward.identity.v1.IdentityReadService/CountUsersByIdpGroups"
 	IdentityReadService_ListAllUsers_FullMethodName               = "/steward.identity.v1.IdentityReadService/ListAllUsers"
@@ -115,6 +116,12 @@ type IdentityReadServiceClient interface {
 	// ListGroups lists the groups under parent_id (empty for the roots),
 	// optionally with all their descendants, sorted by name, a page at a time.
 	ListGroups(ctx context.Context, in *ListGroupsRequest, opts ...grpc.CallOption) (*ListGroupsResponse, error)
+	// SearchGroups finds groups at any depth whose name contains the query,
+	// case-insensitively, sorted by name and capped at limit. The query is
+	// required, so the call can't enumerate the directory; a percent or
+	// underscore in it is text, not a pattern. Groups have no description, so
+	// the name is all that is matched. Who may ask is the caller's rule.
+	SearchGroups(ctx context.Context, in *SearchGroupsRequest, opts ...grpc.CallOption) (*SearchGroupsResponse, error)
 	// ListUsersByIdpGroups lists the users holding any of the named identity
 	// provider groups.
 	ListUsersByIdpGroups(ctx context.Context, in *ListUsersByIdpGroupsRequest, opts ...grpc.CallOption) (*ListUsersByIdpGroupsResponse, error)
@@ -352,6 +359,16 @@ func (c *identityReadServiceClient) ListGroups(ctx context.Context, in *ListGrou
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListGroupsResponse)
 	err := c.cc.Invoke(ctx, IdentityReadService_ListGroups_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *identityReadServiceClient) SearchGroups(ctx context.Context, in *SearchGroupsRequest, opts ...grpc.CallOption) (*SearchGroupsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SearchGroupsResponse)
+	err := c.cc.Invoke(ctx, IdentityReadService_SearchGroups_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -733,6 +750,12 @@ type IdentityReadServiceServer interface {
 	// ListGroups lists the groups under parent_id (empty for the roots),
 	// optionally with all their descendants, sorted by name, a page at a time.
 	ListGroups(context.Context, *ListGroupsRequest) (*ListGroupsResponse, error)
+	// SearchGroups finds groups at any depth whose name contains the query,
+	// case-insensitively, sorted by name and capped at limit. The query is
+	// required, so the call can't enumerate the directory; a percent or
+	// underscore in it is text, not a pattern. Groups have no description, so
+	// the name is all that is matched. Who may ask is the caller's rule.
+	SearchGroups(context.Context, *SearchGroupsRequest) (*SearchGroupsResponse, error)
 	// ListUsersByIdpGroups lists the users holding any of the named identity
 	// provider groups.
 	ListUsersByIdpGroups(context.Context, *ListUsersByIdpGroupsRequest) (*ListUsersByIdpGroupsResponse, error)
@@ -884,6 +907,9 @@ func (UnimplementedIdentityReadServiceServer) ListUsersByEmail(context.Context, 
 }
 func (UnimplementedIdentityReadServiceServer) ListGroups(context.Context, *ListGroupsRequest) (*ListGroupsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListGroups not implemented")
+}
+func (UnimplementedIdentityReadServiceServer) SearchGroups(context.Context, *SearchGroupsRequest) (*SearchGroupsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SearchGroups not implemented")
 }
 func (UnimplementedIdentityReadServiceServer) ListUsersByIdpGroups(context.Context, *ListUsersByIdpGroupsRequest) (*ListUsersByIdpGroupsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListUsersByIdpGroups not implemented")
@@ -1235,6 +1261,24 @@ func _IdentityReadService_ListGroups_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IdentityReadServiceServer).ListGroups(ctx, req.(*ListGroupsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IdentityReadService_SearchGroups_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchGroupsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityReadServiceServer).SearchGroups(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityReadService_SearchGroups_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityReadServiceServer).SearchGroups(ctx, req.(*SearchGroupsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1891,6 +1935,10 @@ var IdentityReadService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListGroups",
 			Handler:    _IdentityReadService_ListGroups_Handler,
+		},
+		{
+			MethodName: "SearchGroups",
+			Handler:    _IdentityReadService_SearchGroups_Handler,
 		},
 		{
 			MethodName: "ListUsersByIdpGroups",

@@ -50,6 +50,12 @@ service IdentityReadService {
   // ListGroups lists the groups under parent_id (empty for the roots),
   // optionally with all their descendants, sorted by name, a page at a time.
   rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse);
+  // SearchGroups finds groups at any depth whose name contains the query,
+  // case-insensitively, sorted by name and capped at limit. The query is
+  // required, so the call can't enumerate the directory; a percent or
+  // underscore in it is text, not a pattern. Groups have no description, so
+  // the name is all that is matched. Who may ask is the caller's rule.
+  rpc SearchGroups(SearchGroupsRequest) returns (SearchGroupsResponse);
   // ListUsersByIdpGroups lists the users holding any of the named identity
   // provider groups.
   rpc ListUsersByIdpGroups(ListUsersByIdpGroupsRequest) returns (ListUsersByIdpGroupsResponse);
@@ -307,6 +313,17 @@ message ListGroupsRequest {
   // 50 when unset; at most 200.
   int32 limit = 3;
   string page_token = 4;
+}
+
+message SearchGroupsRequest {
+  // Required; trimmed.
+  string query = 1;
+  // 50 when unset; at most 200.
+  int32 limit = 2;
+}
+
+message SearchGroupsResponse {
+  repeated Group groups = 1;
 }
 
 message ListGroupsResponse {

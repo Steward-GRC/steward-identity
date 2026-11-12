@@ -42,6 +42,7 @@ var gatewayMethods = []string{
 	identityv1.IdentityReadService_JitProvisionByEmail_FullMethodName,
 	identityv1.IdentityReadService_ListAllUsers_FullMethodName,
 	identityv1.IdentityReadService_ListGroups_FullMethodName,
+	identityv1.IdentityReadService_SearchGroups_FullMethodName,
 	identityv1.IdentityReadService_ListUserFactors_FullMethodName,
 	identityv1.IdentityReadService_ListUserGroupNames_FullMethodName,
 	identityv1.IdentityReadService_ListUserIdpGroups_FullMethodName,

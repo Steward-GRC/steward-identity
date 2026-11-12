@@ -484,6 +484,29 @@ func (h *ReadHandler) ListUsersByEmail(ctx context.Context, req *identityv1.List
 	return &identityv1.ListUsersByEmailResponse{Users: out, NextPageToken: next}, nil
 }
 
+// SearchGroups finds groups by a name fragment for a typeahead. The query is
+// required (an empty one would sweep the whole tree) and the result is capped.
+// Who may ask is decided by the caller; identity only answers.
+func (h *ReadHandler) SearchGroups(ctx context.Context, req *identityv1.SearchGroupsRequest) (*identityv1.SearchGroupsResponse, error) {
+	lg := logger.Ctx(ctx)
+	query := strings.TrimSpace(req.GetQuery())
+	if query == "" {
+		lg.Debug("search groups: refused, empty query")
+		return nil, status.Error(codes.InvalidArgument, "query required")
+	}
+	groups, err := h.store.SearchGroups(ctx, query, clampLimit(req.GetLimit()))
+	if err != nil {
+		lg.Error(err, "search groups: store failed")
+		return nil, statusFromStoreErr(err)
+	}
+	out := make([]*identityv1.Group, 0, len(groups))
+	for _, g := range groups {
+		out = append(out, groupToProto(g))
+	}
+	lg.Debug("search groups: answered", log.F("results", len(out)))
+	return &identityv1.SearchGroupsResponse{Groups: out}, nil
+}
+
 // ListUsersByIdpGroups returns all platform users that have any of the
 // supplied identity provider group names in their membership set.
 func (h *ReadHandler) ListUsersByIdpGroups(ctx context.Context, req *identityv1.ListUsersByIdpGroupsRequest) (*identityv1.ListUsersByIdpGroupsResponse, error) {
