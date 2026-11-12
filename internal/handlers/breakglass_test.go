@@ -69,4 +69,10 @@ func TestBreakGlassReveal_GrantsAndActive(t *testing.T) {
 	if len(active.GetPolicyNumbers()) != 1 || active.GetPolicyNumbers()[0] != "POL-IT-1" {
 		t.Fatalf("active: %v", active.GetPolicyNumbers())
 	}
+	if len(active.GetGrants()) != 1 || active.GetGrants()[0].GetPolicyNumber() != "POL-IT-1" {
+		t.Fatalf("grants: %v", active.GetGrants())
+	}
+	if active.GetGrants()[0].GetExpiresAt() != resp.GetGrantedUntil() {
+		t.Fatalf("grant expiry %q, want the reveal's %q", active.GetGrants()[0].GetExpiresAt(), resp.GetGrantedUntil())
+	}
 }

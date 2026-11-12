@@ -54,17 +54,26 @@ func (s *Store) GrantBreakGlass(ctx context.Context, userID uuid.UUID,
 	return expiresAt, nil
 }
 
-// ActiveBreakGlass returns the policy numbers for which the given user holds an
-// unexpired break-glass grant. Used by the gateway to flip an obfuscated read
-// back to real content within the window.
-func (s *Store) ActiveBreakGlass(ctx context.Context, userID string) ([]string, error) {
+// ActiveGrant is one unexpired break-glass grant: the policy and when it ends.
+type ActiveGrant struct {
+	PolicyNumber string
+	ExpiresAt    time.Time
+}
+
+// ActiveBreakGlass returns the policies for which the given user holds an
+// unexpired break-glass grant, each with the latest expiry when the user
+// revealed it more than once, ordered by policy number. Only the user's own
+// grants are read. Used by the gateway to flip an obfuscated read back to real
+// content within the window and to show when the window ends.
+func (s *Store) ActiveBreakGlass(ctx context.Context, userID string) ([]ActiveGrant, error) {
 	uid, err := uuid.Parse(userID)
 	if err != nil {
 		return nil, fmt.Errorf("%w: user_id %q", ErrInvalid, userID)
 	}
 	rows, err := s.pool.Query(ctx,
-		`SELECT DISTINCT policy_number FROM break_glass_grants
+		`SELECT policy_number, MAX(expires_at) FROM break_glass_grants
 		  WHERE user_id = $1 AND expires_at > now()
+		  GROUP BY policy_number
 		  ORDER BY policy_number`,
 		uid)
 	if err != nil {
@@ -72,13 +81,13 @@ func (s *Store) ActiveBreakGlass(ctx context.Context, userID string) ([]string, 
 	}
 	defer rows.Close()
 
-	var out []string
+	var out []ActiveGrant
 	for rows.Next() {
-		var num string
-		if err := rows.Scan(&num); err != nil {
+		var g ActiveGrant
+		if err := rows.Scan(&g.PolicyNumber, &g.ExpiresAt); err != nil {
 			return nil, err
 		}
-		out = append(out, num)
+		out = append(out, g)
 	}
 	return out, rows.Err()
 }

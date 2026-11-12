@@ -32,8 +32,11 @@ func TestBreakGlass_GrantAndActive(t *testing.T) {
 	if err != nil {
 		t.Fatalf("active: %v", err)
 	}
-	if len(active) != 1 || active[0] != "POL-IT-1" {
+	if len(active) != 1 || active[0].PolicyNumber != "POL-IT-1" {
 		t.Fatalf("active: %v", active)
+	}
+	if !active[0].ExpiresAt.Equal(exp) {
+		t.Fatalf("active expiry %v, want the grant's %v", active[0].ExpiresAt, exp)
 	}
 
 	// Emits a high-severity audit event into the audit buffer.
@@ -45,6 +48,37 @@ func TestBreakGlass_GrantAndActive(t *testing.T) {
 	}
 	if count != 1 {
 		t.Fatalf("expected 1 break-glass audit event, got %d", count)
+	}
+}
+
+// A second reveal of the same policy extends the window; the answer carries
+// the later expiry once, and another person's grant is never reported.
+func TestBreakGlass_ActiveReportsTheLatestExpiryPerPolicyAndOnlyTheCallers(t *testing.T) {
+	pool := newTestDB(t)
+	if pool == nil {
+		return
+	}
+	s := newStoreFor(t, pool)
+	ctx := context.Background()
+	u, _ := s.JITProvision(ctx, "sub-bg-latest", "bgl@e", "BGL")
+	other, _ := s.JITProvision(ctx, "sub-bg-other", "bgo@e", "BGO")
+
+	if _, err := s.GrantBreakGlass(ctx, u.ID, "POL-IT-2", "first", 5, nil); err != nil {
+		t.Fatalf("grant: %v", err)
+	}
+	later, err := s.GrantBreakGlass(ctx, u.ID, "POL-IT-2", "second", 30, nil)
+	if err != nil {
+		t.Fatalf("grant: %v", err)
+	}
+	if _, err := s.GrantBreakGlass(ctx, other.ID, "POL-IT-3", "theirs", 30, nil); err != nil {
+		t.Fatalf("grant: %v", err)
+	}
+	active, err := s.ActiveBreakGlass(ctx, u.ID.String())
+	if err != nil {
+		t.Fatalf("active: %v", err)
+	}
+	if len(active) != 1 || active[0].PolicyNumber != "POL-IT-2" || !active[0].ExpiresAt.Equal(later) {
+		t.Fatalf("want one grant on POL-IT-2 ending %v, got %+v", later, active)
 	}
 }
 

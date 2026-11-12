@@ -676,8 +676,9 @@ func (h *AdminHandler) BreakGlassReveal(ctx context.Context, req *identityv1.Bre
 	return &identityv1.BreakGlassRevealResponse{GrantedUntil: exp.UTC().Format(time.RFC3339)}, nil
 }
 
-// ActiveBreakGlass returns the policy numbers for which the calling user holds
-// an unexpired break-glass grant. The subject is the calling platform user.
+// ActiveBreakGlass returns the policies for which the calling user holds an
+// unexpired break-glass grant, as numbers and as grants with their expiry. The
+// subject is the calling platform user; nobody else's grant is ever reported.
 func (h *AdminHandler) ActiveBreakGlass(ctx context.Context, _ *identityv1.ActiveBreakGlassRequest) (*identityv1.ActiveBreakGlassResponse, error) {
 	actor, err := h.auth.Authorize(ctx)
 	if err != nil {
@@ -687,11 +688,18 @@ func (h *AdminHandler) ActiveBreakGlass(ctx context.Context, _ *identityv1.Activ
 	if subject == nil {
 		return &identityv1.ActiveBreakGlassResponse{}, nil
 	}
-	nums, err := h.store.ActiveBreakGlass(ctx, subject.String())
+	active, err := h.store.ActiveBreakGlass(ctx, subject.String())
 	if err != nil {
 		return nil, statusFromStoreErr(err)
 	}
-	return &identityv1.ActiveBreakGlassResponse{PolicyNumbers: nums}, nil
+	resp := &identityv1.ActiveBreakGlassResponse{}
+	for _, g := range active {
+		resp.PolicyNumbers = append(resp.PolicyNumbers, g.PolicyNumber)
+		resp.Grants = append(resp.Grants, &identityv1.ActiveBreakGlassGrant{
+			PolicyNumber: g.PolicyNumber, ExpiresAt: g.ExpiresAt.UTC().Format(time.RFC3339),
+		})
+	}
+	return resp, nil
 }
 
 // requireRoot enforces that the resolved actor is the protected root account.

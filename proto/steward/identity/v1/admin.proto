@@ -468,7 +468,17 @@ message BreakGlassRevealResponse {
 message ActiveBreakGlassRequest {}
 
 message ActiveBreakGlassResponse {
+  // The policy numbers, in order; the same policies as grants.
   repeated string policy_numbers = 1;
+  // One entry per policy, with when the caller's grant on it ends.
+  repeated ActiveBreakGlassGrant grants = 2;
+}
+
+message ActiveBreakGlassGrant {
+  string policy_number = 1;
+  // RFC 3339 expiry. When the caller revealed the policy more than once, the
+  // latest.
+  string expires_at = 2;
 }
 
 message CreateLocalUserRequest {
