@@ -96,6 +96,7 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 		identityv1.IdentityReadService_RequestLoginOtp_FullMethodName,
 		identityv1.IdentityReadService_RequestPasswordReset_FullMethodName,
 		identityv1.IdentityReadService_ResetPasswordWithCode_FullMethodName,
+		identityv1.IdentityReadService_ResolveLoginEmail_FullMethodName,
 		identityv1.IdentityReadService_RevokeMySessions_FullMethodName,
 		identityv1.IdentityReadService_ListMySessions_FullMethodName,
 		identityv1.IdentityReadService_RevokeMySession_FullMethodName,
@@ -206,6 +207,21 @@ func TestCallerPolicyAdminCLIRunsInTheIdentityPod(t *testing.T) {
 		identityv1.IdentityAdminService_SetGroupParent_FullMethodName,
 		identityv1.IdentityAdminService_BootstrapInitialAdmin_FullMethodName,
 	))
+}
+
+// ResolveLoginEmail is the gateway's alone: no other workload may ask which
+// email a username signs in with.
+func TestCallerPolicyResolveLoginEmailIsGatewayOnly(t *testing.T) {
+	m := identityv1.IdentityReadService_ResolveLoginEmail_FullMethodName
+	callers := CallerPolicy()[m]
+	require.Len(t, callers, 1)
+	a, ok := CallerPolicy().Lookup(m, CallerGateway)
+	require.True(t, ok)
+	require.Equal(t, workloadidentity.OnBehalf, a)
+	for _, c := range []string{CallerWorkflow, CallerObligations, CallerReporting, CallerCollab, CallerAdminCLI, "core", "delivery", "ai", "audit", ""} {
+		_, ok := CallerPolicy().Lookup(m, c)
+		require.False(t, ok, "%q must not reach ResolveLoginEmail", c)
+	}
 }
 
 func TestCallerPolicyListsNoOtherCaller(t *testing.T) {

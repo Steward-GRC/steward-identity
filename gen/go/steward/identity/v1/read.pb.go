@@ -4693,6 +4693,96 @@ func (x *CheckBreakGlassEligibilityResponse) GetReason() string {
 	return ""
 }
 
+type ResolveLoginEmailRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Matched case-insensitively, ignoring surrounding spaces.
+	Username      string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResolveLoginEmailRequest) Reset() {
+	*x = ResolveLoginEmailRequest{}
+	mi := &file_steward_identity_v1_read_proto_msgTypes[97]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveLoginEmailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveLoginEmailRequest) ProtoMessage() {}
+
+func (x *ResolveLoginEmailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_read_proto_msgTypes[97]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveLoginEmailRequest.ProtoReflect.Descriptor instead.
+func (*ResolveLoginEmailRequest) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{97}
+}
+
+func (x *ResolveLoginEmailRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+type ResolveLoginEmailResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Empty when no enabled local account has the username.
+	Email         string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResolveLoginEmailResponse) Reset() {
+	*x = ResolveLoginEmailResponse{}
+	mi := &file_steward_identity_v1_read_proto_msgTypes[98]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveLoginEmailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveLoginEmailResponse) ProtoMessage() {}
+
+func (x *ResolveLoginEmailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_identity_v1_read_proto_msgTypes[98]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveLoginEmailResponse.ProtoReflect.Descriptor instead.
+func (*ResolveLoginEmailResponse) Descriptor() ([]byte, []int) {
+	return file_steward_identity_v1_read_proto_rawDescGZIP(), []int{98}
+}
+
+func (x *ResolveLoginEmailResponse) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
 var File_steward_identity_v1_read_proto protoreflect.FileDescriptor
 
 const file_steward_identity_v1_read_proto_rawDesc = "" +
@@ -4952,7 +5042,11 @@ const file_steward_identity_v1_read_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\"X\n" +
 	"\"CheckBreakGlassEligibilityResponse\x12\x1a\n" +
 	"\beligible\x18\x01 \x01(\bR\beligible\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason2\xa2*\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\"6\n" +
+	"\x18ResolveLoginEmailRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"1\n" +
+	"\x19ResolveLoginEmailResponse\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email2\x96+\n" +
 	"\x13IdentityReadService\x12f\n" +
 	"\rResolveClaims\x12).steward.identity.v1.ResolveClaimsRequest\x1a*.steward.identity.v1.ResolveClaimsResponse\x12T\n" +
 	"\aGetUser\x12#.steward.identity.v1.GetUserRequest\x1a$.steward.identity.v1.GetUserResponse\x12i\n" +
@@ -5002,7 +5096,8 @@ const file_steward_identity_v1_read_proto_rawDesc = "" +
 	"\x17ListWebauthnCredentials\x123.steward.identity.v1.ListWebauthnCredentialsRequest\x1a4.steward.identity.v1.ListWebauthnCredentialsResponse\x12\x87\x01\n" +
 	"\x18RemoveWebauthnCredential\x124.steward.identity.v1.RemoveWebauthnCredentialRequest\x1a5.steward.identity.v1.RemoveWebauthnCredentialResponse\x12l\n" +
 	"\x0fRenameMFAMethod\x12+.steward.identity.v1.RenameMFAMethodRequest\x1a,.steward.identity.v1.RenameMFAMethodResponse\x12W\n" +
-	"\bDiscover\x12$.steward.identity.v1.DiscoverRequest\x1a%.steward.identity.v1.DiscoverResponse\x12\x8d\x01\n" +
+	"\bDiscover\x12$.steward.identity.v1.DiscoverRequest\x1a%.steward.identity.v1.DiscoverResponse\x12r\n" +
+	"\x11ResolveLoginEmail\x12-.steward.identity.v1.ResolveLoginEmailRequest\x1a..steward.identity.v1.ResolveLoginEmailResponse\x12\x8d\x01\n" +
 	"\x1aCheckBreakGlassEligibility\x126.steward.identity.v1.CheckBreakGlassEligibilityRequest\x1a7.steward.identity.v1.CheckBreakGlassEligibilityResponseBOZMgithub.com/Steward-GRC/steward-identity/gen/go/steward/identity/v1;identityv1b\x06proto3"
 
 var (
@@ -5017,7 +5112,7 @@ func file_steward_identity_v1_read_proto_rawDescGZIP() []byte {
 	return file_steward_identity_v1_read_proto_rawDescData
 }
 
-var file_steward_identity_v1_read_proto_msgTypes = make([]protoimpl.MessageInfo, 97)
+var file_steward_identity_v1_read_proto_msgTypes = make([]protoimpl.MessageInfo, 99)
 var file_steward_identity_v1_read_proto_goTypes = []any{
 	(*ResolveClaimsRequest)(nil),               // 0: steward.identity.v1.ResolveClaimsRequest
 	(*ResolveClaimsResponse)(nil),              // 1: steward.identity.v1.ResolveClaimsResponse
@@ -5116,32 +5211,34 @@ var file_steward_identity_v1_read_proto_goTypes = []any{
 	(*DiscoverResponse)(nil),                   // 94: steward.identity.v1.DiscoverResponse
 	(*CheckBreakGlassEligibilityRequest)(nil),  // 95: steward.identity.v1.CheckBreakGlassEligibilityRequest
 	(*CheckBreakGlassEligibilityResponse)(nil), // 96: steward.identity.v1.CheckBreakGlassEligibilityResponse
-	(*User)(nil),               // 97: steward.identity.v1.User
-	(*Group)(nil),              // 98: steward.identity.v1.Group
-	(*Session)(nil),            // 99: steward.identity.v1.Session
-	(*UserFactor)(nil),         // 100: steward.identity.v1.UserFactor
-	(*WebauthnCredential)(nil), // 101: steward.identity.v1.WebauthnCredential
+	(*ResolveLoginEmailRequest)(nil),           // 97: steward.identity.v1.ResolveLoginEmailRequest
+	(*ResolveLoginEmailResponse)(nil),          // 98: steward.identity.v1.ResolveLoginEmailResponse
+	(*User)(nil),                               // 99: steward.identity.v1.User
+	(*Group)(nil),                              // 100: steward.identity.v1.Group
+	(*Session)(nil),                            // 101: steward.identity.v1.Session
+	(*UserFactor)(nil),                         // 102: steward.identity.v1.UserFactor
+	(*WebauthnCredential)(nil),                 // 103: steward.identity.v1.WebauthnCredential
 }
 var file_steward_identity_v1_read_proto_depIdxs = []int32{
-	97,  // 0: steward.identity.v1.ResolveClaimsResponse.user:type_name -> steward.identity.v1.User
-	97,  // 1: steward.identity.v1.GetUserResponse.user:type_name -> steward.identity.v1.User
-	97,  // 2: steward.identity.v1.GetUserByEmailResponse.user:type_name -> steward.identity.v1.User
-	97,  // 3: steward.identity.v1.JitProvisionByEmailResponse.user:type_name -> steward.identity.v1.User
-	97,  // 4: steward.identity.v1.ListUsersInGroupResponse.users:type_name -> steward.identity.v1.User
-	98,  // 5: steward.identity.v1.GetGroupResponse.group:type_name -> steward.identity.v1.Group
-	98,  // 6: steward.identity.v1.ListGroupDescendantsResponse.groups:type_name -> steward.identity.v1.Group
-	98,  // 7: steward.identity.v1.ListGroupAncestorsResponse.groups:type_name -> steward.identity.v1.Group
-	98,  // 8: steward.identity.v1.ListUserGroupsResponse.groups:type_name -> steward.identity.v1.Group
-	97,  // 9: steward.identity.v1.ListUsersByEmailResponse.users:type_name -> steward.identity.v1.User
-	98,  // 10: steward.identity.v1.SearchGroupsResponse.groups:type_name -> steward.identity.v1.Group
-	98,  // 11: steward.identity.v1.ListGroupsResponse.groups:type_name -> steward.identity.v1.Group
-	97,  // 12: steward.identity.v1.ListUsersByIdpGroupsResponse.users:type_name -> steward.identity.v1.User
-	97,  // 13: steward.identity.v1.ListAllUsersResponse.users:type_name -> steward.identity.v1.User
+	99,  // 0: steward.identity.v1.ResolveClaimsResponse.user:type_name -> steward.identity.v1.User
+	99,  // 1: steward.identity.v1.GetUserResponse.user:type_name -> steward.identity.v1.User
+	99,  // 2: steward.identity.v1.GetUserByEmailResponse.user:type_name -> steward.identity.v1.User
+	99,  // 3: steward.identity.v1.JitProvisionByEmailResponse.user:type_name -> steward.identity.v1.User
+	99,  // 4: steward.identity.v1.ListUsersInGroupResponse.users:type_name -> steward.identity.v1.User
+	100, // 5: steward.identity.v1.GetGroupResponse.group:type_name -> steward.identity.v1.Group
+	100, // 6: steward.identity.v1.ListGroupDescendantsResponse.groups:type_name -> steward.identity.v1.Group
+	100, // 7: steward.identity.v1.ListGroupAncestorsResponse.groups:type_name -> steward.identity.v1.Group
+	100, // 8: steward.identity.v1.ListUserGroupsResponse.groups:type_name -> steward.identity.v1.Group
+	99,  // 9: steward.identity.v1.ListUsersByEmailResponse.users:type_name -> steward.identity.v1.User
+	100, // 10: steward.identity.v1.SearchGroupsResponse.groups:type_name -> steward.identity.v1.Group
+	100, // 11: steward.identity.v1.ListGroupsResponse.groups:type_name -> steward.identity.v1.Group
+	99,  // 12: steward.identity.v1.ListUsersByIdpGroupsResponse.users:type_name -> steward.identity.v1.User
+	99,  // 13: steward.identity.v1.ListAllUsersResponse.users:type_name -> steward.identity.v1.User
 	39,  // 14: steward.identity.v1.ListUserGroupNamesResponse.users:type_name -> steward.identity.v1.UserGroupNames
-	99,  // 15: steward.identity.v1.ListMySessionsResponse.sessions:type_name -> steward.identity.v1.Session
-	97,  // 16: steward.identity.v1.BootstrapRootResponse.user:type_name -> steward.identity.v1.User
-	100, // 17: steward.identity.v1.ListUserFactorsResponse.factors:type_name -> steward.identity.v1.UserFactor
-	101, // 18: steward.identity.v1.ListWebauthnCredentialsResponse.credentials:type_name -> steward.identity.v1.WebauthnCredential
+	101, // 15: steward.identity.v1.ListMySessionsResponse.sessions:type_name -> steward.identity.v1.Session
+	99,  // 16: steward.identity.v1.BootstrapRootResponse.user:type_name -> steward.identity.v1.User
+	102, // 17: steward.identity.v1.ListUserFactorsResponse.factors:type_name -> steward.identity.v1.UserFactor
+	103, // 18: steward.identity.v1.ListWebauthnCredentialsResponse.credentials:type_name -> steward.identity.v1.WebauthnCredential
 	0,   // 19: steward.identity.v1.IdentityReadService.ResolveClaims:input_type -> steward.identity.v1.ResolveClaimsRequest
 	2,   // 20: steward.identity.v1.IdentityReadService.GetUser:input_type -> steward.identity.v1.GetUserRequest
 	4,   // 21: steward.identity.v1.IdentityReadService.GetUserByEmail:input_type -> steward.identity.v1.GetUserByEmailRequest
@@ -5189,57 +5286,59 @@ var file_steward_identity_v1_read_proto_depIdxs = []int32{
 	91,  // 63: steward.identity.v1.IdentityReadService.RemoveWebauthnCredential:input_type -> steward.identity.v1.RemoveWebauthnCredentialRequest
 	79,  // 64: steward.identity.v1.IdentityReadService.RenameMFAMethod:input_type -> steward.identity.v1.RenameMFAMethodRequest
 	93,  // 65: steward.identity.v1.IdentityReadService.Discover:input_type -> steward.identity.v1.DiscoverRequest
-	95,  // 66: steward.identity.v1.IdentityReadService.CheckBreakGlassEligibility:input_type -> steward.identity.v1.CheckBreakGlassEligibilityRequest
-	1,   // 67: steward.identity.v1.IdentityReadService.ResolveClaims:output_type -> steward.identity.v1.ResolveClaimsResponse
-	3,   // 68: steward.identity.v1.IdentityReadService.GetUser:output_type -> steward.identity.v1.GetUserResponse
-	5,   // 69: steward.identity.v1.IdentityReadService.GetUserByEmail:output_type -> steward.identity.v1.GetUserByEmailResponse
-	7,   // 70: steward.identity.v1.IdentityReadService.JitProvisionByEmail:output_type -> steward.identity.v1.JitProvisionByEmailResponse
-	9,   // 71: steward.identity.v1.IdentityReadService.ListUsersInGroup:output_type -> steward.identity.v1.ListUsersInGroupResponse
-	11,  // 72: steward.identity.v1.IdentityReadService.GetGroup:output_type -> steward.identity.v1.GetGroupResponse
-	13,  // 73: steward.identity.v1.IdentityReadService.ListGroupDescendants:output_type -> steward.identity.v1.ListGroupDescendantsResponse
-	15,  // 74: steward.identity.v1.IdentityReadService.ListGroupAncestors:output_type -> steward.identity.v1.ListGroupAncestorsResponse
-	17,  // 75: steward.identity.v1.IdentityReadService.ResolveEmail:output_type -> steward.identity.v1.ResolveEmailResponse
-	19,  // 76: steward.identity.v1.IdentityReadService.ResolveFCMToken:output_type -> steward.identity.v1.ResolveFCMTokenResponse
-	21,  // 77: steward.identity.v1.IdentityReadService.ListUserGroups:output_type -> steward.identity.v1.ListUserGroupsResponse
-	23,  // 78: steward.identity.v1.IdentityReadService.ListUsersByEmail:output_type -> steward.identity.v1.ListUsersByEmailResponse
-	27,  // 79: steward.identity.v1.IdentityReadService.ListGroups:output_type -> steward.identity.v1.ListGroupsResponse
-	26,  // 80: steward.identity.v1.IdentityReadService.SearchGroups:output_type -> steward.identity.v1.SearchGroupsResponse
-	29,  // 81: steward.identity.v1.IdentityReadService.ListUsersByIdpGroups:output_type -> steward.identity.v1.ListUsersByIdpGroupsResponse
-	31,  // 82: steward.identity.v1.IdentityReadService.CountUsersByIdpGroups:output_type -> steward.identity.v1.CountUsersByIdpGroupsResponse
-	33,  // 83: steward.identity.v1.IdentityReadService.ListAllUsers:output_type -> steward.identity.v1.ListAllUsersResponse
-	35,  // 84: steward.identity.v1.IdentityReadService.CountAllUsers:output_type -> steward.identity.v1.CountAllUsersResponse
-	37,  // 85: steward.identity.v1.IdentityReadService.ListUserIdpGroups:output_type -> steward.identity.v1.ListUserIdpGroupsResponse
-	40,  // 86: steward.identity.v1.IdentityReadService.ListUserGroupNames:output_type -> steward.identity.v1.ListUserGroupNamesResponse
-	42,  // 87: steward.identity.v1.IdentityReadService.RevokeMySessions:output_type -> steward.identity.v1.RevokeMySessionsResponse
-	44,  // 88: steward.identity.v1.IdentityReadService.ListMySessions:output_type -> steward.identity.v1.ListMySessionsResponse
-	46,  // 89: steward.identity.v1.IdentityReadService.RevokeMySession:output_type -> steward.identity.v1.RevokeMySessionResponse
-	48,  // 90: steward.identity.v1.IdentityReadService.ChangeMyPassword:output_type -> steward.identity.v1.ChangeMyPasswordResponse
-	50,  // 91: steward.identity.v1.IdentityReadService.GetSetupState:output_type -> steward.identity.v1.GetSetupStateResponse
-	52,  // 92: steward.identity.v1.IdentityReadService.BootstrapRoot:output_type -> steward.identity.v1.BootstrapRootResponse
-	54,  // 93: steward.identity.v1.IdentityReadService.GetAuthConfig:output_type -> steward.identity.v1.GetAuthConfigResponse
-	56,  // 94: steward.identity.v1.IdentityReadService.RequestPasswordReset:output_type -> steward.identity.v1.RequestPasswordResetResponse
-	58,  // 95: steward.identity.v1.IdentityReadService.ResetPasswordWithCode:output_type -> steward.identity.v1.ResetPasswordWithCodeResponse
-	60,  // 96: steward.identity.v1.IdentityReadService.RequestLoginOtp:output_type -> steward.identity.v1.RequestLoginOtpResponse
-	62,  // 97: steward.identity.v1.IdentityReadService.VerifyLoginOtp:output_type -> steward.identity.v1.VerifyLoginOtpResponse
-	64,  // 98: steward.identity.v1.IdentityReadService.MarkEmailVerified:output_type -> steward.identity.v1.MarkEmailVerifiedResponse
-	66,  // 99: steward.identity.v1.IdentityReadService.EnrollTotpBegin:output_type -> steward.identity.v1.EnrollTotpBeginResponse
-	68,  // 100: steward.identity.v1.IdentityReadService.EnrollTotpConfirm:output_type -> steward.identity.v1.EnrollTotpConfirmResponse
-	70,  // 101: steward.identity.v1.IdentityReadService.VerifyTotp:output_type -> steward.identity.v1.VerifyTotpResponse
-	72,  // 102: steward.identity.v1.IdentityReadService.SendEmailOtp:output_type -> steward.identity.v1.SendEmailOtpResponse
-	74,  // 103: steward.identity.v1.IdentityReadService.VerifyEmailOtp:output_type -> steward.identity.v1.VerifyEmailOtpResponse
-	76,  // 104: steward.identity.v1.IdentityReadService.ListUserFactors:output_type -> steward.identity.v1.ListUserFactorsResponse
-	78,  // 105: steward.identity.v1.IdentityReadService.RemoveFactor:output_type -> steward.identity.v1.RemoveFactorResponse
-	82,  // 106: steward.identity.v1.IdentityReadService.WebauthnRegisterBegin:output_type -> steward.identity.v1.WebauthnRegisterBeginResponse
-	84,  // 107: steward.identity.v1.IdentityReadService.WebauthnRegisterFinish:output_type -> steward.identity.v1.WebauthnRegisterFinishResponse
-	86,  // 108: steward.identity.v1.IdentityReadService.WebauthnAssertBegin:output_type -> steward.identity.v1.WebauthnAssertBeginResponse
-	88,  // 109: steward.identity.v1.IdentityReadService.WebauthnAssertFinish:output_type -> steward.identity.v1.WebauthnAssertFinishResponse
-	90,  // 110: steward.identity.v1.IdentityReadService.ListWebauthnCredentials:output_type -> steward.identity.v1.ListWebauthnCredentialsResponse
-	92,  // 111: steward.identity.v1.IdentityReadService.RemoveWebauthnCredential:output_type -> steward.identity.v1.RemoveWebauthnCredentialResponse
-	80,  // 112: steward.identity.v1.IdentityReadService.RenameMFAMethod:output_type -> steward.identity.v1.RenameMFAMethodResponse
-	94,  // 113: steward.identity.v1.IdentityReadService.Discover:output_type -> steward.identity.v1.DiscoverResponse
-	96,  // 114: steward.identity.v1.IdentityReadService.CheckBreakGlassEligibility:output_type -> steward.identity.v1.CheckBreakGlassEligibilityResponse
-	67,  // [67:115] is the sub-list for method output_type
-	19,  // [19:67] is the sub-list for method input_type
+	97,  // 66: steward.identity.v1.IdentityReadService.ResolveLoginEmail:input_type -> steward.identity.v1.ResolveLoginEmailRequest
+	95,  // 67: steward.identity.v1.IdentityReadService.CheckBreakGlassEligibility:input_type -> steward.identity.v1.CheckBreakGlassEligibilityRequest
+	1,   // 68: steward.identity.v1.IdentityReadService.ResolveClaims:output_type -> steward.identity.v1.ResolveClaimsResponse
+	3,   // 69: steward.identity.v1.IdentityReadService.GetUser:output_type -> steward.identity.v1.GetUserResponse
+	5,   // 70: steward.identity.v1.IdentityReadService.GetUserByEmail:output_type -> steward.identity.v1.GetUserByEmailResponse
+	7,   // 71: steward.identity.v1.IdentityReadService.JitProvisionByEmail:output_type -> steward.identity.v1.JitProvisionByEmailResponse
+	9,   // 72: steward.identity.v1.IdentityReadService.ListUsersInGroup:output_type -> steward.identity.v1.ListUsersInGroupResponse
+	11,  // 73: steward.identity.v1.IdentityReadService.GetGroup:output_type -> steward.identity.v1.GetGroupResponse
+	13,  // 74: steward.identity.v1.IdentityReadService.ListGroupDescendants:output_type -> steward.identity.v1.ListGroupDescendantsResponse
+	15,  // 75: steward.identity.v1.IdentityReadService.ListGroupAncestors:output_type -> steward.identity.v1.ListGroupAncestorsResponse
+	17,  // 76: steward.identity.v1.IdentityReadService.ResolveEmail:output_type -> steward.identity.v1.ResolveEmailResponse
+	19,  // 77: steward.identity.v1.IdentityReadService.ResolveFCMToken:output_type -> steward.identity.v1.ResolveFCMTokenResponse
+	21,  // 78: steward.identity.v1.IdentityReadService.ListUserGroups:output_type -> steward.identity.v1.ListUserGroupsResponse
+	23,  // 79: steward.identity.v1.IdentityReadService.ListUsersByEmail:output_type -> steward.identity.v1.ListUsersByEmailResponse
+	27,  // 80: steward.identity.v1.IdentityReadService.ListGroups:output_type -> steward.identity.v1.ListGroupsResponse
+	26,  // 81: steward.identity.v1.IdentityReadService.SearchGroups:output_type -> steward.identity.v1.SearchGroupsResponse
+	29,  // 82: steward.identity.v1.IdentityReadService.ListUsersByIdpGroups:output_type -> steward.identity.v1.ListUsersByIdpGroupsResponse
+	31,  // 83: steward.identity.v1.IdentityReadService.CountUsersByIdpGroups:output_type -> steward.identity.v1.CountUsersByIdpGroupsResponse
+	33,  // 84: steward.identity.v1.IdentityReadService.ListAllUsers:output_type -> steward.identity.v1.ListAllUsersResponse
+	35,  // 85: steward.identity.v1.IdentityReadService.CountAllUsers:output_type -> steward.identity.v1.CountAllUsersResponse
+	37,  // 86: steward.identity.v1.IdentityReadService.ListUserIdpGroups:output_type -> steward.identity.v1.ListUserIdpGroupsResponse
+	40,  // 87: steward.identity.v1.IdentityReadService.ListUserGroupNames:output_type -> steward.identity.v1.ListUserGroupNamesResponse
+	42,  // 88: steward.identity.v1.IdentityReadService.RevokeMySessions:output_type -> steward.identity.v1.RevokeMySessionsResponse
+	44,  // 89: steward.identity.v1.IdentityReadService.ListMySessions:output_type -> steward.identity.v1.ListMySessionsResponse
+	46,  // 90: steward.identity.v1.IdentityReadService.RevokeMySession:output_type -> steward.identity.v1.RevokeMySessionResponse
+	48,  // 91: steward.identity.v1.IdentityReadService.ChangeMyPassword:output_type -> steward.identity.v1.ChangeMyPasswordResponse
+	50,  // 92: steward.identity.v1.IdentityReadService.GetSetupState:output_type -> steward.identity.v1.GetSetupStateResponse
+	52,  // 93: steward.identity.v1.IdentityReadService.BootstrapRoot:output_type -> steward.identity.v1.BootstrapRootResponse
+	54,  // 94: steward.identity.v1.IdentityReadService.GetAuthConfig:output_type -> steward.identity.v1.GetAuthConfigResponse
+	56,  // 95: steward.identity.v1.IdentityReadService.RequestPasswordReset:output_type -> steward.identity.v1.RequestPasswordResetResponse
+	58,  // 96: steward.identity.v1.IdentityReadService.ResetPasswordWithCode:output_type -> steward.identity.v1.ResetPasswordWithCodeResponse
+	60,  // 97: steward.identity.v1.IdentityReadService.RequestLoginOtp:output_type -> steward.identity.v1.RequestLoginOtpResponse
+	62,  // 98: steward.identity.v1.IdentityReadService.VerifyLoginOtp:output_type -> steward.identity.v1.VerifyLoginOtpResponse
+	64,  // 99: steward.identity.v1.IdentityReadService.MarkEmailVerified:output_type -> steward.identity.v1.MarkEmailVerifiedResponse
+	66,  // 100: steward.identity.v1.IdentityReadService.EnrollTotpBegin:output_type -> steward.identity.v1.EnrollTotpBeginResponse
+	68,  // 101: steward.identity.v1.IdentityReadService.EnrollTotpConfirm:output_type -> steward.identity.v1.EnrollTotpConfirmResponse
+	70,  // 102: steward.identity.v1.IdentityReadService.VerifyTotp:output_type -> steward.identity.v1.VerifyTotpResponse
+	72,  // 103: steward.identity.v1.IdentityReadService.SendEmailOtp:output_type -> steward.identity.v1.SendEmailOtpResponse
+	74,  // 104: steward.identity.v1.IdentityReadService.VerifyEmailOtp:output_type -> steward.identity.v1.VerifyEmailOtpResponse
+	76,  // 105: steward.identity.v1.IdentityReadService.ListUserFactors:output_type -> steward.identity.v1.ListUserFactorsResponse
+	78,  // 106: steward.identity.v1.IdentityReadService.RemoveFactor:output_type -> steward.identity.v1.RemoveFactorResponse
+	82,  // 107: steward.identity.v1.IdentityReadService.WebauthnRegisterBegin:output_type -> steward.identity.v1.WebauthnRegisterBeginResponse
+	84,  // 108: steward.identity.v1.IdentityReadService.WebauthnRegisterFinish:output_type -> steward.identity.v1.WebauthnRegisterFinishResponse
+	86,  // 109: steward.identity.v1.IdentityReadService.WebauthnAssertBegin:output_type -> steward.identity.v1.WebauthnAssertBeginResponse
+	88,  // 110: steward.identity.v1.IdentityReadService.WebauthnAssertFinish:output_type -> steward.identity.v1.WebauthnAssertFinishResponse
+	90,  // 111: steward.identity.v1.IdentityReadService.ListWebauthnCredentials:output_type -> steward.identity.v1.ListWebauthnCredentialsResponse
+	92,  // 112: steward.identity.v1.IdentityReadService.RemoveWebauthnCredential:output_type -> steward.identity.v1.RemoveWebauthnCredentialResponse
+	80,  // 113: steward.identity.v1.IdentityReadService.RenameMFAMethod:output_type -> steward.identity.v1.RenameMFAMethodResponse
+	94,  // 114: steward.identity.v1.IdentityReadService.Discover:output_type -> steward.identity.v1.DiscoverResponse
+	98,  // 115: steward.identity.v1.IdentityReadService.ResolveLoginEmail:output_type -> steward.identity.v1.ResolveLoginEmailResponse
+	96,  // 116: steward.identity.v1.IdentityReadService.CheckBreakGlassEligibility:output_type -> steward.identity.v1.CheckBreakGlassEligibilityResponse
+	68,  // [68:117] is the sub-list for method output_type
+	19,  // [19:68] is the sub-list for method input_type
 	19,  // [19:19] is the sub-list for extension type_name
 	19,  // [19:19] is the sub-list for extension extendee
 	0,   // [0:19] is the sub-list for field type_name
@@ -5257,7 +5356,7 @@ func file_steward_identity_v1_read_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_steward_identity_v1_read_proto_rawDesc), len(file_steward_identity_v1_read_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   97,
+			NumMessages:   99,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
