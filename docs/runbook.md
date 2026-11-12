@@ -2,7 +2,7 @@
 
 ## Start-up
 
-The service applies the baseline migration, creates the audit outbox table, connects to Postgres
+The service applies the migrations, creates the audit outbox table, connects to Postgres
 and RabbitMQ, and serves gRPC. A bad setting stops it with every problem listed. Kratos, Polis,
 core and the group cache are optional: without them the features that need them answer with a
 coded error and everything else works.

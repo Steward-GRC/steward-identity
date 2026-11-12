@@ -53,12 +53,24 @@ groups and is matched against the connection's group mappings.
 
 ## Root admins and hard resets
 
-There may be several root admins. `GrantRoot` and `RevokeRoot` add and remove one; both need a
-root admin, the caller's step-up code (`RequestStepUpOtp`) and no act-as. The last root admin
-can't lose the role, and a root admin can't be disabled, deleted or merged away until it's
-revoked. `BootstrapRoot` makes only the first.
+There is exactly one root admin at a time (a unique index on `users.is_root` enforces it).
+`TransferRoot(to_user_id, otp)` moves the role: the new root is enabled and gets site-admin, and the
+old root becomes an ordinary site-admin in the same step. Sessions are not revoked. Only the root
+may call it, with the caller's step-up code (`RequestStepUpOtp`), never during act-as and never from
+the admin CLI (no actor, `PERMISSION_DENIED`). The target must be a live account other than the
+caller. The audit event is `root.transferred` (actor: the old root, subject: the new root,
+`from_user_id` in the payload). The root can't be disabled, deleted, merged away or stripped of
+site-admin; to retire the account, transfer root first. `BootstrapRoot` makes only the first.
 
-A hard reset of a module (only `compliance` today) takes two root admins:
+`GrantRoot` and `RevokeRoot` are removed.
+
+Migration `0002_single_root` keeps one root where an older database had several (the oldest
+site-admin grant, else the oldest account) and clears `is_root` on the rest, who stay site-admins.
+It cannot write audit rows, since the audit outbox table is created at start-up after migrations,
+so each demotion is a `NOTICE` in the migration log instead.
+
+A hard reset of a module (only `compliance` today) takes two root admins. With a single root that
+cannot currently complete; the hard reset is unchanged here and is reworked separately:
 
 1. `RequestHardReset` (module and reason) by one root admin. It waits `HARD_RESET_REQUEST_TTL`
    (24 hours) for approval, and a module has at most one open request.

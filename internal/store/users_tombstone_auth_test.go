@@ -5,6 +5,7 @@ package store_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/google/uuid"
@@ -22,7 +23,7 @@ import (
 //
 // Every test below therefore RE-ENABLES the tombstoned row after tombstoning it
 // (`enabled = true, deleted_at IS NOT NULL`) — a state no production path
-// creates today, EXCEPT GrantRoot, which unconditionally sets
+// creates today, EXCEPT TransferRoot, which unconditionally sets
 // `enabled = true` on its target. Re-enabling is what makes these assertions
 // bite for the right reason: a test against an `enabled = false` tombstone
 // passes on the OLD code too, proving nothing about the deleted_at filter.
@@ -455,19 +456,17 @@ func TestBootstrapAdminSkipsTombstonedAdmin(t *testing.T) {
 	}
 }
 
-// TestGrantRootRefusesTombstonedTarget: GrantRoot sets `enabled = true` on its
-// target. Granting root to a tombstoned row would therefore manufacture the
-// enabled tombstone that every other query's safety rests on not existing, and
-// make a root account a deleted one.
-func TestGrantRootRefusesTombstonedTarget(t *testing.T) {
+// TestTransferRootRefusesTombstonedTarget: TransferRoot sets `enabled = true`
+// on its target. Handing root to a tombstoned row would therefore manufacture
+// the enabled tombstone that every other query's safety rests on not
+// existing, and make the root account a deleted one.
+func TestTransferRootRefusesTombstonedTarget(t *testing.T) {
 	pool := newTestDB(t)
-	if pool == nil {
-		return
-	}
 	s := newStoreFor(t, pool)
 	ctx := context.Background()
 
-	if _, err := s.PreCreateLocalUserRoot(ctx, "trroot", "root@tr.example.org", "Root"); err != nil {
+	root, err := s.PreCreateLocalUserRoot(ctx, "trroot", "root@tr.example.org", "Root")
+	if err != nil {
 		t.Fatalf("PreCreateLocalUserRoot: %v", err)
 	}
 	dead, err := s.PreCreateLocalUser(ctx, "trdead", "dead@tr.example.org", "Deleted Target")
@@ -480,22 +479,22 @@ func TestGrantRootRefusesTombstonedTarget(t *testing.T) {
 	}
 	tombstoneAndReEnable(t, pool, s, dead.ID)
 
-	if _, err := s.GrantRoot(ctx, dead.ID, nil, "test"); err == nil {
-		t.Errorf("GrantRoot onto a tombstoned account must be refused")
-	} else if err != store.ErrNotFound {
-		t.Errorf("want ErrNotFound granting root to a tombstone, got %v", err)
+	if _, err := s.TransferRoot(ctx, dead.ID, &root.ID, "test"); err == nil {
+		t.Errorf("TransferRoot onto a tombstoned account must be refused")
+	} else if !errors.Is(err, store.ErrNotFound) {
+		t.Errorf("want ErrNotFound transferring root to a tombstone, got %v", err)
 	}
 	var deadRoot bool
 	if err := pool.QueryRow(ctx, `SELECT is_root FROM users WHERE id = $1`, dead.ID).Scan(&deadRoot); err != nil {
 		t.Fatalf("re-read tombstone: %v", err)
 	}
 	if deadRoot {
-		t.Errorf("a refused GrantRoot must not flag the tombstone")
+		t.Errorf("a refused TransferRoot must not flag the tombstone")
 	}
 
-	// Control: the grant still works onto a live account.
-	if _, err := s.GrantRoot(ctx, live.ID, nil, "test"); err != nil {
-		t.Fatalf("control: GrantRoot onto a live account: %v", err)
+	// Control: the transfer still works onto a live account.
+	if _, err := s.TransferRoot(ctx, live.ID, &root.ID, "test"); err != nil {
+		t.Fatalf("control: TransferRoot onto a live account: %v", err)
 	}
 }
 

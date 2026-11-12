@@ -5,24 +5,42 @@ package store_test
 
 import (
 	"context"
-	"errors"
-	"sync"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 
 	"github.com/Steward-GRC/steward-identity/internal/store"
 )
 
-func newRoot(t *testing.T, s *store.Store, name string) store.User {
+// newRoot makes a root admin with site-admin by writing the rows directly:
+// the store itself offers no way to add a second root.
+func newRoot(t *testing.T, pool *pgxpool.Pool, s *store.Store, name string) store.User {
 	t.Helper()
-	u, err := s.PreCreateLocalUser(context.Background(), name, name+"@roots.example.org", name)
+	ctx := context.Background()
+	u, err := s.PreCreateLocalUser(ctx, name, name+"@roots.example.org", name)
 	require.NoError(t, err)
-	g, err := s.GrantRoot(context.Background(), u.ID, nil, "test")
+	_, err = pool.Exec(ctx, `UPDATE users SET is_root = true WHERE id = $1`, u.ID)
+	require.NoError(t, err)
+	_, err = pool.Exec(ctx, `INSERT INTO user_roles (user_id, role, scope_category) VALUES ($1, 'site-admin', '') ON CONFLICT DO NOTHING`, u.ID)
+	require.NoError(t, err)
+	g, err := s.GetUser(ctx, u.ID)
 	require.NoError(t, err)
 	return g
+}
+
+// newSeveralRootsStore returns a store on a database where the single-root
+// index is dropped. The two-person hard reset still needs two root admins and
+// is out of scope for the single-root change, so its tests keep running on a
+// database that allows them.
+func newSeveralRootsStore(t *testing.T) (*pgxpool.Pool, *store.Store) {
+	t.Helper()
+	pool := newTestDB(t)
+	_, err := pool.Exec(context.Background(), `DROP INDEX users_single_root_idx`)
+	require.NoError(t, err)
+	return pool, newStoreFor(t, pool)
 }
 
 func auditTypes(t *testing.T, s *store.Store) []string {
@@ -36,59 +54,6 @@ func auditTypes(t *testing.T, s *store.Store) []string {
 	return out
 }
 
-func TestSeveralRootAdmins_LastOneKeepsRoot(t *testing.T) {
-	s := newTestStore(t)
-	ctx := context.Background()
-	a := newRoot(t, s, "roota")
-	b := newRoot(t, s, "rootb")
-
-	require.True(t, a.IsRoot)
-	require.True(t, b.IsRoot)
-
-	_, err := s.RevokeRoot(ctx, a.ID, &b.ID, "")
-	require.NoError(t, err)
-	_, err = s.RevokeRoot(ctx, b.ID, &b.ID, "")
-	require.ErrorIs(t, err, store.ErrRootProtected, "the last root admin keeps the role")
-
-	got, err := s.GetUser(ctx, b.ID)
-	require.NoError(t, err)
-	require.True(t, got.IsRoot)
-	_, err = s.DeleteUser(ctx, b.ID, nil, "")
-	require.ErrorIs(t, err, store.ErrRootProtected, "a root admin can't be deleted")
-
-	_, err = s.RevokeRoot(ctx, a.ID, &b.ID, "")
-	require.ErrorIs(t, err, store.ErrInvalid, "revoking from a non-root is refused")
-	require.Contains(t, auditTypes(t, s), "root.granted")
-	require.Contains(t, auditTypes(t, s), "root.revoked")
-}
-
-func TestRevokeRoot_ConcurrentRevokesLeaveOneRoot(t *testing.T) {
-	s := newTestStore(t)
-	ctx := context.Background()
-	a := newRoot(t, s, "roota")
-	b := newRoot(t, s, "rootb")
-
-	var wg sync.WaitGroup
-	errs := make([]error, 2)
-	for i, id := range []uuid.UUID{a.ID, b.ID} {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			_, errs[i] = s.RevokeRoot(ctx, id, nil, "test")
-		}()
-	}
-	wg.Wait()
-	failed := 0
-	for _, err := range errs {
-		if errors.Is(err, store.ErrRootProtected) {
-			failed++
-		} else {
-			require.NoError(t, err)
-		}
-	}
-	require.Equal(t, 1, failed, "exactly one revoke is refused, so one root remains")
-}
-
 func TestBootstrapRoot_RefusedOnceAnyRootExists(t *testing.T) {
 	s := newTestStore(t)
 	ctx := context.Background()
@@ -99,10 +64,10 @@ func TestBootstrapRoot_RefusedOnceAnyRootExists(t *testing.T) {
 }
 
 func TestHardReset_TwoPersonFlow(t *testing.T) {
-	s := newTestStore(t)
+	pool, s := newSeveralRootsStore(t)
 	ctx := context.Background()
-	a := newRoot(t, s, "roota")
-	b := newRoot(t, s, "rootb")
+	a := newRoot(t, pool, s, "roota")
+	b := newRoot(t, pool, s, "rootb")
 	now := time.Now().UTC().Truncate(time.Microsecond)
 
 	r, err := s.CreateHardResetRequest(ctx, "compliance", "fresh start", a.ID, now, 24*time.Hour)
@@ -144,10 +109,10 @@ func TestHardReset_TwoPersonFlow(t *testing.T) {
 }
 
 func TestHardReset_ExpiryAndCancel(t *testing.T) {
-	s := newTestStore(t)
+	pool, s := newSeveralRootsStore(t)
 	ctx := context.Background()
-	a := newRoot(t, s, "roota")
-	b := newRoot(t, s, "rootb")
+	a := newRoot(t, pool, s, "roota")
+	b := newRoot(t, pool, s, "rootb")
 	now := time.Now().UTC()
 
 	r, err := s.CreateHardResetRequest(ctx, "compliance", "r1", a.ID, now, 24*time.Hour)
@@ -184,9 +149,10 @@ func TestHardReset_ExpiryAndCancel(t *testing.T) {
 }
 
 func TestHardReset_OnlyRootsTakePart(t *testing.T) {
-	s := newTestStore(t)
+	pool := newTestDB(t)
+	s := newStoreFor(t, pool)
 	ctx := context.Background()
-	a := newRoot(t, s, "roota")
+	a := newRoot(t, pool, s, "roota")
 	plain, err := s.PreCreateLocalUser(ctx, "plain", "plain@roots.example.org", "Plain")
 	require.NoError(t, err)
 	now := time.Now().UTC()

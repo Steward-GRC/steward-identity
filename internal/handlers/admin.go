@@ -75,9 +75,9 @@ type AdminHandler struct {
 	// sessions. Nil answers the coded "unavailable" errors.
 	accounts localAccounts
 
-	// otp wires the step-up email-OTP flow (RequestStepUpOtp + GrantRoot and
-	// RevokeRoot verification). Nil when unwired; RequestStepUpOtp then returns
-	// Unavailable and GrantRoot and RevokeRoot reject every code (fail-closed).
+	// otp wires the step-up email-OTP flow (RequestStepUpOtp + TransferRoot
+	// verification). Nil when unwired; RequestStepUpOtp then returns
+	// Unavailable and TransferRoot rejects every code (fail-closed).
 	otp *otpDeps
 
 	// hardReset holds the two hard reset windows and the clock. Zero windows
@@ -929,8 +929,8 @@ func (h *AdminHandler) SetUserPolicyOverride(ctx context.Context, req *identityv
 
 // RequestStepUpOtp mints a step_up OTP for the CALLING admin (actor bound from
 // forwarded claims — never from input) and emails it to that actor's own
-// address. It arms the server-verified confirmation GrantRoot and RevokeRoot
-// require.
+// address. It arms the server-verified confirmation TransferRoot
+// requires.
 // The response is content-free (anti-enumeration), mirroring RequestLoginOtp;
 // every real failure is logged server-side only. Only the gateway (claims) path
 // can arm this — the admin CLI path has no platform user id to email.
@@ -973,51 +973,31 @@ func (h *AdminHandler) RequestStepUpOtp(ctx context.Context, _ *identityv1.Reque
 	return &identityv1.RequestStepUpOtpResponse{}, nil
 }
 
-// GrantRoot makes another user a root admin as well, granting them
-// site-admin. Only a root admin may, never during act-as, and only after the
-// calling admin's step_up OTP in req.otp is verified (single-use): a missing,
-// invalid or expired code returns InvalidArgument and changes nothing.
-func (h *AdminHandler) GrantRoot(ctx context.Context, req *identityv1.GrantRootRequest) (*identityv1.GrantRootResponse, error) {
-	actor, id, err := h.authorizeRootChange(ctx, req.GetUserId(), req.GetOtp())
+// TransferRoot hands the root role to another user and takes it from the
+// caller in the same step. Only the root may, never during act-as, never from
+// the admin CLI (no actor), and only after the calling admin's step_up OTP in
+// req.otp is verified (single-use): a missing, invalid or expired code returns
+// InvalidArgument and changes nothing. The old root keeps site-admin.
+func (h *AdminHandler) TransferRoot(ctx context.Context, req *identityv1.TransferRootRequest) (*identityv1.TransferRootResponse, error) {
+	actor, id, err := h.authorizeRootChange(ctx, req.GetToUserId(), req.GetOtp())
 	if err != nil {
 		return nil, err
 	}
-	u, err := h.store.GrantRoot(ctx, id, actorUUIDPtr(actor), actor.ActorExternal)
+	u, err := h.store.TransferRoot(ctx, id, actorUUIDPtr(actor), actor.ActorExternal)
 	if err != nil {
+		if errors.Is(err, store.ErrRootRequired) {
+			return nil, errcodes.Error(ctx, errcodes.RootRequired("root"))
+		}
 		return nil, statusFromStoreErr(err)
 	}
 	lg := logger.Ctx(ctx)
-	lg.Info("root admin granted", log.F("user_id", id.String()))
-	return &identityv1.GrantRootResponse{User: userToProto(u)}, nil
+	lg.Info("root transferred", log.F("from_user_id", actor.ActorUserID), log.F("to_user_id", id.String()))
+	return &identityv1.TransferRootResponse{User: userToProto(u)}, nil
 }
 
-// RevokeRoot takes the root role from a user, who keeps site-admin. The last
-// root admin keeps it (FailedPrecondition). Same checks as GrantRoot.
-func (h *AdminHandler) RevokeRoot(ctx context.Context, req *identityv1.RevokeRootRequest) (*identityv1.RevokeRootResponse, error) {
-	actor, id, err := h.authorizeRootChange(ctx, req.GetUserId(), req.GetOtp())
-	if err != nil {
-		return nil, err
-	}
-	u, err := h.store.RevokeRoot(ctx, id, actorUUIDPtr(actor), actor.ActorExternal)
-	if err != nil {
-		return nil, statusFromStoreErr(err)
-	}
-	lg := logger.Ctx(ctx)
-	lg.Info("root admin revoked", log.F("user_id", id.String()))
-	return &identityv1.RevokeRootResponse{User: userToProto(u)}, nil
-}
-
-// TransferRoot is removed now that more than one user can hold the root
-// role: its clear-then-set behavior has no sound meaning once root is a set.
-// It always returns Unimplemented, naming GrantRoot and RevokeRoot, so a
-// caller still built against the old shape gets a clear error instead of a
-// broken RPC. The proto keeps the RPC and its messages only for that.
-func (h *AdminHandler) TransferRoot(context.Context, *identityv1.TransferRootRequest) (*identityv1.TransferRootResponse, error) { //nolint:staticcheck // the removed RPC's own request/response types, kept only for this stub
-	return nil, status.Error(codes.Unimplemented, "TransferRoot is removed; use GrantRoot and RevokeRoot")
-}
-
-// authorizeRootChange runs the checks every change to the root admins needs:
-// a site-admin caller, no act-as, a root admin, then the step-up code.
+// authorizeRootChange runs the checks a change of root needs: a site-admin
+// caller, no act-as, a caller who is a user (the admin CLI has no actor and
+// can't transfer root), the root itself, then the step-up code.
 func (h *AdminHandler) authorizeRootChange(ctx context.Context, userID, otp string) (adminActor, uuid.UUID, error) {
 	actor, err := h.auth.Authorize(ctx)
 	if err != nil {
@@ -1030,7 +1010,11 @@ func (h *AdminHandler) authorizeRootChange(ctx context.Context, userID, otp stri
 	if err != nil {
 		return adminActor{}, uuid.Nil, err
 	}
-	isRoot, err := h.store.IsRootActor(ctx, actorUUIDPtr(actor))
+	uid := actorUUIDPtr(actor)
+	if uid == nil {
+		return adminActor{}, uuid.Nil, status.Error(codes.PermissionDenied, "root can't be transferred without a signed-in root admin")
+	}
+	isRoot, err := h.store.IsRootActor(ctx, uid)
 	if err != nil {
 		return adminActor{}, uuid.Nil, statusFromStoreErr(err)
 	}

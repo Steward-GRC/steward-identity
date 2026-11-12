@@ -18,8 +18,8 @@ func contains(s []string, v string) bool {
 
 // TestRootProtection covers the root guards: a user flagged is_root cannot be
 // disabled or stripped of site-admin, GetUser surfaces the flag, and
-// GrantRoot adds a root admin (granting site-admin) and RevokeRoot removes
-// one, after which the former root is unprotected.
+// TransferRoot moves root (granting the target site-admin), after which the
+// former root is unprotected.
 func TestRootProtection(t *testing.T) {
 	pool := newTestDB(t)
 	s := newStoreFor(t, pool)
@@ -53,26 +53,23 @@ func TestRootProtection(t *testing.T) {
 		t.Fatalf("revoke root site-admin: want ErrRootProtected, got %v", err)
 	}
 
-	// Grant root to a second user, then revoke it from the first.
+	// Hand root to a second user; the first keeps site-admin but loses the guard.
 	other, err := s.JITProvision(ctx, "other-sub", "other@test.example.org", "Other")
 	if err != nil {
 		t.Fatalf("provision other: %v", err)
 	}
-	granted, err := s.GrantRoot(ctx, other.ID, nil, "")
+	moved, err := s.TransferRoot(ctx, other.ID, &root.ID, "")
 	if err != nil {
-		t.Fatalf("grant root: %v", err)
+		t.Fatalf("transfer root: %v", err)
 	}
-	if !granted.IsRoot {
-		t.Fatal("grant target is not root")
+	if !moved.IsRoot {
+		t.Fatal("transfer target is not root")
 	}
-	if !contains(granted.Roles, "site-admin") {
-		t.Fatalf("grant target missing site-admin role: %v", granted.Roles)
+	if !contains(moved.Roles, "site-admin") {
+		t.Fatalf("transfer target missing site-admin role: %v", moved.Roles)
 	}
-	if contains(granted.Roles, "admin") {
-		t.Fatalf("grant target must not get dropped role 'admin': %v", granted.Roles)
-	}
-	if _, err := s.RevokeRoot(ctx, root.ID, nil, ""); err != nil {
-		t.Fatalf("revoke root: %v", err)
+	if contains(moved.Roles, "admin") {
+		t.Fatalf("transfer target must not get dropped role 'admin': %v", moved.Roles)
 	}
 
 	// The former root is no longer root and is now disable-able.
@@ -81,10 +78,10 @@ func TestRootProtection(t *testing.T) {
 		t.Fatalf("get old root: %v", err)
 	}
 	if oldRoot.IsRoot {
-		t.Fatal("old root still flagged is_root after revoke")
+		t.Fatal("old root still flagged is_root after transfer")
 	}
 	if !contains(oldRoot.Roles, "site-admin") {
-		t.Fatalf("revoking root keeps site-admin: %v", oldRoot.Roles)
+		t.Fatalf("transferring root keeps site-admin: %v", oldRoot.Roles)
 	}
 	if _, err := s.SetEnabled(ctx, root.ID, false, nil, ""); err != nil {
 		t.Fatalf("disable former root: %v", err)

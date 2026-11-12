@@ -69,22 +69,14 @@ service IdentityAdminService {
   // clears it.
   rpc SetUserPolicyOverride(SetUserPolicyOverrideRequest) returns (SetUserPolicyOverrideResponse);
   // RequestStepUpOtp emails a step-up code to the calling admin, to confirm
-  // a high-risk action such as GrantRoot or RevokeRoot.
+  // a high-risk action such as TransferRoot.
   rpc RequestStepUpOtp(RequestStepUpOtpRequest) returns (RequestStepUpOtpResponse);
-  // GrantRoot makes another user a root admin as well; they also get
-  // site-admin. Root only, refused during act-as, and the calling admin's
-  // step-up code is checked first.
-  rpc GrantRoot(GrantRootRequest) returns (GrantRootResponse);
-  // RevokeRoot takes the root role from a user, who keeps site-admin. The
-  // last root admin can't lose it. Same checks as GrantRoot.
-  rpc RevokeRoot(RevokeRootRequest) returns (RevokeRootResponse);
-  // TransferRoot is removed now that more than one user can hold the root
-  // role: it always returns Unimplemented, naming GrantRoot and RevokeRoot.
-  // Kept only so a caller still built against the old shape gets a clear
-  // error instead of a broken RPC.
-  rpc TransferRoot(TransferRootRequest) returns (TransferRootResponse) {
-    option deprecated = true;
-  };
+  // TransferRoot hands the root role to another user and takes it from the
+  // caller in the same step, so there is always exactly one root. The new
+  // root also gets site-admin and is enabled; the old root keeps site-admin.
+  // Root only, refused during act-as and from the admin CLI, and the calling
+  // admin's step-up code is checked first.
+  rpc TransferRoot(TransferRootRequest) returns (TransferRootResponse);
   // RequestHardReset starts a two-person hard reset of a module: one root
   // admin asks, a different root admin approves. The request expires after
   // HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
@@ -331,35 +323,15 @@ message RequestStepUpOtpRequest {}
 
 message RequestStepUpOtpResponse {}
 
-message GrantRootRequest {
-  string user_id = 1;
-  // The calling admin's step-up code.
-  string otp = 2;
-}
-
-message GrantRootResponse {
-  User user = 1;
-}
-
-message RevokeRootRequest {
-  string user_id = 1;
-  // The calling admin's step-up code.
-  string otp = 2;
-}
-
-message RevokeRootResponse {
-  User user = 1;
-}
-
 message TransferRootRequest {
-  option deprecated = true;
+  // The user who becomes the root.
   string to_user_id = 1;
   // The calling admin's step-up code.
   string otp = 2;
 }
 
 message TransferRootResponse {
-  option deprecated = true;
+  // The new root.
   User user = 1;
 }
 
