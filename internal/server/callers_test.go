@@ -95,6 +95,8 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 		identityv1.IdentityReadService_RequestPasswordReset_FullMethodName,
 		identityv1.IdentityReadService_ResetPasswordWithCode_FullMethodName,
 		identityv1.IdentityReadService_RevokeMySessions_FullMethodName,
+		identityv1.IdentityReadService_ListMySessions_FullMethodName,
+		identityv1.IdentityReadService_RevokeMySession_FullMethodName,
 		identityv1.IdentityReadService_SendEmailOtp_FullMethodName,
 		identityv1.IdentityReadService_VerifyEmailOtp_FullMethodName,
 		identityv1.IdentityReadService_VerifyLoginOtp_FullMethodName,

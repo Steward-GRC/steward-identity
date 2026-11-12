@@ -70,6 +70,16 @@ service IdentityReadService {
   rpc ListUserGroupNames(ListUserGroupNamesRequest) returns (ListUserGroupNamesResponse);
   // RevokeMySessions revokes every session of the calling user.
   rpc RevokeMySessions(RevokeMySessionsRequest) returns (RevokeMySessionsResponse);
+  // ListMySessions lists the calling user's active sign-in sessions and marks
+  // the one the call runs on. Self-service: the user comes from the forwarded
+  // actor, never from the request. Unavailable when the sign-in service
+  // can't answer, so a failure never reads as "signed in nowhere".
+  rpc ListMySessions(ListMySessionsRequest) returns (ListMySessionsResponse);
+  // RevokeMySession signs out one of the calling user's other sessions. It
+  // refuses the current session (FailedPrecondition; use RevokeMySessions to
+  // end everything) and a session that isn't the caller's (NotFound, the same
+  // as an unknown one). Audited as session.revoked.
+  rpc RevokeMySession(RevokeMySessionRequest) returns (RevokeMySessionResponse);
   // GetSetupState reports whether first-run setup is still needed (no root
   // admin exists).
   rpc GetSetupState(GetSetupStateRequest) returns (GetSetupStateResponse);
@@ -358,6 +368,30 @@ message ListUserGroupNamesResponse {
 message RevokeMySessionsRequest {}
 
 message RevokeMySessionsResponse {
+  int32 revoked = 1;
+}
+
+message ListMySessionsRequest {
+  // The sign-in session the request runs on; the matching session comes back
+  // with current set. Empty marks none.
+  string current_session_id = 1;
+}
+
+message ListMySessionsResponse {
+  // Active sessions only, newest first.
+  repeated Session sessions = 1;
+}
+
+message RevokeMySessionRequest {
+  string session_id = 1;
+  // The session the request runs on. Required, so the call can refuse to end
+  // it.
+  string current_session_id = 2;
+}
+
+message RevokeMySessionResponse {
+  // 1 when the session was active and is now ended; 0 when it had already
+  // ended.
   int32 revoked = 1;
 }
 
