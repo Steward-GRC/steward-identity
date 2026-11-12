@@ -18,7 +18,7 @@ with every problem listed; values never appear in the errors.
 | `MIGRATIONS_DIR` | `migrations` | The SQL migrations; the image sets `/migrations`. |
 | `GRPC_PORT` | `9090` | gRPC. |
 | `PROBE_PORT` | `8080` | Plain HTTP for `/livez` and `/readyz`. |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `localhost:4317` | OpenTelemetry collector, `host:port`. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | empty | OpenTelemetry collector, `host:port`. Unset or empty turns tracing off. |
 | `LOG_LEVEL`, `LOG_FORMAT` | | go-log's level and format. |
 
 ## Callers and mTLS
