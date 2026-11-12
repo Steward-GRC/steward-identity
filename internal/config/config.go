@@ -200,6 +200,11 @@ func Load(getenv func(string) string) (Config, error) {
 	if c.RabbitURL == "" {
 		errs = append(errs, errors.New("RABBITMQ_URL is required"))
 	}
+	// Every cluster environment logs JSON and local development logs console,
+	// so JSON marks a deployment; echoing sign-in codes there would leak them.
+	if c.OTPDevEcho && strings.EqualFold(strings.TrimSpace(getenv("LOG_FORMAT")), "json") {
+		errs = append(errs, errors.New("OTP_DEV_ECHO must not be set when LOG_FORMAT=json (a deployed environment); it is for local development only"))
+	}
 	tlsSet := c.TLS.CertFile != "" || c.TLS.KeyFile != "" || c.TLS.ClientCAFile != ""
 	if tlsSet && (c.TLS.CertFile == "" || c.TLS.KeyFile == "" || c.TLS.ClientCAFile == "") {
 		errs = append(errs, errors.New("GRPC_TLS_CERT_FILE, GRPC_TLS_KEY_FILE and GRPC_TLS_CLIENT_CA_FILE are set together"))

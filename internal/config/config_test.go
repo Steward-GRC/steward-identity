@@ -279,3 +279,34 @@ func TestLoadOTLPEndpoint(t *testing.T) {
 		})
 	}
 }
+
+// OTP_DEV_ECHO logs sign-in codes, so start-up refuses it where logs are JSON
+// (every cluster environment); local development logs console.
+func TestLoadRefusesOTPDevEchoWithJSONLogs(t *testing.T) {
+	for _, format := range []string{"json", "JSON", " json "} {
+		m := base()
+		m["OTP_DEV_ECHO"], m["LOG_FORMAT"] = "true", format
+		_, err := Load(env(m))
+		require.Error(t, err, "format %q", format)
+		require.Contains(t, err.Error(), "OTP_DEV_ECHO")
+		require.Contains(t, err.Error(), "LOG_FORMAT")
+	}
+}
+
+func TestLoadAllowsOTPDevEchoLocally(t *testing.T) {
+	for _, format := range []string{"", "console"} {
+		m := base()
+		m["OTP_DEV_ECHO"], m["LOG_FORMAT"] = "true", format
+		c, err := Load(env(m))
+		require.NoError(t, err, "format %q", format)
+		require.True(t, c.OTPDevEcho)
+	}
+}
+
+func TestLoadAllowsJSONLogsWithoutOTPDevEcho(t *testing.T) {
+	m := base()
+	m["LOG_FORMAT"] = "json"
+	c, err := Load(env(m))
+	require.NoError(t, err)
+	require.False(t, c.OTPDevEcho)
+}
