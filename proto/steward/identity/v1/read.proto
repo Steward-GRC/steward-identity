@@ -172,6 +172,12 @@ service IdentityReadService {
   // Discover routes an identifier (an email, or a username that is an
   // email's local part) to its domain's one sign-in method.
   rpc Discover(DiscoverRequest) returns (DiscoverResponse);
+  // ResolveLoginEmail turns a username into the email the sign-in service
+  // takes as its login identifier. Only the gateway calls it. It answers an
+  // empty email, with OK, for every username that can't sign in locally:
+  // unknown, disabled, deleted, SSO and email-shaped alike, so the answer
+  // never says which usernames exist.
+  rpc ResolveLoginEmail(ResolveLoginEmailRequest) returns (ResolveLoginEmailResponse);
   // CheckBreakGlassEligibility reports whether an account may break glass:
   // root or site-admin, with a local credential.
   rpc CheckBreakGlassEligibility(CheckBreakGlassEligibilityRequest) returns (CheckBreakGlassEligibilityResponse);
@@ -654,4 +660,14 @@ message CheckBreakGlassEligibilityRequest {
 message CheckBreakGlassEligibilityResponse {
   bool eligible = 1;
   string reason = 2;
+}
+
+message ResolveLoginEmailRequest {
+  // Matched case-insensitively, ignoring surrounding spaces.
+  string username = 1;
+}
+
+message ResolveLoginEmailResponse {
+  // Empty when no enabled local account has the username.
+  string email = 1;
 }

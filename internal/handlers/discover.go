@@ -56,6 +56,31 @@ func (h *ReadHandler) Discover(ctx context.Context, req *identityv1.DiscoverRequ
 	}, nil
 }
 
+// ResolveLoginEmail turns a username into the email the sign-in service takes
+// as its login identifier. Only an enabled, live, local account answers its
+// email. Every other case (unknown, disabled, deleted, federated, empty or
+// email-shaped input) answers the same empty response with OK, and logs
+// nothing, so the answer and the logs never tell which usernames exist. A
+// store failure is the only error: it says nothing about the username.
+func (h *ReadHandler) ResolveLoginEmail(ctx context.Context, req *identityv1.ResolveLoginEmailRequest) (*identityv1.ResolveLoginEmailResponse, error) {
+	// The same normalisation as Discover.
+	id := strings.TrimSpace(strings.ToLower(req.GetUsername()))
+	if id == "" || strings.Contains(id, "@") {
+		return &identityv1.ResolveLoginEmailResponse{}, nil
+	}
+	u, err := h.store.GetUserByUsername(ctx, id)
+	if errors.Is(err, store.ErrNotFound) {
+		return &identityv1.ResolveLoginEmailResponse{}, nil
+	}
+	if err != nil {
+		return nil, statusFromStoreErr(err)
+	}
+	if !u.Enabled || u.DeletedAt != nil || !u.LocalAccount {
+		return &identityv1.ResolveLoginEmailResponse{}, nil
+	}
+	return &identityv1.ResolveLoginEmailResponse{Email: u.Email}, nil
+}
+
 // CheckBreakGlassEligibility reports whether the account behind req.Email may
 // use the audited break-glass local login path when SSO is unavailable. See
 // store.BreakGlassLoginEligible for the eligibility rule and reason strings.

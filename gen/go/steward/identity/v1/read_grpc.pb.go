@@ -69,6 +69,7 @@ const (
 	IdentityReadService_RemoveWebauthnCredential_FullMethodName   = "/steward.identity.v1.IdentityReadService/RemoveWebauthnCredential"
 	IdentityReadService_RenameMFAMethod_FullMethodName            = "/steward.identity.v1.IdentityReadService/RenameMFAMethod"
 	IdentityReadService_Discover_FullMethodName                   = "/steward.identity.v1.IdentityReadService/Discover"
+	IdentityReadService_ResolveLoginEmail_FullMethodName          = "/steward.identity.v1.IdentityReadService/ResolveLoginEmail"
 	IdentityReadService_CheckBreakGlassEligibility_FullMethodName = "/steward.identity.v1.IdentityReadService/CheckBreakGlassEligibility"
 )
 
@@ -228,6 +229,12 @@ type IdentityReadServiceClient interface {
 	// Discover routes an identifier (an email, or a username that is an
 	// email's local part) to its domain's one sign-in method.
 	Discover(ctx context.Context, in *DiscoverRequest, opts ...grpc.CallOption) (*DiscoverResponse, error)
+	// ResolveLoginEmail turns a username into the email the sign-in service
+	// takes as its login identifier. Only the gateway calls it. It answers an
+	// empty email, with OK, for every username that can't sign in locally:
+	// unknown, disabled, deleted, SSO and email-shaped alike, so the answer
+	// never says which usernames exist.
+	ResolveLoginEmail(ctx context.Context, in *ResolveLoginEmailRequest, opts ...grpc.CallOption) (*ResolveLoginEmailResponse, error)
 	// CheckBreakGlassEligibility reports whether an account may break glass:
 	// root or site-admin, with a local credential.
 	CheckBreakGlassEligibility(ctx context.Context, in *CheckBreakGlassEligibilityRequest, opts ...grpc.CallOption) (*CheckBreakGlassEligibilityResponse, error)
@@ -711,6 +718,16 @@ func (c *identityReadServiceClient) Discover(ctx context.Context, in *DiscoverRe
 	return out, nil
 }
 
+func (c *identityReadServiceClient) ResolveLoginEmail(ctx context.Context, in *ResolveLoginEmailRequest, opts ...grpc.CallOption) (*ResolveLoginEmailResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResolveLoginEmailResponse)
+	err := c.cc.Invoke(ctx, IdentityReadService_ResolveLoginEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *identityReadServiceClient) CheckBreakGlassEligibility(ctx context.Context, in *CheckBreakGlassEligibilityRequest, opts ...grpc.CallOption) (*CheckBreakGlassEligibilityResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CheckBreakGlassEligibilityResponse)
@@ -877,6 +894,12 @@ type IdentityReadServiceServer interface {
 	// Discover routes an identifier (an email, or a username that is an
 	// email's local part) to its domain's one sign-in method.
 	Discover(context.Context, *DiscoverRequest) (*DiscoverResponse, error)
+	// ResolveLoginEmail turns a username into the email the sign-in service
+	// takes as its login identifier. Only the gateway calls it. It answers an
+	// empty email, with OK, for every username that can't sign in locally:
+	// unknown, disabled, deleted, SSO and email-shaped alike, so the answer
+	// never says which usernames exist.
+	ResolveLoginEmail(context.Context, *ResolveLoginEmailRequest) (*ResolveLoginEmailResponse, error)
 	// CheckBreakGlassEligibility reports whether an account may break glass:
 	// root or site-admin, with a local credential.
 	CheckBreakGlassEligibility(context.Context, *CheckBreakGlassEligibilityRequest) (*CheckBreakGlassEligibilityResponse, error)
@@ -1030,6 +1053,9 @@ func (UnimplementedIdentityReadServiceServer) RenameMFAMethod(context.Context, *
 }
 func (UnimplementedIdentityReadServiceServer) Discover(context.Context, *DiscoverRequest) (*DiscoverResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Discover not implemented")
+}
+func (UnimplementedIdentityReadServiceServer) ResolveLoginEmail(context.Context, *ResolveLoginEmailRequest) (*ResolveLoginEmailResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveLoginEmail not implemented")
 }
 func (UnimplementedIdentityReadServiceServer) CheckBreakGlassEligibility(context.Context, *CheckBreakGlassEligibilityRequest) (*CheckBreakGlassEligibilityResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CheckBreakGlassEligibility not implemented")
@@ -1901,6 +1927,24 @@ func _IdentityReadService_Discover_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IdentityReadService_ResolveLoginEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveLoginEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IdentityReadServiceServer).ResolveLoginEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IdentityReadService_ResolveLoginEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IdentityReadServiceServer).ResolveLoginEmail(ctx, req.(*ResolveLoginEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IdentityReadService_CheckBreakGlassEligibility_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckBreakGlassEligibilityRequest)
 	if err := dec(in); err != nil {
@@ -2113,6 +2157,10 @@ var IdentityReadService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Discover",
 			Handler:    _IdentityReadService_Discover_Handler,
+		},
+		{
+			MethodName: "ResolveLoginEmail",
+			Handler:    _IdentityReadService_ResolveLoginEmail_Handler,
 		},
 		{
 			MethodName: "CheckBreakGlassEligibility",

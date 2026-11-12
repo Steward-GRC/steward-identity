@@ -57,6 +57,7 @@ var gatewayMethods = []string{
 	identityv1.IdentityReadService_RequestLoginOtp_FullMethodName,
 	identityv1.IdentityReadService_RequestPasswordReset_FullMethodName,
 	identityv1.IdentityReadService_ResetPasswordWithCode_FullMethodName,
+	identityv1.IdentityReadService_ResolveLoginEmail_FullMethodName,
 	identityv1.IdentityReadService_RevokeMySessions_FullMethodName,
 	identityv1.IdentityReadService_ListMySessions_FullMethodName,
 	identityv1.IdentityReadService_RevokeMySession_FullMethodName,

@@ -225,6 +225,15 @@ func TestCallerPolicyAdmitsEachCallerOnlyOnItsMethods(t *testing.T) {
 		_, err := read.ResolveEmail(as(caller), &identityv1.ResolveEmailRequest{UserId: "u"})
 		return status.Code(err)
 	}
+	resolveLogin := func(ctx context.Context) codes.Code {
+		_, err := read.ResolveLoginEmail(ctx, &identityv1.ResolveLoginEmailRequest{Username: "u"})
+		return status.Code(err)
+	}
+	require.Equal(t, codes.Unimplemented, resolveLogin(as(CallerGateway)), "the gateway resolves a login username")
+	for _, c := range []string{CallerWorkflow, CallerObligations, CallerReporting, CallerCollab, CallerAdminCLI, "delivery"} {
+		require.Equal(t, codes.PermissionDenied, resolveLogin(as(c)), "%s is refused ResolveLoginEmail", c)
+	}
+	require.Equal(t, codes.Unauthenticated, resolveLogin(context.Background()), "no token is refused")
 	for _, c := range []string{CallerGateway, CallerWorkflow, CallerObligations, CallerReporting, CallerCollab, CallerAdminCLI} {
 		require.Equal(t, codes.Unimplemented, getUser(c), "%s may read a user", c)
 	}
