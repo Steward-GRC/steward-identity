@@ -47,7 +47,8 @@ to the caller `<name>`, and checks the per-method allow-list in `internal/server
 | --- | --- | --- |
 | `gateway` | the sign-in steps and the read, admin and SSO admin methods it serves, including `ListGroups` and `CreateGroup` for the admin app's platform groups, and the root admin and hard reset requests | on behalf of the signed-in user |
 | `reporting` | `GetUser`, `ConsumeHardReset` | as itself |
-| `workflow`, `collab` | `GetUser` | as itself |
+| `workflow` | `GetUser`, `ListAllUsers` (its approver access filter) | as itself |
+| `collab` | `GetUser` | as itself |
 | `obligations` | `GetUser`, `ListAllUsers`, `ResolveEmail`, `ResolveFCMToken` | as itself |
 | `identity` (`identity-admin` in the identity pod) | the CLI's read and admin methods | as itself; the admin methods also need the CLI certificate (`IDENTITY_ADMIN_CLI_ID`) |
 
