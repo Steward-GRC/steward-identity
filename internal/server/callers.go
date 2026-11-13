@@ -125,7 +125,12 @@ var gatewayMethods = []string{
 // The internal callers act as themselves: each reads what its own job needs
 // about a user it names in the request, never by forwarding an actor.
 var (
-	userReader       = []string{identityv1.IdentityReadService_GetUser_FullMethodName}
+	userReader = []string{identityv1.IdentityReadService_GetUser_FullMethodName}
+	// workflow's approver access filter reads every enabled user (steward-identity#80).
+	workflowMethods = []string{
+		identityv1.IdentityReadService_GetUser_FullMethodName,
+		identityv1.IdentityReadService_ListAllUsers_FullMethodName,
+	}
 	reportingMethods = []string{
 		identityv1.IdentityReadService_GetUser_FullMethodName,
 		identityv1.IdentityAdminService_ConsumeHardReset_FullMethodName,
@@ -170,7 +175,7 @@ func CallerPolicy() workloadidentity.Policy {
 		}
 	}
 	grant(CallerGateway, workloadidentity.OnBehalf, gatewayMethods)
-	grant(CallerWorkflow, workloadidentity.Self, userReader)
+	grant(CallerWorkflow, workloadidentity.Self, workflowMethods)
 	grant(CallerReporting, workloadidentity.Self, reportingMethods)
 	grant(CallerCollab, workloadidentity.Self, userReader)
 	grant(CallerObligations, workloadidentity.Self, obligationsMethods)

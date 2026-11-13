@@ -240,7 +240,8 @@ func TestCallerPolicyAdmitsEachCallerOnlyOnItsMethods(t *testing.T) {
 	require.Equal(t, codes.PermissionDenied, getUser("delivery"), "delivery calls nothing on identity")
 	require.Equal(t, codes.Unimplemented, listAll(CallerObligations))
 	require.Equal(t, codes.Unimplemented, listAll(CallerGateway))
-	for _, c := range []string{CallerWorkflow, CallerReporting, CallerCollab, CallerAdminCLI} {
+	require.Equal(t, codes.Unimplemented, listAll(CallerWorkflow), "workflow's approver access filter lists every user")
+	for _, c := range []string{CallerReporting, CallerCollab, CallerAdminCLI} {
 		require.Equal(t, codes.PermissionDenied, listAll(c), "%s has no need to list every user", c)
 	}
 	require.Equal(t, codes.Unimplemented, resolveEmail(CallerObligations))
