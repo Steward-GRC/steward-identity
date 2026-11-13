@@ -324,7 +324,7 @@ type HardResetState int32
 
 const (
 	HardResetState_HARD_RESET_STATE_UNSPECIFIED HardResetState = 0
-	// Waiting for a second root admin.
+	// Waiting for a different site-admin to approve.
 	HardResetState_HARD_RESET_STATE_PENDING HardResetState = 1
 	// Approved; usable once until approval_expires_at.
 	HardResetState_HARD_RESET_STATE_APPROVED HardResetState = 2
@@ -2153,7 +2153,7 @@ func (x *SPCertificate) GetActive() bool {
 	return false
 }
 
-// HardResetRequest is one two-person hard reset of a module. Times are RFC
+// HardResetRequest is one four-eyes hard reset of a module. Times are RFC
 // 3339; an empty time hasn't happened.
 type HardResetRequest struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
@@ -2166,7 +2166,7 @@ type HardResetRequest struct {
 	RequestedAt string `protobuf:"bytes,6,opt,name=requested_at,json=requestedAt,proto3" json:"requested_at,omitempty"`
 	// The request must be approved before this.
 	ExpiresAt string `protobuf:"bytes,7,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	// The approving root admin's user id.
+	// The approving site-admin's user id: never the requester.
 	ApprovedBy string `protobuf:"bytes,8,opt,name=approved_by,json=approvedBy,proto3" json:"approved_by,omitempty"`
 	ApprovedAt string `protobuf:"bytes,9,opt,name=approved_at,json=approvedAt,proto3" json:"approved_at,omitempty"`
 	// The approval must be used before this.

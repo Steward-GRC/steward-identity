@@ -19,7 +19,7 @@ import (
 	"github.com/Steward-GRC/steward-identity/internal/store"
 )
 
-// Default hard reset windows: a request waits a day for a second root admin,
+// Default hard reset windows: a request waits a day for a site-admin to approve,
 // and an approval is usable for an hour.
 const (
 	defaultHardResetRequestTTL  = 24 * time.Hour
@@ -64,10 +64,11 @@ func (h *AdminHandler) WithHardReset(requestTTL, approvalTTL time.Duration, now 
 	return h
 }
 
-// hardResetActor authorizes a root admin's hard reset step: a site-admin
-// caller with a platform user id (the admin CLI can't take part, since both
-// people must be named), never during act-as. Whether they are root is
-// checked with the step, in the same transaction.
+// hardResetActor authorizes a caller of a hard reset step: a site-admin caller
+// with a platform user id (the admin CLI can't take part, since both people
+// must be named), never during act-as. Whether they are root (to request) or
+// an active site-admin in the database (to approve) is checked with the step,
+// in the same transaction.
 func (h *AdminHandler) hardResetActor(ctx context.Context) (uuid.UUID, error) {
 	actor, err := h.auth.Authorize(ctx)
 	if err != nil {
@@ -78,7 +79,7 @@ func (h *AdminHandler) hardResetActor(ctx context.Context) (uuid.UUID, error) {
 	}
 	id := actorUUIDPtr(actor)
 	if id == nil {
-		return uuid.Nil, status.Error(codes.PermissionDenied, "a hard reset needs two named root admins, not the admin CLI")
+		return uuid.Nil, status.Error(codes.PermissionDenied, "a hard reset needs two named people, not the admin CLI")
 	}
 	return *id, nil
 }
@@ -86,9 +87,11 @@ func (h *AdminHandler) hardResetActor(ctx context.Context) (uuid.UUID, error) {
 func hardResetStatus(err error) error {
 	switch {
 	case errors.Is(err, store.ErrRootRequired):
-		return status.Error(codes.PermissionDenied, "only a root admin can take part in a hard reset")
+		return status.Error(codes.PermissionDenied, "only the root admin can request a hard reset")
+	case errors.Is(err, store.ErrSiteAdminRequired):
+		return status.Error(codes.PermissionDenied, "a hard reset needs the approval of a different, active site-admin")
 	case errors.Is(err, store.ErrSelfApproval):
-		return status.Error(codes.PermissionDenied, "a second root admin must approve: the requester can't")
+		return status.Error(codes.PermissionDenied, "a different site-admin must approve: the requester can't")
 	case errors.Is(err, store.ErrNotRequester):
 		return status.Error(codes.PermissionDenied, "only the requester can cancel a hard reset request")
 	case errors.Is(err, store.ErrHardResetState), errors.Is(err, store.ErrConflict):
@@ -98,7 +101,7 @@ func hardResetStatus(err error) error {
 	}
 }
 
-// RequestHardReset records a root admin's request to hard reset a module.
+// RequestHardReset records the root admin's request to hard reset a module.
 func (h *AdminHandler) RequestHardReset(ctx context.Context, req *identityv1.RequestHardResetRequest) (*identityv1.RequestHardResetResponse, error) {
 	requester, err := h.hardResetActor(ctx)
 	if err != nil {
@@ -115,6 +118,7 @@ func (h *AdminHandler) RequestHardReset(ctx context.Context, req *identityv1.Req
 	reqTTL, _ := h.hardReset.windows()
 	r, err := h.store.CreateHardResetRequest(ctx, module, reason, requester, h.hardReset.clock(), reqTTL)
 	if err != nil {
+		logger.Ctx(ctx).Warn("hard reset request refused", log.F("module", module), log.F("requested_by", requester.String()), log.F("error", errText(err)))
 		return nil, hardResetStatus(err)
 	}
 	lg := logger.Ctx(ctx)
@@ -122,7 +126,7 @@ func (h *AdminHandler) RequestHardReset(ctx context.Context, req *identityv1.Req
 	return &identityv1.RequestHardResetResponse{Request: hardResetToProto(r)}, nil
 }
 
-// ApproveHardReset records a second root admin's approval.
+// ApproveHardReset records a different active site-admin's approval.
 func (h *AdminHandler) ApproveHardReset(ctx context.Context, req *identityv1.ApproveHardResetRequest) (*identityv1.ApproveHardResetResponse, error) {
 	approver, err := h.hardResetActor(ctx)
 	if err != nil {
@@ -135,6 +139,7 @@ func (h *AdminHandler) ApproveHardReset(ctx context.Context, req *identityv1.App
 	_, apprTTL := h.hardReset.windows()
 	r, err := h.store.ApproveHardResetRequest(ctx, id, approver, h.hardReset.clock(), apprTTL)
 	if err != nil {
+		logger.Ctx(ctx).Warn("hard reset approval refused", log.F("request_id", id.String()), log.F("approver", approver.String()), log.F("error", errText(err)))
 		return nil, hardResetStatus(err)
 	}
 	lg := logger.Ctx(ctx)
@@ -154,6 +159,7 @@ func (h *AdminHandler) CancelHardReset(ctx context.Context, req *identityv1.Canc
 	}
 	r, err := h.store.CancelHardResetRequest(ctx, id, requester, h.hardReset.clock())
 	if err != nil {
+		logger.Ctx(ctx).Warn("hard reset cancel refused", log.F("request_id", id.String()), log.F("error", errText(err)))
 		return nil, hardResetStatus(err)
 	}
 	lg := logger.Ctx(ctx)
@@ -161,7 +167,8 @@ func (h *AdminHandler) CancelHardReset(ctx context.Context, req *identityv1.Canc
 	return &identityv1.CancelHardResetResponse{Request: hardResetToProto(r)}, nil
 }
 
-// ListHardResetRequests lists the requests for a root admin.
+// ListHardResetRequests lists the requests for the root admin or any active
+// site-admin (who need to see a request to approve it).
 func (h *AdminHandler) ListHardResetRequests(ctx context.Context, req *identityv1.ListHardResetRequestsRequest) (*identityv1.ListHardResetRequestsResponse, error) {
 	actor, err := h.hardResetActor(ctx)
 	if err != nil {
@@ -172,7 +179,13 @@ func (h *AdminHandler) ListHardResetRequests(ctx context.Context, req *identityv
 		return nil, statusFromStoreErr(err)
 	}
 	if !isRoot {
-		return nil, hardResetStatus(store.ErrRootRequired)
+		isAdmin, err := h.store.IsActiveSiteAdmin(ctx, actor)
+		if err != nil {
+			return nil, statusFromStoreErr(err)
+		}
+		if !isAdmin {
+			return nil, hardResetStatus(store.ErrSiteAdminRequired)
+		}
 	}
 	rs, err := h.store.ListHardResetRequests(ctx, strings.ToLower(strings.TrimSpace(req.GetModule())), h.hardReset.clock())
 	if err != nil {

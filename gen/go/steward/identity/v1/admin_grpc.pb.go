@@ -149,19 +149,21 @@ type IdentityAdminServiceClient interface {
 	// RevokeRoot is removed: there is exactly one root, changed only by
 	// TransferRoot. It always returns Unimplemented; use TransferRoot.
 	RevokeRoot(ctx context.Context, in *RevokeRootRequest, opts ...grpc.CallOption) (*RevokeRootResponse, error)
-	// RequestHardReset starts a two-person hard reset of a module: one root
-	// admin asks, a different root admin approves. The request expires after
-	// HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
+	// RequestHardReset starts a four-eyes hard reset of a module: the root
+	// admin asks, a different active site-admin approves. The request expires
+	// after HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
 	// request per module.
 	RequestHardReset(ctx context.Context, in *RequestHardResetRequest, opts ...grpc.CallOption) (*RequestHardResetResponse, error)
-	// ApproveHardReset approves a pending request. The requester can't approve
-	// their own. The approval can be used once, within HARD_RESET_APPROVAL_TTL.
+	// ApproveHardReset approves a pending request. The approver must be an
+	// enabled site-admin other than the requester (the root admin can't approve
+	// its own request). The approval can be used once, within
+	// HARD_RESET_APPROVAL_TTL.
 	ApproveHardReset(ctx context.Context, in *ApproveHardResetRequest, opts ...grpc.CallOption) (*ApproveHardResetResponse, error)
 	// CancelHardReset withdraws a pending or approved request. Only its
 	// requester may cancel it.
 	CancelHardReset(ctx context.Context, in *CancelHardResetRequest, opts ...grpc.CallOption) (*CancelHardResetResponse, error)
-	// ListHardResetRequests lists the hard reset requests, newest first. Root
-	// only.
+	// ListHardResetRequests lists the hard reset requests, newest first. The
+	// root admin or an active site-admin.
 	ListHardResetRequests(ctx context.Context, in *ListHardResetRequestsRequest, opts ...grpc.CallOption) (*ListHardResetRequestsResponse, error)
 	// ConsumeHardReset redeems an approved request once, just before the
 	// module's own service runs the reset. Only the module's service calls it,
@@ -736,19 +738,21 @@ type IdentityAdminServiceServer interface {
 	// RevokeRoot is removed: there is exactly one root, changed only by
 	// TransferRoot. It always returns Unimplemented; use TransferRoot.
 	RevokeRoot(context.Context, *RevokeRootRequest) (*RevokeRootResponse, error)
-	// RequestHardReset starts a two-person hard reset of a module: one root
-	// admin asks, a different root admin approves. The request expires after
-	// HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
+	// RequestHardReset starts a four-eyes hard reset of a module: the root
+	// admin asks, a different active site-admin approves. The request expires
+	// after HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
 	// request per module.
 	RequestHardReset(context.Context, *RequestHardResetRequest) (*RequestHardResetResponse, error)
-	// ApproveHardReset approves a pending request. The requester can't approve
-	// their own. The approval can be used once, within HARD_RESET_APPROVAL_TTL.
+	// ApproveHardReset approves a pending request. The approver must be an
+	// enabled site-admin other than the requester (the root admin can't approve
+	// its own request). The approval can be used once, within
+	// HARD_RESET_APPROVAL_TTL.
 	ApproveHardReset(context.Context, *ApproveHardResetRequest) (*ApproveHardResetResponse, error)
 	// CancelHardReset withdraws a pending or approved request. Only its
 	// requester may cancel it.
 	CancelHardReset(context.Context, *CancelHardResetRequest) (*CancelHardResetResponse, error)
-	// ListHardResetRequests lists the hard reset requests, newest first. Root
-	// only.
+	// ListHardResetRequests lists the hard reset requests, newest first. The
+	// root admin or an active site-admin.
 	ListHardResetRequests(context.Context, *ListHardResetRequestsRequest) (*ListHardResetRequestsResponse, error)
 	// ConsumeHardReset redeems an approved request once, just before the
 	// module's own service runs the reset. Only the module's service calls it,

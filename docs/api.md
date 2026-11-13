@@ -69,21 +69,31 @@ site-admin grant, else the oldest account) and clears `is_root` on the rest, who
 It cannot write audit rows, since the audit outbox table is created at start-up after migrations,
 so each demotion is a `NOTICE` in the migration log instead.
 
-A hard reset of a module (only `compliance` today) takes two root admins. With a single root that
-cannot currently complete; the hard reset is unchanged here and is reworked separately:
+A hard reset of a module (only `compliance` today) takes two different people: the root admin asks
+and a different site-admin approves. The root cannot approve its own request, and there is never a
+second root.
 
-1. `RequestHardReset` (module and reason) by one root admin. It waits `HARD_RESET_REQUEST_TTL`
+1. `RequestHardReset` (module and reason) by the root admin. It waits `HARD_RESET_REQUEST_TTL`
    (24 hours) for approval, and a module has at most one open request.
-2. `ApproveHardReset` by a different root admin. The approval is usable once, for
-   `HARD_RESET_APPROVAL_TTL` (1 hour).
+2. `ApproveHardReset` by an active site-admin who is not the requester: the account is enabled and
+   not deleted and holds the global site-admin right in the database (a session claim is not enough).
+   The approval is usable once, for `HARD_RESET_APPROVAL_TTL` (1 hour).
 3. `ConsumeHardReset` by the module's own service (steward-reporting for `compliance`), calling
-   as itself, just before it runs the reset. It answers with the request naming both admins.
+   as itself, just before it runs the reset. It answers with the request naming both people
+   (`requested_by` and `approved_by`, never equal). It re-checks that the requester is still the
+   root admin and the approver is still an active site-admin, and refuses (`FAILED_PRECONDITION`,
+   the request is left as it is) when either has changed since.
+
+A request that is not approved in time, or an approval not used in time, expires and is refused with
+`FAILED_PRECONDITION`. A non-root requester or an approver who is not an active site-admin gets
+`PERMISSION_DENIED`, so does the requester approving its own request.
 
 `CancelHardReset` withdraws a pending or approved request; only the requester may.
-`ListHardResetRequests` lists them for a root admin. Request, approve and cancel are refused during
-act-as and from the admin CLI, since both people must be named. Each step is an audit event
-crediting the admin (`hard_reset.requested`, `.approved`, `.cancelled`), or the service
-(`hard_reset.consumed`); a request that runs out of time is recorded as `hard_reset.expired`.
+`ListHardResetRequests` lists them for the root admin or any active site-admin (who need to see a
+request to approve it). Request, approve and cancel are refused during act-as and from the admin CLI,
+since both people must be named. Each step is an audit event crediting the person
+(`hard_reset.requested`, `.approved`, `.cancelled`), or the service (`hard_reset.consumed`); a request
+that runs out of time is recorded as `hard_reset.expired`.
 
 ## Errors
 
