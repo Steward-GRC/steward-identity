@@ -666,7 +666,7 @@ func (s *Store) DeleteUser(ctx context.Context, id uuid.UUID, actor *uuid.UUID, 
 }
 
 // ListUsersByEmail returns up to limit users whose email, username, first name,
-// last name, or "first last" display name contains the given substring
+// last name, stored display name, or "first last" name contains the given substring
 // (case-insensitive, ILIKE), in (email, id) ascending order. Despite the
 // historical name, the match is NOT email-only: the user-picker typeahead
 // backing every RACI/admin user select needs to resolve on a person's name
@@ -755,7 +755,10 @@ func (s *Store) SearchUsers(ctx context.Context, opts UserSearchOpts) ([]User, e
 	// The match widens across the identifier columns: email, username (NULL for
 	// federated rows — ILIKE against NULL yields NULL, i.e. no match, which is
 	// correct), first_name / last_name, and the composed "first last" display
-	// name so a full-name query ("ivan ive") resolves too. All comparisons are
+	// name so a full-name query ("ivan ive") resolves too. The stored display
+	// name column is matched as well: a local account is created with that one
+	// name and empty first/last columns, so without it such a person could only
+	// be found by e-mail or username. All comparisons are
 	// case-insensitive and fully parameterized. first_name/last_name are
 	// NOT NULL DEFAULT '' so the concat is always well-formed.
 	//
@@ -773,6 +776,7 @@ func (s *Store) SearchUsers(ctx context.Context, opts UserSearchOpts) ([]User, e
 		                OR username ILIKE '%' || $1 || '%'
 		                OR first_name ILIKE '%' || $1 || '%'
 		                OR last_name ILIKE '%' || $1 || '%'
+		                OR name ILIKE '%' || $1 || '%'
 		                OR (first_name || ' ' || last_name) ILIKE '%' || $1 || '%')
 		   AND ($5 OR deleted_at IS NULL)
 		   AND ($2 = '' OR (email, id) > ($2, $3))
