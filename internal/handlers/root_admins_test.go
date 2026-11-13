@@ -71,27 +71,42 @@ func reportingCtx() context.Context {
 type hardResetFixture struct {
 	s    *store.Store
 	h    *handlers.AdminHandler
-	a, b store.User
+	a, b store.User // a is the one root; b is an ordinary site-admin
 	now  time.Time
+}
+
+// newSiteAdminUser provisions an ordinary account holding the global
+// site-admin right, in the database and in the test claims.
+func newSiteAdminUser(t *testing.T, s *store.Store, sub, email string) store.User {
+	t.Helper()
+	u, err := s.JITProvision(context.Background(), sub, email, "Admin "+sub)
+	require.NoError(t, err)
+	execTestSQL(t, s, `INSERT INTO user_roles (user_id, role, scope_category) VALUES ($1, 'site-admin', '') ON CONFLICT DO NOTHING`, u.ID)
+	u, err = s.GetUser(context.Background(), u.ID)
+	require.NoError(t, err)
+	return u
 }
 
 func newHardResetFixture(t *testing.T) *hardResetFixture {
 	t.Helper()
 	s := newTestStore(t)
 	f := &hardResetFixture{s: s, now: time.Now().UTC()}
-	// The two-person hard reset still needs two root admins, which the
-	// single-root index forbids. Out of scope here (see the PR), so this test
-	// database drops the index to keep exercising the hard reset as it is.
-	execTestSQL(t, s, `DROP INDEX users_single_root_idx`)
 	f.a = newRootUser(t, s, "kc-hr-a", "hra@example.example.org")
-	f.b = newRootUser(t, s, "kc-hr-b", "hrb@example.example.org")
+	f.b = newSiteAdminUser(t, s, "kc-hr-b", "hrb@example.example.org")
 	f.h = handlers.NewAdminHandler(s, testAdminAuth()).
 		WithOTP(&fakeSender{}, zerolog.Nop(), true).
 		WithHardReset(24*time.Hour, time.Hour, func() time.Time { return f.now })
 	return f
 }
 
-func TestHardReset_TwoRootAdminsAndTheModuleService(t *testing.T) {
+func (f *hardResetFixture) request(t *testing.T) string {
+	t.Helper()
+	r, err := f.h.RequestHardReset(adminCtx(f.a.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "start over"})
+	require.NoError(t, err)
+	return r.GetRequest().GetId()
+}
+
+func TestHardReset_RootRequestsSiteAdminApprovesModuleServiceRedeems(t *testing.T) {
 	f := newHardResetFixture(t)
 
 	req, err := f.h.RequestHardReset(adminCtx(f.a.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "start over"})
@@ -100,9 +115,6 @@ func TestHardReset_TwoRootAdminsAndTheModuleService(t *testing.T) {
 	require.Equal(t, identityv1.HardResetState_HARD_RESET_STATE_PENDING, r.GetState())
 	require.Equal(t, f.a.ID.String(), r.GetRequestedBy())
 	require.Equal(t, f.now.Add(24*time.Hour).Format(time.RFC3339), r.GetExpiresAt())
-
-	_, err = f.h.ApproveHardReset(adminCtx(f.a.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: r.GetId()})
-	require.Equal(t, codes.PermissionDenied, status.Code(err), "the requester can't approve their own request")
 
 	appr, err := f.h.ApproveHardReset(adminCtx(f.b.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: r.GetId()})
 	require.NoError(t, err)
@@ -116,22 +128,93 @@ func TestHardReset_TwoRootAdminsAndTheModuleService(t *testing.T) {
 	require.Equal(t, "reporting", used.GetRequest().GetConsumedBy())
 	require.Equal(t, f.a.ID.String(), used.GetRequest().GetRequestedBy())
 	require.Equal(t, f.b.ID.String(), used.GetRequest().GetApprovedBy())
+	require.NotEqual(t, used.GetRequest().GetRequestedBy(), used.GetRequest().GetApprovedBy(), "the contract reporting checks")
 
 	_, err = f.h.ConsumeHardReset(reportingCtx(), &identityv1.ConsumeHardResetRequest{RequestId: r.GetId(), Module: "compliance"})
 	require.Equal(t, codes.FailedPrecondition, status.Code(err), "an approval is used once")
 
-	list, err := f.h.ListHardResetRequests(adminCtx(f.b.ID.String()), &identityv1.ListHardResetRequestsRequest{})
+	for _, who := range []string{f.a.ID.String(), f.b.ID.String()} {
+		list, err := f.h.ListHardResetRequests(adminCtx(who), &identityv1.ListHardResetRequestsRequest{})
+		require.NoError(t, err, "root and a site-admin can both list")
+		require.Len(t, list.GetRequests(), 1)
+	}
+}
+
+func TestHardReset_SamePersonRefused(t *testing.T) {
+	f := newHardResetFixture(t)
+	id := f.request(t)
+	_, err := f.h.ApproveHardReset(adminCtx(f.a.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: id})
+	require.Equal(t, codes.PermissionDenied, status.Code(err), "root can't approve its own request")
+
+	_, err = f.h.ConsumeHardReset(reportingCtx(), &identityv1.ConsumeHardResetRequest{RequestId: id, Module: "compliance"})
+	require.Equal(t, codes.FailedPrecondition, status.Code(err), "nothing is approved, so nothing redeems")
+}
+
+func TestHardReset_NonAdminApproverRefused(t *testing.T) {
+	f := newHardResetFixture(t)
+	id := f.request(t)
+	plain, err := f.s.JITProvision(context.Background(), "kc-hr-plain", "hrplain@example.example.org", "Plain")
 	require.NoError(t, err)
-	require.Len(t, list.GetRequests(), 1)
+
+	// A stale or forged claim that says site-admin is not enough: the database decides.
+	_, err = f.h.ApproveHardReset(adminCtx(plain.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: id})
+	require.Equal(t, codes.PermissionDenied, status.Code(err))
+	// Without the claim the caller is refused before the store.
+	_, err = f.h.ApproveHardReset(claimsCtx(plain.ID.String(), []string{"author"}), &identityv1.ApproveHardResetRequest{RequestId: id})
+	require.Equal(t, codes.PermissionDenied, status.Code(err))
+
+	_, err = f.h.ConsumeHardReset(reportingCtx(), &identityv1.ConsumeHardResetRequest{RequestId: id, Module: "compliance"})
+	require.Equal(t, codes.FailedPrecondition, status.Code(err))
+}
+
+func TestHardReset_DisabledApproverRefused(t *testing.T) {
+	f := newHardResetFixture(t)
+	id := f.request(t)
+	_, err := f.s.SetEnabled(context.Background(), f.b.ID, false, nil, "test")
+	require.NoError(t, err)
+
+	_, err = f.h.ApproveHardReset(adminCtx(f.b.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: id})
+	require.Equal(t, codes.PermissionDenied, status.Code(err), "a disabled account can't approve, whatever its session says")
+}
+
+func TestHardReset_ExpiredRefused(t *testing.T) {
+	f := newHardResetFixture(t)
+	id := f.request(t)
+
+	f.now = f.now.Add(25 * time.Hour)
+	_, err := f.h.ApproveHardReset(adminCtx(f.b.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: id})
+	require.Equal(t, codes.FailedPrecondition, status.Code(err), "an unapproved request lapses after HARD_RESET_REQUEST_TTL")
+
+	id = f.request(t)
+	_, err = f.h.ApproveHardReset(adminCtx(f.b.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: id})
+	require.NoError(t, err)
+	f.now = f.now.Add(61 * time.Minute)
+	_, err = f.h.ConsumeHardReset(reportingCtx(), &identityv1.ConsumeHardResetRequest{RequestId: id, Module: "compliance"})
+	require.Equal(t, codes.FailedPrecondition, status.Code(err), "the approval lapses after HARD_RESET_APPROVAL_TTL")
+
+	list, err := f.h.ListHardResetRequests(adminCtx(f.a.ID.String()), &identityv1.ListHardResetRequestsRequest{Module: "compliance"})
+	require.NoError(t, err)
+	require.Equal(t, identityv1.HardResetState_HARD_RESET_STATE_EXPIRED, list.GetRequests()[0].GetState())
+}
+
+func TestHardReset_RedeemOnceOnly(t *testing.T) {
+	f := newHardResetFixture(t)
+	id := f.request(t)
+	_, err := f.h.ApproveHardReset(adminCtx(f.b.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: id})
+	require.NoError(t, err)
+
+	_, err = f.h.ConsumeHardReset(reportingCtx(), &identityv1.ConsumeHardResetRequest{RequestId: id, Module: "compliance"})
+	require.NoError(t, err)
+	for i := 0; i < 2; i++ {
+		_, err = f.h.ConsumeHardReset(reportingCtx(), &identityv1.ConsumeHardResetRequest{RequestId: id, Module: "compliance"})
+		require.Equal(t, codes.FailedPrecondition, status.Code(err))
+	}
 }
 
 func TestHardReset_Refusals(t *testing.T) {
 	f := newHardResetFixture(t)
-	ctx := context.Background()
-	plain, err := f.s.JITProvision(ctx, "kc-hr-plain", "hrplain@example.example.org", "Plain")
-	require.NoError(t, err)
 
-	_, err = f.h.RequestHardReset(adminCtx(plain.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "x"})
+	_, err := f.h.RequestHardReset(adminCtx(f.b.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "x"})
 	require.Equal(t, codes.PermissionDenied, status.Code(err), "a site-admin who isn't root can't request")
 
 	_, err = f.h.RequestHardReset(adminCtx(f.a.ID.String()), &identityv1.RequestHardResetRequest{Module: "everything", Reason: "x"})
@@ -143,11 +226,9 @@ func TestHardReset_Refusals(t *testing.T) {
 	_, err = f.h.RequestHardReset(actingAsCtx(f.a.ID.String(), f.b.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "x"})
 	require.Error(t, err, "refused during act-as")
 
-	r, err := f.h.RequestHardReset(adminCtx(f.a.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "x"})
-	require.NoError(t, err)
-	id := r.GetRequest().GetId()
+	id := f.request(t)
 
-	_, err = f.h.RequestHardReset(adminCtx(f.b.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "y"})
+	_, err = f.h.RequestHardReset(adminCtx(f.a.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "y"})
 	require.Equal(t, codes.FailedPrecondition, status.Code(err), "one open request per module")
 
 	claimsCtx(f.b.ID.String(), []string{"site-admin"})
@@ -165,20 +246,12 @@ func TestHardReset_Refusals(t *testing.T) {
 	require.Equal(t, identityv1.HardResetState_HARD_RESET_STATE_CANCELLED, c.GetRequest().GetState())
 }
 
-func TestHardReset_ApprovalWindowsAreConfigurable(t *testing.T) {
+func TestHardReset_ListNeedsRootOrSiteAdmin(t *testing.T) {
 	f := newHardResetFixture(t)
-	r, err := f.h.RequestHardReset(adminCtx(f.a.ID.String()), &identityv1.RequestHardResetRequest{Module: "compliance", Reason: "x"})
+	plain, err := f.s.JITProvision(context.Background(), "kc-hr-plain", "hrplain@example.example.org", "Plain")
 	require.NoError(t, err)
-	_, err = f.h.ApproveHardReset(adminCtx(f.b.ID.String()), &identityv1.ApproveHardResetRequest{RequestId: r.GetRequest().GetId()})
-	require.NoError(t, err)
-
-	f.now = f.now.Add(61 * time.Minute)
-	_, err = f.h.ConsumeHardReset(reportingCtx(), &identityv1.ConsumeHardResetRequest{RequestId: r.GetRequest().GetId(), Module: "compliance"})
-	require.Equal(t, codes.FailedPrecondition, status.Code(err), "the approval lapses after HARD_RESET_APPROVAL_TTL")
-
-	list, err := f.h.ListHardResetRequests(adminCtx(f.a.ID.String()), &identityv1.ListHardResetRequestsRequest{Module: "compliance"})
-	require.NoError(t, err)
-	require.Equal(t, identityv1.HardResetState_HARD_RESET_STATE_EXPIRED, list.GetRequests()[0].GetState())
+	_, err = f.h.ListHardResetRequests(adminCtx(plain.ID.String()), &identityv1.ListHardResetRequestsRequest{})
+	require.Equal(t, codes.PermissionDenied, status.Code(err))
 }
 
 func TestConsumeHardReset_OnlyAsAService(t *testing.T) {

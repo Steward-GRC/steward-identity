@@ -22,7 +22,8 @@ const (
 	HardResetExpired   = "expired"
 )
 
-// HardResetRequest is one two-person hard reset of a module.
+// HardResetRequest is one four-eyes hard reset of a module: the root admin
+// asks and a different active site-admin approves.
 type HardResetRequest struct {
 	ID                uuid.UUID
 	Module            string
@@ -99,6 +100,52 @@ func requireRootTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID) error {
 	return nil
 }
 
+// requireSiteAdminTx checks that userID is a live, enabled account holding the
+// global site-admin right (the root admin holds it too).
+func requireSiteAdminTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID) error {
+	var ok bool
+	if err := tx.QueryRow(ctx,
+		`SELECT EXISTS(SELECT 1 FROM users u
+		                WHERE u.id = $1 AND u.enabled AND u.deleted_at IS NULL
+		                  AND EXISTS(SELECT 1 FROM user_roles r
+		                              WHERE r.user_id = u.id AND r.role = 'site-admin' AND r.scope_category = ''))`,
+		userID).Scan(&ok); err != nil {
+		return fmt.Errorf("site-admin check: %w", err)
+	}
+	if !ok {
+		return ErrSiteAdminRequired
+	}
+	return nil
+}
+
+// IsActiveSiteAdmin reports whether userID is a live, enabled account holding
+// the global site-admin right.
+func (s *Store) IsActiveSiteAdmin(ctx context.Context, userID uuid.UUID) (bool, error) {
+	var ok bool
+	err := s.db.RunInTx(ctx, func(tx pgx.Tx) error {
+		err := requireSiteAdminTx(ctx, tx, userID)
+		if errors.Is(err, ErrSiteAdminRequired) {
+			return nil
+		}
+		ok = err == nil
+		return err
+	})
+	return ok, err
+}
+
+// requireStillRootTx refuses a request whose requester has stopped being the
+// root admin (root moved by TransferRoot, or the account was disabled) since
+// asking: the authority behind it is gone.
+func requireStillRootTx(ctx context.Context, tx pgx.Tx, requester uuid.UUID) error {
+	if err := requireRootTx(ctx, tx, requester); err != nil {
+		if errors.Is(err, ErrRootRequired) {
+			return fmt.Errorf("%w: the requester is no longer the root admin", ErrHardResetState)
+		}
+		return err
+	}
+	return nil
+}
+
 func lockHardReset(ctx context.Context, tx pgx.Tx, id uuid.UUID) (HardResetRequest, error) {
 	r, err := scanHardReset(tx.QueryRow(ctx,
 		`SELECT `+hardResetColumns+` FROM hard_reset_requests WHERE id = $1 FOR UPDATE`, id))
@@ -146,9 +193,12 @@ func (s *Store) CreateHardResetRequest(ctx context.Context, module, reason strin
 	return out, err
 }
 
-// ApproveHardResetRequest records a second root admin's approval. The
-// requester can't approve (ErrSelfApproval); the request must still be
-// pending (ErrHardResetState). The approval can be redeemed once within ttl.
+// ApproveHardResetRequest records the approval of a different, active
+// site-admin. The requester can't approve (ErrSelfApproval, checked first so
+// the root admin is always told that); the approver must hold the global
+// site-admin right on an enabled, live account (ErrSiteAdminRequired); the
+// request must still be pending (ErrHardResetState) and its requester still
+// the root admin. The approval can be redeemed once within ttl.
 func (s *Store) ApproveHardResetRequest(ctx context.Context, id, approver uuid.UUID, now time.Time, ttl time.Duration) (HardResetRequest, error) {
 	var out HardResetRequest
 	err := s.db.RunInTx(ctx, func(tx pgx.Tx) error {
@@ -159,14 +209,17 @@ func (s *Store) ApproveHardResetRequest(ctx context.Context, id, approver uuid.U
 		if err != nil {
 			return err
 		}
-		if err := requireRootTx(ctx, tx, approver); err != nil {
-			return err
-		}
 		if r.RequestedBy == approver {
 			return ErrSelfApproval
 		}
+		if err := requireSiteAdminTx(ctx, tx, approver); err != nil {
+			return err
+		}
 		if r.State != HardResetPending {
 			return fmt.Errorf("%w: it is %s", ErrHardResetState, r.State)
+		}
+		if err := requireStillRootTx(ctx, tx, r.RequestedBy); err != nil {
+			return err
 		}
 		r, err = scanHardReset(tx.QueryRow(ctx,
 			`UPDATE hard_reset_requests
@@ -238,6 +291,18 @@ func (s *Store) ConsumeHardResetRequest(ctx context.Context, id uuid.UUID, modul
 		}
 		if r.Module != module {
 			return fmt.Errorf("%w: it is for another module", ErrHardResetState)
+		}
+		// The two people are checked again at redeem time: an approver disabled
+		// or stripped of site-admin, or a requester no longer root, since the
+		// approval no longer counts. The request is left as it is.
+		if r.ApprovedBy == nil {
+			return fmt.Errorf("%w: it names no approver", ErrHardResetState)
+		}
+		if err := requireStillRootTx(ctx, tx, r.RequestedBy); err != nil {
+			return err
+		}
+		if err := requireSiteAdminTx(ctx, tx, *r.ApprovedBy); err != nil {
+			return fmt.Errorf("%w: the approver is no longer an active site-admin", ErrHardResetState)
 		}
 		r, err = scanHardReset(tx.QueryRow(ctx,
 			`UPDATE hard_reset_requests SET state = 'consumed', consumed_at = $2, consumed_by = $3 WHERE id = $1

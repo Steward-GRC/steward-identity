@@ -363,7 +363,7 @@ message SPCertificate {
 // HardResetState is where a hard reset request stands.
 enum HardResetState {
   HARD_RESET_STATE_UNSPECIFIED = 0;
-  // Waiting for a second root admin.
+  // Waiting for a different site-admin to approve.
   HARD_RESET_STATE_PENDING = 1;
   // Approved; usable once until approval_expires_at.
   HARD_RESET_STATE_APPROVED = 2;
@@ -375,7 +375,7 @@ enum HardResetState {
   HARD_RESET_STATE_EXPIRED = 5;
 }
 
-// HardResetRequest is one two-person hard reset of a module. Times are RFC
+// HardResetRequest is one four-eyes hard reset of a module. Times are RFC
 // 3339; an empty time hasn't happened.
 message HardResetRequest {
   string id = 1;
@@ -387,7 +387,7 @@ message HardResetRequest {
   string requested_at = 6;
   // The request must be approved before this.
   string expires_at = 7;
-  // The approving root admin's user id.
+  // The approving site-admin's user id: never the requester.
   string approved_by = 8;
   string approved_at = 9;
   // The approval must be used before this.

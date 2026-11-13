@@ -85,7 +85,7 @@ A method no caller uses is refused to everyone.
 | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_ORIGINS`, `WEBAUTHN_RP_NAME`, `WEBAUTHN_USER_VERIFICATION` | `localhost`, `http://localhost:5173`, `Steward`, `preferred` | The passkey relying party. |
 | `BREAK_GLASS_DURATION` | `15m` | How long a break-glass reveal lasts. |
 | `SESSION_LAST_SEEN_THROTTLE` | `1m` | How often a sign-in session's last-seen time moves while it is in use. |
-| `HARD_RESET_REQUEST_TTL` | `24h` | How long a hard reset request waits for a second root admin. |
+| `HARD_RESET_REQUEST_TTL` | `24h` | How long a hard reset request waits for a site-admin to approve it. |
 | `HARD_RESET_APPROVAL_TTL` | `1h` | How long an approved hard reset stays usable, once. |
 
 ## SSO connections

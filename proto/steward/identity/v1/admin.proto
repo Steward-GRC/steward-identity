@@ -89,19 +89,21 @@ service IdentityAdminService {
   rpc RevokeRoot(RevokeRootRequest) returns (RevokeRootResponse) {
     option deprecated = true;
   };
-  // RequestHardReset starts a two-person hard reset of a module: one root
-  // admin asks, a different root admin approves. The request expires after
-  // HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
+  // RequestHardReset starts a four-eyes hard reset of a module: the root
+  // admin asks, a different active site-admin approves. The request expires
+  // after HARD_RESET_REQUEST_TTL. Root only, refused during act-as. One open
   // request per module.
   rpc RequestHardReset(RequestHardResetRequest) returns (RequestHardResetResponse);
-  // ApproveHardReset approves a pending request. The requester can't approve
-  // their own. The approval can be used once, within HARD_RESET_APPROVAL_TTL.
+  // ApproveHardReset approves a pending request. The approver must be an
+  // enabled site-admin other than the requester (the root admin can't approve
+  // its own request). The approval can be used once, within
+  // HARD_RESET_APPROVAL_TTL.
   rpc ApproveHardReset(ApproveHardResetRequest) returns (ApproveHardResetResponse);
   // CancelHardReset withdraws a pending or approved request. Only its
   // requester may cancel it.
   rpc CancelHardReset(CancelHardResetRequest) returns (CancelHardResetResponse);
-  // ListHardResetRequests lists the hard reset requests, newest first. Root
-  // only.
+  // ListHardResetRequests lists the hard reset requests, newest first. The
+  // root admin or an active site-admin.
   rpc ListHardResetRequests(ListHardResetRequestsRequest) returns (ListHardResetRequestsResponse);
   // ConsumeHardReset redeems an approved request once, just before the
   // module's own service runs the reset. Only the module's service calls it,
