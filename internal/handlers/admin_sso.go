@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"maps"
 	"net"
@@ -1236,10 +1237,14 @@ func (h *SSOAdminHandler) AddGroupMapping(ctx context.Context, req *identityv1.A
 		return nil, status.Error(codes.InvalidArgument, "idp_group_claim_value required")
 	}
 
+	lg := logger.Ctx(ctx)
+	lg.Debug("sso: adding group mapping", log.F("connection_id", connID.String()), log.F("target_group_id", targetGroupID.String()))
 	m, err := h.store.AddIdPGroupMapping(ctx, connID, idpValue, targetGroupID)
 	if err != nil {
+		lg.Warn("sso: add group mapping failed", log.F("connection_id", connID.String()), log.F("target_group_id", targetGroupID.String()), log.F("not_found", errors.Is(err, store.ErrNotFound)), log.F("error", errText(err)))
 		return nil, statusFromStoreErr(err)
 	}
+	lg.Debug("sso: group mapping added", log.F("connection_id", connID.String()), log.F("mapping_id", m.ID.String()))
 	return &identityv1.AddGroupMappingResponse{Mapping: groupMappingToProto(m)}, nil
 }
 

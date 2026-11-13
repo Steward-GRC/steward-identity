@@ -148,3 +148,31 @@ func TestDeleteIdPGroupMapping_NotFound(t *testing.T) {
 	err := s.DeleteIdPGroupMapping(ctx, uuid.New())
 	require.ErrorIs(t, err, store.ErrNotFound)
 }
+
+// TestAddIdPGroupMapping_UnknownReferences verifies that a mapping for a
+// connection or target group that does not exist is reported as ErrNotFound
+// (not a raw foreign key error), with a message that names which side is
+// missing and never leaks the constraint name. See issue 82.
+func TestAddIdPGroupMapping_UnknownReferences(t *testing.T) {
+	s := newTestStore(t)
+	ctx := context.Background()
+
+	conn, err := s.CreateIdPConnection(ctx, store.IdPConnection{OrgName: "Example Organisation", Protocol: "oidc", ConnectionAlias: "example-org"})
+	require.NoError(t, err)
+	g, err := s.CreateGroup(ctx, "Approvers", uuid.Nil, nil, nil, "test")
+	require.NoError(t, err)
+
+	_, err = s.AddIdPGroupMapping(ctx, uuid.New(), "eng", g.ID)
+	require.ErrorIs(t, err, store.ErrNotFound)
+	require.EqualError(t, err, "connection not found")
+
+	_, err = s.AddIdPGroupMapping(ctx, conn.ID, "eng", uuid.New())
+	require.ErrorIs(t, err, store.ErrNotFound)
+	require.EqualError(t, err, "target group not found")
+
+	// A duplicate claim value is still a conflict, not a not-found.
+	_, err = s.AddIdPGroupMapping(ctx, conn.ID, "eng", g.ID)
+	require.NoError(t, err)
+	_, err = s.AddIdPGroupMapping(ctx, conn.ID, "eng", g.ID)
+	require.ErrorIs(t, err, store.ErrConflict)
+}

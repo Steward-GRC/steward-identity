@@ -11,7 +11,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
+
+// pgForeignKeyViolation is the SQLSTATE for a foreign key violation.
+const pgForeignKeyViolation = "23503"
 
 // IdPGroupMapping maps a single asserted IdP group-claim value to a
 // platform group by id. The target is a group UUID (not a name): group
@@ -31,6 +35,9 @@ type IdPGroupMapping struct {
 // mapping for a connection. The migration's FK (target_group_id REFERENCES
 // groups(id) ON DELETE CASCADE) enforces that the target group exists at
 // creation time and that the mapping is removed if the group is later deleted.
+// A foreign key violation on either reference is returned as ErrNotFound
+// ("connection not found" / "target group not found"); the constraint name
+// never reaches the caller.
 func (s *Store) AddIdPGroupMapping(ctx context.Context, connID uuid.UUID, idpValue string, targetGroupID uuid.UUID) (IdPGroupMapping, error) {
 	m := IdPGroupMapping{
 		ConnectionID:       connID,
@@ -44,6 +51,15 @@ func (s *Store) AddIdPGroupMapping(ctx context.Context, connID uuid.UUID, idpVal
 		connID, idpValue, targetGroupID).
 		Scan(&m.ID)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == pgForeignKeyViolation {
+			switch pgErr.ConstraintName {
+			case "idp_group_mappings_connection_id_fkey":
+				return IdPGroupMapping{}, fmt.Errorf("connection %w", ErrNotFound)
+			case "idp_group_mappings_target_group_id_fkey":
+				return IdPGroupMapping{}, fmt.Errorf("target group %w", ErrNotFound)
+			}
+		}
 		return IdPGroupMapping{}, mapPgError(err, ErrConflict)
 	}
 	return m, nil

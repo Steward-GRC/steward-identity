@@ -112,3 +112,45 @@ func TestGroupMappingRPCs_RequireAuth(t *testing.T) {
 		t.Fatalf("DeleteGroupMapping: expected PermissionDenied, got %v", err)
 	}
 }
+
+// AddGroupMapping for a connection or target group that does not exist must
+// answer NotFound, not Internal (issue 82).
+func TestAddGroupMapping_UnknownReferencesAreNotFound(t *testing.T) {
+	s := newTestStore(t)
+	ctx := context.Background()
+	conn, err := s.CreateIdPConnection(ctx, store.IdPConnection{OrgName: "Partner Organisation", Protocol: "oidc", ConnectionAlias: "partner"})
+	if err != nil {
+		t.Fatalf("CreateIdPConnection: %v", err)
+	}
+	g, err := s.CreateGroup(ctx, "Engineering", uuid.Nil, nil, nil, "test")
+	if err != nil {
+		t.Fatalf("CreateGroup: %v", err)
+	}
+	h := handlers.NewSSOAdminHandler(s, newPolisFake(t).provisioner(), ssoAdminAuth())
+	authed := adminCtx(uuid.NewString())
+
+	cases := []struct {
+		name    string
+		connID  string
+		groupID string
+		msg     string
+	}{
+		{"unknown connection", uuid.NewString(), g.ID.String(), "connection not found"},
+		{"unknown target group", conn.ID.String(), uuid.NewString(), "target group not found"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := h.AddGroupMapping(authed, &identityv1.AddGroupMappingRequest{
+				ConnectionId:       tc.connID,
+				IdpGroupClaimValue: "eng",
+				TargetGroupId:      tc.groupID,
+			})
+			if status.Code(err) != codes.NotFound {
+				t.Fatalf("code: got %v (%v), want NotFound", status.Code(err), err)
+			}
+			if got := status.Convert(err).Message(); got != tc.msg {
+				t.Fatalf("message: got %q want %q", got, tc.msg)
+			}
+		})
+	}
+}
