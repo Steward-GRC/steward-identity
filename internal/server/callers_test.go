@@ -175,7 +175,11 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 }
 
 func TestCallerPolicyInternalCallersActAsThemselves(t *testing.T) {
-	requireCallerMethods(t, CallerWorkflow, self(identityv1.IdentityReadService_GetUser_FullMethodName))
+	// workflow's approver access filter reads every enabled user (identity#80).
+	requireCallerMethods(t, CallerWorkflow, self(
+		identityv1.IdentityReadService_GetUser_FullMethodName,
+		identityv1.IdentityReadService_ListAllUsers_FullMethodName,
+	))
 	requireCallerMethods(t, CallerReporting, self(
 		identityv1.IdentityReadService_GetUser_FullMethodName,
 		identityv1.IdentityAdminService_ConsumeHardReset_FullMethodName,
