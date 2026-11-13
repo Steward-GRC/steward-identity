@@ -139,19 +139,145 @@ func (x *Maintenance) GetMessage() string {
 	return ""
 }
 
-// GlobalSettings is the stored settings singleton. Every field is an adopter
-// setting with an empty default.
+// Holiday is one day off on the work calendar. date is a strict YYYY-MM-DD
+// civil date in the calendar's time zone; label is 0 to 80 characters (empty is allowed).
+type Holiday struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	Label         string                 `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Holiday) Reset() {
+	*x = Holiday{}
+	mi := &file_steward_core_v1_settings_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Holiday) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Holiday) ProtoMessage() {}
+
+func (x *Holiday) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_core_v1_settings_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Holiday.ProtoReflect.Descriptor instead.
+func (*Holiday) Descriptor() ([]byte, []int) {
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Holiday) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *Holiday) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+// WorkCalendar is the one site-wide calendar that says which days count as
+// working days. weekdays are ISO numbers (1 Monday to 7 Sunday), at least one,
+// no repeats. timezone is an IANA name ("UTC", "Europe/London"); the empty
+// string and "Local" are refused. holidays are unique dates, at most 366.
+// Whole days only. Unset, the calendar is Monday to Friday, UTC, no holidays.
+type WorkCalendar struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Weekdays      []int32                `protobuf:"varint,1,rep,packed,name=weekdays,proto3" json:"weekdays,omitempty"`
+	Timezone      string                 `protobuf:"bytes,2,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	Holidays      []*Holiday             `protobuf:"bytes,3,rep,name=holidays,proto3" json:"holidays,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorkCalendar) Reset() {
+	*x = WorkCalendar{}
+	mi := &file_steward_core_v1_settings_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorkCalendar) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorkCalendar) ProtoMessage() {}
+
+func (x *WorkCalendar) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_core_v1_settings_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorkCalendar.ProtoReflect.Descriptor instead.
+func (*WorkCalendar) Descriptor() ([]byte, []int) {
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *WorkCalendar) GetWeekdays() []int32 {
+	if x != nil {
+		return x.Weekdays
+	}
+	return nil
+}
+
+func (x *WorkCalendar) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+func (x *WorkCalendar) GetHolidays() []*Holiday {
+	if x != nil {
+		return x.Holidays
+	}
+	return nil
+}
+
+// GlobalSettings is the stored settings singleton. The banners are adopter
+// settings with an empty default.
+//
+// work_calendar has message presence. On Get it is always set: the effective
+// calendar, the defaults when none was ever saved. On Set an absent
+// work_calendar means "leave the stored calendar unchanged" (so a client that
+// predates the field cannot wipe it); a present one replaces it whole and is
+// validated, an invalid one is InvalidArgument and nothing is written.
 type GlobalSettings struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Announcement  *Announcement          `protobuf:"bytes,1,opt,name=announcement,proto3" json:"announcement,omitempty"`
 	Maintenance   *Maintenance           `protobuf:"bytes,2,opt,name=maintenance,proto3" json:"maintenance,omitempty"`
+	WorkCalendar  *WorkCalendar          `protobuf:"bytes,3,opt,name=work_calendar,json=workCalendar,proto3" json:"work_calendar,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GlobalSettings) Reset() {
 	*x = GlobalSettings{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[2]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -163,7 +289,7 @@ func (x *GlobalSettings) String() string {
 func (*GlobalSettings) ProtoMessage() {}
 
 func (x *GlobalSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[2]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -176,7 +302,7 @@ func (x *GlobalSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GlobalSettings.ProtoReflect.Descriptor instead.
 func (*GlobalSettings) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{2}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GlobalSettings) GetAnnouncement() *Announcement {
@@ -193,6 +319,13 @@ func (x *GlobalSettings) GetMaintenance() *Maintenance {
 	return nil
 }
 
+func (x *GlobalSettings) GetWorkCalendar() *WorkCalendar {
+	if x != nil {
+		return x.WorkCalendar
+	}
+	return nil
+}
+
 type GetGlobalSettingsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -201,7 +334,7 @@ type GetGlobalSettingsRequest struct {
 
 func (x *GetGlobalSettingsRequest) Reset() {
 	*x = GetGlobalSettingsRequest{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[3]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -213,7 +346,7 @@ func (x *GetGlobalSettingsRequest) String() string {
 func (*GetGlobalSettingsRequest) ProtoMessage() {}
 
 func (x *GetGlobalSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[3]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -226,7 +359,7 @@ func (x *GetGlobalSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetGlobalSettingsRequest.ProtoReflect.Descriptor instead.
 func (*GetGlobalSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{3}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{5}
 }
 
 type GetGlobalSettingsResponse struct {
@@ -238,7 +371,7 @@ type GetGlobalSettingsResponse struct {
 
 func (x *GetGlobalSettingsResponse) Reset() {
 	*x = GetGlobalSettingsResponse{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[4]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -250,7 +383,7 @@ func (x *GetGlobalSettingsResponse) String() string {
 func (*GetGlobalSettingsResponse) ProtoMessage() {}
 
 func (x *GetGlobalSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[4]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -263,7 +396,7 @@ func (x *GetGlobalSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetGlobalSettingsResponse.ProtoReflect.Descriptor instead.
 func (*GetGlobalSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{4}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetGlobalSettingsResponse) GetSettings() *GlobalSettings {
@@ -283,7 +416,7 @@ type SetGlobalSettingsRequest struct {
 
 func (x *SetGlobalSettingsRequest) Reset() {
 	*x = SetGlobalSettingsRequest{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[5]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -295,7 +428,7 @@ func (x *SetGlobalSettingsRequest) String() string {
 func (*SetGlobalSettingsRequest) ProtoMessage() {}
 
 func (x *SetGlobalSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[5]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -308,7 +441,7 @@ func (x *SetGlobalSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetGlobalSettingsRequest.ProtoReflect.Descriptor instead.
 func (*SetGlobalSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{5}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *SetGlobalSettingsRequest) GetSettings() *GlobalSettings {
@@ -334,7 +467,7 @@ type SetGlobalSettingsResponse struct {
 
 func (x *SetGlobalSettingsResponse) Reset() {
 	*x = SetGlobalSettingsResponse{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[6]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -346,7 +479,7 @@ func (x *SetGlobalSettingsResponse) String() string {
 func (*SetGlobalSettingsResponse) ProtoMessage() {}
 
 func (x *SetGlobalSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[6]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -359,7 +492,7 @@ func (x *SetGlobalSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetGlobalSettingsResponse.ProtoReflect.Descriptor instead.
 func (*SetGlobalSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{6}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SetGlobalSettingsResponse) GetSettings() *GlobalSettings {
@@ -388,7 +521,7 @@ type EmailServiceStatus struct {
 
 func (x *EmailServiceStatus) Reset() {
 	*x = EmailServiceStatus{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[7]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -400,7 +533,7 @@ func (x *EmailServiceStatus) String() string {
 func (*EmailServiceStatus) ProtoMessage() {}
 
 func (x *EmailServiceStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[7]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -413,7 +546,7 @@ func (x *EmailServiceStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmailServiceStatus.ProtoReflect.Descriptor instead.
 func (*EmailServiceStatus) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{7}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *EmailServiceStatus) GetApiKeySet() bool {
@@ -483,7 +616,7 @@ type SetEmailServiceConfigRequest struct {
 
 func (x *SetEmailServiceConfigRequest) Reset() {
 	*x = SetEmailServiceConfigRequest{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[8]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -495,7 +628,7 @@ func (x *SetEmailServiceConfigRequest) String() string {
 func (*SetEmailServiceConfigRequest) ProtoMessage() {}
 
 func (x *SetEmailServiceConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[8]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -508,7 +641,7 @@ func (x *SetEmailServiceConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetEmailServiceConfigRequest.ProtoReflect.Descriptor instead.
 func (*SetEmailServiceConfigRequest) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{8}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SetEmailServiceConfigRequest) GetApiKey() string {
@@ -569,7 +702,7 @@ type SetEmailServiceConfigResponse struct {
 
 func (x *SetEmailServiceConfigResponse) Reset() {
 	*x = SetEmailServiceConfigResponse{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[9]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -581,7 +714,7 @@ func (x *SetEmailServiceConfigResponse) String() string {
 func (*SetEmailServiceConfigResponse) ProtoMessage() {}
 
 func (x *SetEmailServiceConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[9]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -594,7 +727,7 @@ func (x *SetEmailServiceConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetEmailServiceConfigResponse.ProtoReflect.Descriptor instead.
 func (*SetEmailServiceConfigResponse) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{9}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SetEmailServiceConfigResponse) GetStatus() *EmailServiceStatus {
@@ -612,7 +745,7 @@ type EmailServiceConfigStatusRequest struct {
 
 func (x *EmailServiceConfigStatusRequest) Reset() {
 	*x = EmailServiceConfigStatusRequest{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[10]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -624,7 +757,7 @@ func (x *EmailServiceConfigStatusRequest) String() string {
 func (*EmailServiceConfigStatusRequest) ProtoMessage() {}
 
 func (x *EmailServiceConfigStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[10]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -637,7 +770,7 @@ func (x *EmailServiceConfigStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmailServiceConfigStatusRequest.ProtoReflect.Descriptor instead.
 func (*EmailServiceConfigStatusRequest) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{10}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{12}
 }
 
 type EmailServiceConfigStatusResponse struct {
@@ -649,7 +782,7 @@ type EmailServiceConfigStatusResponse struct {
 
 func (x *EmailServiceConfigStatusResponse) Reset() {
 	*x = EmailServiceConfigStatusResponse{}
-	mi := &file_steward_core_v1_settings_proto_msgTypes[11]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -661,7 +794,7 @@ func (x *EmailServiceConfigStatusResponse) String() string {
 func (*EmailServiceConfigStatusResponse) ProtoMessage() {}
 
 func (x *EmailServiceConfigStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_steward_core_v1_settings_proto_msgTypes[11]
+	mi := &file_steward_core_v1_settings_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -674,7 +807,7 @@ func (x *EmailServiceConfigStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmailServiceConfigStatusResponse.ProtoReflect.Descriptor instead.
 func (*EmailServiceConfigStatusResponse) Descriptor() ([]byte, []int) {
-	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{11}
+	return file_steward_core_v1_settings_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *EmailServiceConfigStatusResponse) GetStatus() *EmailServiceStatus {
@@ -695,10 +828,18 @@ const file_steward_core_v1_settings_proto_rawDesc = "" +
 	"\amessage\x18\x03 \x01(\tR\amessage\"A\n" +
 	"\vMaintenance\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x93\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"3\n" +
+	"\aHoliday\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x14\n" +
+	"\x05label\x18\x02 \x01(\tR\x05label\"|\n" +
+	"\fWorkCalendar\x12\x1a\n" +
+	"\bweekdays\x18\x01 \x03(\x05R\bweekdays\x12\x1a\n" +
+	"\btimezone\x18\x02 \x01(\tR\btimezone\x124\n" +
+	"\bholidays\x18\x03 \x03(\v2\x18.steward.core.v1.HolidayR\bholidays\"\xd7\x01\n" +
 	"\x0eGlobalSettings\x12A\n" +
 	"\fannouncement\x18\x01 \x01(\v2\x1d.steward.core.v1.AnnouncementR\fannouncement\x12>\n" +
-	"\vmaintenance\x18\x02 \x01(\v2\x1c.steward.core.v1.MaintenanceR\vmaintenance\"\x1a\n" +
+	"\vmaintenance\x18\x02 \x01(\v2\x1c.steward.core.v1.MaintenanceR\vmaintenance\x12B\n" +
+	"\rwork_calendar\x18\x03 \x01(\v2\x1d.steward.core.v1.WorkCalendarR\fworkCalendar\"\x1a\n" +
 	"\x18GetGlobalSettingsRequest\"X\n" +
 	"\x19GetGlobalSettingsResponse\x12;\n" +
 	"\bsettings\x18\x01 \x01(\v2\x1f.steward.core.v1.GlobalSettingsR\bsettings\"{\n" +
@@ -749,42 +890,46 @@ func file_steward_core_v1_settings_proto_rawDescGZIP() []byte {
 	return file_steward_core_v1_settings_proto_rawDescData
 }
 
-var file_steward_core_v1_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_steward_core_v1_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_steward_core_v1_settings_proto_goTypes = []any{
 	(*Announcement)(nil),                     // 0: steward.core.v1.Announcement
 	(*Maintenance)(nil),                      // 1: steward.core.v1.Maintenance
-	(*GlobalSettings)(nil),                   // 2: steward.core.v1.GlobalSettings
-	(*GetGlobalSettingsRequest)(nil),         // 3: steward.core.v1.GetGlobalSettingsRequest
-	(*GetGlobalSettingsResponse)(nil),        // 4: steward.core.v1.GetGlobalSettingsResponse
-	(*SetGlobalSettingsRequest)(nil),         // 5: steward.core.v1.SetGlobalSettingsRequest
-	(*SetGlobalSettingsResponse)(nil),        // 6: steward.core.v1.SetGlobalSettingsResponse
-	(*EmailServiceStatus)(nil),               // 7: steward.core.v1.EmailServiceStatus
-	(*SetEmailServiceConfigRequest)(nil),     // 8: steward.core.v1.SetEmailServiceConfigRequest
-	(*SetEmailServiceConfigResponse)(nil),    // 9: steward.core.v1.SetEmailServiceConfigResponse
-	(*EmailServiceConfigStatusRequest)(nil),  // 10: steward.core.v1.EmailServiceConfigStatusRequest
-	(*EmailServiceConfigStatusResponse)(nil), // 11: steward.core.v1.EmailServiceConfigStatusResponse
+	(*Holiday)(nil),                          // 2: steward.core.v1.Holiday
+	(*WorkCalendar)(nil),                     // 3: steward.core.v1.WorkCalendar
+	(*GlobalSettings)(nil),                   // 4: steward.core.v1.GlobalSettings
+	(*GetGlobalSettingsRequest)(nil),         // 5: steward.core.v1.GetGlobalSettingsRequest
+	(*GetGlobalSettingsResponse)(nil),        // 6: steward.core.v1.GetGlobalSettingsResponse
+	(*SetGlobalSettingsRequest)(nil),         // 7: steward.core.v1.SetGlobalSettingsRequest
+	(*SetGlobalSettingsResponse)(nil),        // 8: steward.core.v1.SetGlobalSettingsResponse
+	(*EmailServiceStatus)(nil),               // 9: steward.core.v1.EmailServiceStatus
+	(*SetEmailServiceConfigRequest)(nil),     // 10: steward.core.v1.SetEmailServiceConfigRequest
+	(*SetEmailServiceConfigResponse)(nil),    // 11: steward.core.v1.SetEmailServiceConfigResponse
+	(*EmailServiceConfigStatusRequest)(nil),  // 12: steward.core.v1.EmailServiceConfigStatusRequest
+	(*EmailServiceConfigStatusResponse)(nil), // 13: steward.core.v1.EmailServiceConfigStatusResponse
 }
 var file_steward_core_v1_settings_proto_depIdxs = []int32{
-	0,  // 0: steward.core.v1.GlobalSettings.announcement:type_name -> steward.core.v1.Announcement
-	1,  // 1: steward.core.v1.GlobalSettings.maintenance:type_name -> steward.core.v1.Maintenance
-	2,  // 2: steward.core.v1.GetGlobalSettingsResponse.settings:type_name -> steward.core.v1.GlobalSettings
-	2,  // 3: steward.core.v1.SetGlobalSettingsRequest.settings:type_name -> steward.core.v1.GlobalSettings
-	2,  // 4: steward.core.v1.SetGlobalSettingsResponse.settings:type_name -> steward.core.v1.GlobalSettings
-	7,  // 5: steward.core.v1.SetEmailServiceConfigResponse.status:type_name -> steward.core.v1.EmailServiceStatus
-	7,  // 6: steward.core.v1.EmailServiceConfigStatusResponse.status:type_name -> steward.core.v1.EmailServiceStatus
-	3,  // 7: steward.core.v1.SettingsService.GetGlobalSettings:input_type -> steward.core.v1.GetGlobalSettingsRequest
-	5,  // 8: steward.core.v1.SettingsService.SetGlobalSettings:input_type -> steward.core.v1.SetGlobalSettingsRequest
-	8,  // 9: steward.core.v1.SettingsService.SetEmailServiceConfig:input_type -> steward.core.v1.SetEmailServiceConfigRequest
-	10, // 10: steward.core.v1.SettingsService.EmailServiceConfigStatus:input_type -> steward.core.v1.EmailServiceConfigStatusRequest
-	4,  // 11: steward.core.v1.SettingsService.GetGlobalSettings:output_type -> steward.core.v1.GetGlobalSettingsResponse
-	6,  // 12: steward.core.v1.SettingsService.SetGlobalSettings:output_type -> steward.core.v1.SetGlobalSettingsResponse
-	9,  // 13: steward.core.v1.SettingsService.SetEmailServiceConfig:output_type -> steward.core.v1.SetEmailServiceConfigResponse
-	11, // 14: steward.core.v1.SettingsService.EmailServiceConfigStatus:output_type -> steward.core.v1.EmailServiceConfigStatusResponse
-	11, // [11:15] is the sub-list for method output_type
-	7,  // [7:11] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	2,  // 0: steward.core.v1.WorkCalendar.holidays:type_name -> steward.core.v1.Holiday
+	0,  // 1: steward.core.v1.GlobalSettings.announcement:type_name -> steward.core.v1.Announcement
+	1,  // 2: steward.core.v1.GlobalSettings.maintenance:type_name -> steward.core.v1.Maintenance
+	3,  // 3: steward.core.v1.GlobalSettings.work_calendar:type_name -> steward.core.v1.WorkCalendar
+	4,  // 4: steward.core.v1.GetGlobalSettingsResponse.settings:type_name -> steward.core.v1.GlobalSettings
+	4,  // 5: steward.core.v1.SetGlobalSettingsRequest.settings:type_name -> steward.core.v1.GlobalSettings
+	4,  // 6: steward.core.v1.SetGlobalSettingsResponse.settings:type_name -> steward.core.v1.GlobalSettings
+	9,  // 7: steward.core.v1.SetEmailServiceConfigResponse.status:type_name -> steward.core.v1.EmailServiceStatus
+	9,  // 8: steward.core.v1.EmailServiceConfigStatusResponse.status:type_name -> steward.core.v1.EmailServiceStatus
+	5,  // 9: steward.core.v1.SettingsService.GetGlobalSettings:input_type -> steward.core.v1.GetGlobalSettingsRequest
+	7,  // 10: steward.core.v1.SettingsService.SetGlobalSettings:input_type -> steward.core.v1.SetGlobalSettingsRequest
+	10, // 11: steward.core.v1.SettingsService.SetEmailServiceConfig:input_type -> steward.core.v1.SetEmailServiceConfigRequest
+	12, // 12: steward.core.v1.SettingsService.EmailServiceConfigStatus:input_type -> steward.core.v1.EmailServiceConfigStatusRequest
+	6,  // 13: steward.core.v1.SettingsService.GetGlobalSettings:output_type -> steward.core.v1.GetGlobalSettingsResponse
+	8,  // 14: steward.core.v1.SettingsService.SetGlobalSettings:output_type -> steward.core.v1.SetGlobalSettingsResponse
+	11, // 15: steward.core.v1.SettingsService.SetEmailServiceConfig:output_type -> steward.core.v1.SetEmailServiceConfigResponse
+	13, // 16: steward.core.v1.SettingsService.EmailServiceConfigStatus:output_type -> steward.core.v1.EmailServiceConfigStatusResponse
+	13, // [13:17] is the sub-list for method output_type
+	9,  // [9:13] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_steward_core_v1_settings_proto_init() }
@@ -792,14 +937,14 @@ func file_steward_core_v1_settings_proto_init() {
 	if File_steward_core_v1_settings_proto != nil {
 		return
 	}
-	file_steward_core_v1_settings_proto_msgTypes[8].OneofWrappers = []any{}
+	file_steward_core_v1_settings_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_steward_core_v1_settings_proto_rawDesc), len(file_steward_core_v1_settings_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
