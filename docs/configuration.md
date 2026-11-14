@@ -45,7 +45,7 @@ to the caller `<name>`, and checks the per-method allow-list in `internal/server
 
 | Caller | Methods | Access |
 | --- | --- | --- |
-| `gateway` | the sign-in steps and the read, admin and SSO admin methods it serves, including `ListGroups` and `CreateGroup` for the admin app's platform groups, and the root admin and hard reset requests | on behalf of the signed-in user |
+| `gateway` | the sign-in steps and the read, admin and SSO admin methods it serves, including `ListGroups`, `SearchGroups`, `ListIdpGroupNames` and `CreateGroup` for the admin app's platform groups, and the root admin and hard reset requests | on behalf of the signed-in user |
 | `reporting` | `GetUser`, `ConsumeHardReset` | as itself |
 | `workflow` | `GetUser`, `ListAllUsers` (its approver access filter) | as itself |
 | `collab` | `GetUser` | as itself |

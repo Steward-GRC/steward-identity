@@ -511,6 +511,36 @@ func (h *ReadHandler) SearchGroups(ctx context.Context, req *identityv1.SearchGr
 	return &identityv1.SearchGroupsResponse{Groups: out}, nil
 }
 
+// listIdpGroupNamesMaxPrefix bounds the prefix a caller may send.
+const listIdpGroupNamesMaxPrefix = 256
+
+// ListIdpGroupNames lists the distinct directory group names identity knows,
+// for the gateway's group picker. It asks the store for one name more than the
+// limit to tell whether the list was cut. Who may ask is the caller's rule
+// (the gateway allows group managers and template admins); identity only
+// answers, and the log carries counts and lengths, never a group name.
+func (h *ReadHandler) ListIdpGroupNames(ctx context.Context, req *identityv1.ListIdpGroupNamesRequest) (*identityv1.ListIdpGroupNamesResponse, error) {
+	lg := logger.Ctx(ctx)
+	prefix := strings.TrimSpace(req.GetPrefix())
+	limit := clampLimit(req.GetLimit())
+	log.Trace(lg, "list idp group names: start", log.F("prefix_len", len(prefix)), log.F("requested_limit", req.GetLimit()), log.F("limit", limit))
+	if len(prefix) > listIdpGroupNamesMaxPrefix {
+		lg.Debug("list idp group names: refused, prefix too long", log.F("prefix_len", len(prefix)))
+		return nil, status.Error(codes.InvalidArgument, "prefix too long")
+	}
+	names, err := h.store.ListIdpGroupNames(ctx, prefix, limit+1)
+	if err != nil {
+		lg.Error(err, "list idp group names: store failed", log.F("prefix_len", len(prefix)))
+		return nil, statusFromStoreErr(err)
+	}
+	truncated := len(names) > limit
+	if truncated {
+		names = names[:limit]
+	}
+	lg.Debug("list idp group names: answered", log.F("results", len(names)), log.F("truncated", truncated), log.F("filtered", prefix != ""))
+	return &identityv1.ListIdpGroupNamesResponse{Names: names, Truncated: truncated}, nil
+}
+
 // ListUsersByIdpGroups returns all platform users that have any of the
 // supplied identity provider group names in their membership set.
 func (h *ReadHandler) ListUsersByIdpGroups(ctx context.Context, req *identityv1.ListUsersByIdpGroupsRequest) (*identityv1.ListUsersByIdpGroupsResponse, error) {

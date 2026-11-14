@@ -51,6 +51,24 @@ admin must enter the secret again.
 claims as fields. With a `connection_alias`, `idp_groups` replaces the user's identity provider
 groups and is matched against the connection's group mappings.
 
+## Directory group names
+
+`ListIdpGroupNames` (`IdentityReadService`) lists the directory (identity provider) group names
+identity knows, so the gateway's category-rule group picker can offer real names instead of free
+text. The answer is the distinct union of every user's IdP groups (`user_idp_groups`) and the claim
+values in the SSO group mappings (`idp_group_mappings`, across all connections), sorted in byte
+order (upper case before lower). It carries names only, never which user holds one.
+
+| Field | Meaning |
+| --- | --- |
+| `prefix` | optional; trimmed, at most 256 bytes (`InvalidArgument` beyond that); matched at the start of the name, case-insensitively; a percent sign or underscore is text, not a pattern |
+| `limit` | 50 when unset, at most 200 |
+| `names` | the matching names, up to `limit` |
+| `truncated` | true when more names matched than `limit` allowed; narrow the prefix to see them |
+
+Only the gateway may call it. Like `SearchGroups`, identity does not decide who may ask: the gateway
+allows group managers and template admins. Logs carry counts and the prefix length, never a name.
+
 ## Root admins and hard resets
 
 There is exactly one root admin at a time (a unique index on `users.is_root` enforces it).

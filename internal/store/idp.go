@@ -197,3 +197,38 @@ func (s *Store) GetIdPConnectionByAlias(ctx context.Context, alias string) (IdPC
 	}
 	return c, nil
 }
+
+// ListIdpGroupNames returns up to limit distinct directory group names: every
+// name held by any user (user_idp_groups) together with every claim value in
+// the SSO group mappings, in byte order. prefix, when set, keeps the names that
+// start with it, case-insensitively; a percent sign, underscore or backslash in
+// it matches itself. A non-positive limit means 50. The result is never nil.
+// It carries names only, never which user holds one.
+func (s *Store) ListIdpGroupNames(ctx context.Context, prefix string, limit int) ([]string, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows, err := s.pool.Query(ctx, `
+		SELECT name FROM (
+		  SELECT idp_group_name AS name FROM user_idp_groups
+		  UNION
+		  SELECT idp_group_claim_value FROM idp_group_mappings
+		) n
+		 WHERE name ILIKE $1 || '%' ESCAPE '\'
+		 ORDER BY name COLLATE "C" ASC
+		 LIMIT $2`,
+		escapeLike(prefix), limit)
+	if err != nil {
+		return nil, fmt.Errorf("list idp group names: %w", err)
+	}
+	defer rows.Close()
+	out := []string{}
+	for rows.Next() {
+		var n string
+		if err := rows.Scan(&n); err != nil {
+			return nil, err
+		}
+		out = append(out, n)
+	}
+	return out, rows.Err()
+}
