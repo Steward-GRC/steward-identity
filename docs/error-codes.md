@@ -21,3 +21,4 @@ caller; every other code is sent as `Code N: Internal Error`.
 | 5012 | `PASSWORD_TOO_WEAK` | change password | the sign-in service's password policy refused the new password | yes |
 | 5013 | `NO_LOCAL_PASSWORD` | change password | the account signs in through an identity provider and has no local password to change | yes |
 | 5014 | `PASSWORD_CHANGE_UNAVAILABLE` | change password | the sign-in service's public or admin API isn't configured or didn't answer, so the password was not changed | yes |
+| 5015 | `SSO_NOT_ENABLED` | single sign-on | an SSO admin call needs the SP-certificate service, which this deployment hasn't switched on | yes |

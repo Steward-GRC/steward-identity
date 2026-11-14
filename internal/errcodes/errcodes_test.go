@@ -74,6 +74,7 @@ func TestEveryUserSafeCodeKeepsItsGRPCCode(t *testing.T) {
 		{errcodes.PasswordTooWeak(), codes.InvalidArgument, "PASSWORD_TOO_WEAK"},
 		{errcodes.NoLocalPassword(), codes.FailedPrecondition, "NO_LOCAL_PASSWORD"},
 		{errcodes.PasswordChangeUnavailable(errors.New("down")), codes.FailedPrecondition, "PASSWORD_CHANGE_UNAVAILABLE"},
+		{errcodes.SSONotEnabled(), codes.FailedPrecondition, "SSO_NOT_ENABLED"},
 	} {
 		st := status.Convert(errcodes.Error(context.Background(), tc.err))
 		require.Equal(t, tc.code, st.Code(), tc.sym)
