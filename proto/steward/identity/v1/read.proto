@@ -56,6 +56,14 @@ service IdentityReadService {
   // underscore in it is text, not a pattern. Groups have no description, so
   // the name is all that is matched. Who may ask is the caller's rule.
   rpc SearchGroups(SearchGroupsRequest) returns (SearchGroupsResponse);
+  // ListIdpGroupNames lists the directory (identity provider) group names
+  // identity knows: the distinct union of every user's IdP groups and the
+  // claim values in the SSO group mappings, sorted by byte order. The optional
+  // prefix matches case-insensitively (percent and underscore are text);
+  // limit is 50 when unset and at most 200, and truncated says more matched.
+  // It carries names only, never who holds them. Who may ask (group managers
+  // and template admins) is the caller's rule.
+  rpc ListIdpGroupNames(ListIdpGroupNamesRequest) returns (ListIdpGroupNamesResponse);
   // ListUsersByIdpGroups lists the users holding any of the named identity
   // provider groups.
   rpc ListUsersByIdpGroups(ListUsersByIdpGroupsRequest) returns (ListUsersByIdpGroupsResponse);
@@ -335,6 +343,19 @@ message SearchGroupsRequest {
 
 message SearchGroupsResponse {
   repeated Group groups = 1;
+}
+
+message ListIdpGroupNamesRequest {
+  // Optional; trimmed, at most 256 bytes.
+  string prefix = 1;
+  // 50 when unset; at most 200.
+  int32 limit = 2;
+}
+
+message ListIdpGroupNamesResponse {
+  repeated string names = 1;
+  // True when more names matched than limit allowed.
+  bool truncated = 2;
 }
 
 message ListGroupsResponse {

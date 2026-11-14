@@ -83,6 +83,7 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 		identityv1.IdentityReadService_ListAllUsers_FullMethodName,
 		identityv1.IdentityReadService_ListGroups_FullMethodName,
 		identityv1.IdentityReadService_SearchGroups_FullMethodName,
+		identityv1.IdentityReadService_ListIdpGroupNames_FullMethodName,
 		identityv1.IdentityReadService_ListUserFactors_FullMethodName,
 		identityv1.IdentityReadService_ListUserGroupNames_FullMethodName,
 		identityv1.IdentityReadService_ListUserIdpGroups_FullMethodName,
@@ -163,6 +164,11 @@ func TestCallerPolicyGatewayActsForTheSignedInUser(t *testing.T) {
 		want[m] = workloadidentity.OnBehalf
 	}
 	requireCallerMethods(t, CallerGateway, want)
+	// The directory group names are for the gateway's rule picker only.
+	for _, c := range []string{CallerWorkflow, CallerObligations, CallerReporting, CallerCollab, CallerAdminCLI} {
+		_, ok := CallerPolicy().Lookup(identityv1.IdentityReadService_ListIdpGroupNames_FullMethodName, c)
+		require.False(t, ok, "%s may not list the directory group names", c)
+	}
 	for _, m := range []string{
 		identityv1.IdentityReadService_ResolveEmail_FullMethodName,
 		identityv1.IdentityReadService_ResolveFCMToken_FullMethodName,
