@@ -242,12 +242,13 @@ func (h *SSOAdminHandler) resolvePolisSecret(ctx context.Context, conn store.IdP
 	return string(b)
 }
 
-// requireSPCert returns a clean Unavailable error when the SP-certificate
-// service isn't wired (the config-gated default), so the three SP-cert RPCs
-// never panic on a nil h.sp.
-func (h *SSOAdminHandler) requireSPCert() error {
+// requireSPCert returns the coded SSO_NOT_ENABLED error (FailedPrecondition)
+// when the SP-certificate service isn't wired (the config-gated default), so
+// the three SP-cert RPCs never panic on a nil h.sp and a client can tell a
+// switched-off feature from a service fault.
+func (h *SSOAdminHandler) requireSPCert(ctx context.Context) error {
 	if h.sp == nil {
-		return status.Error(codes.Unavailable, "sp certificate service not enabled")
+		return errcodes.Error(ctx, errcodes.SSONotEnabled())
 	}
 	return nil
 }
@@ -1067,7 +1068,7 @@ func (h *SSOAdminHandler) GetSPCertificate(ctx context.Context, _ *identityv1.Ge
 	if _, err := h.auth.Authorize(ctx); err != nil {
 		return nil, err
 	}
-	if err := h.requireSPCert(); err != nil {
+	if err := h.requireSPCert(ctx); err != nil {
 		return nil, err
 	}
 	c, err := h.store.GetActiveSPCertificate(ctx)
@@ -1089,7 +1090,7 @@ func (h *SSOAdminHandler) ListSPCertificates(ctx context.Context, _ *identityv1.
 	if _, err := h.auth.Authorize(ctx); err != nil {
 		return nil, err
 	}
-	if err := h.requireSPCert(); err != nil {
+	if err := h.requireSPCert(ctx); err != nil {
 		return nil, err
 	}
 	rows, err := h.store.ListSPCertificates(ctx)
@@ -1111,7 +1112,7 @@ func (h *SSOAdminHandler) ForceRotateSPCertificate(ctx context.Context, _ *ident
 	if _, err := h.auth.Authorize(ctx); err != nil {
 		return nil, err
 	}
-	if err := h.requireSPCert(); err != nil {
+	if err := h.requireSPCert(ctx); err != nil {
 		return nil, err
 	}
 	c, err := h.sp.ForceRotate(ctx)

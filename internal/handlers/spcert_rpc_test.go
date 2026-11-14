@@ -96,21 +96,21 @@ func TestForceRotateSPCertificate_NewSerialAndEvent(t *testing.T) {
 	require.Equal(t, "sso.sp_cert_rotated", pub.calls[0])
 }
 
-// TestSPCertRPCs_UnavailableWhenNotWired: without WithSPCert, all three RPCs
-// return a clean Unavailable rather than panicking on a nil sp field.
-func TestSPCertRPCs_UnavailableWhenNotWired(t *testing.T) {
+// TestSPCertRPCs_SSONotEnabledWhenNotWired: without WithSPCert, all three RPCs
+// return the coded SSO_NOT_ENABLED (FailedPrecondition) rather than panicking on a nil sp field.
+func TestSPCertRPCs_SSONotEnabledWhenNotWired(t *testing.T) {
 	s := newTestStore(t)
 	h := handlers.NewSSOAdminHandler(s, newPolisFake(t).provisioner(), ssoAdminAuth())
 	ctx := adminCtx(uuid.NewString())
 
 	_, err := h.GetSPCertificate(ctx, &identityv1.GetSPCertificateRequest{})
-	require.Equal(t, codes.Unavailable, status.Code(err))
+	require.Equal(t, codes.FailedPrecondition, status.Code(err))
 
 	_, err = h.ListSPCertificates(ctx, &identityv1.ListSPCertificatesRequest{})
-	require.Equal(t, codes.Unavailable, status.Code(err))
+	require.Equal(t, codes.FailedPrecondition, status.Code(err))
 
 	_, err = h.ForceRotateSPCertificate(ctx, &identityv1.ForceRotateSPCertificateRequest{})
-	require.Equal(t, codes.Unavailable, status.Code(err))
+	require.Equal(t, codes.FailedPrecondition, status.Code(err))
 }
 
 // TestSPCertRPCs_RequireAuth: each of the three RPCs is PermissionDenied

@@ -36,6 +36,7 @@ const (
 	CodePasswordTooWeak             = 5012
 	CodeNoLocalPassword             = 5013
 	CodePasswordChangeUnavailable   = 5014
+	CodeSSONotEnabled               = 5015
 )
 
 // Entries returns the registry entries.
@@ -85,6 +86,9 @@ func Entries() []apperr.Entry {
 		{Code: CodePasswordChangeUnavailable, Symbol: "PASSWORD_CHANGE_UNAVAILABLE", Category: apperr.CategoryFailedPrecondition,
 			Title: "change password", Cause: "the sign-in service's public or admin API isn't configured or didn't answer, so the password was not changed",
 			UserSafe: true, Message: "The password can't be changed right now, so nothing was changed. Try again shortly."},
+		{Code: CodeSSONotEnabled, Symbol: "SSO_NOT_ENABLED", Category: apperr.CategoryFailedPrecondition,
+			Title: "single sign-on", Cause: "an SSO admin call needs the SP-certificate service, which this deployment hasn't switched on",
+			UserSafe: true, Message: "Single sign-on isn't set up on this deployment."},
 	}
 }
 
@@ -129,6 +133,7 @@ var (
 	errWrongCurrent = errors.New("identity: the current password is wrong")
 	errWeak         = errors.New("identity: the new password does not meet the password policy")
 	errNoPassword   = errors.New("identity: the account has no local password")
+	errSSOOff       = errors.New("identity: the sp certificate service is not enabled")
 )
 
 // SSOProviderUnreachable codes a failed call to the SSO broker; org names the
@@ -196,6 +201,10 @@ func NoLocalPassword() error { return apperr.Coded(CodeNoLocalPassword, errNoPas
 func PasswordChangeUnavailable(cause error) error {
 	return apperr.Coded(CodePasswordChangeUnavailable, cause)
 }
+
+// SSONotEnabled codes an SSO admin call on a deployment where the SP-certificate
+// service is switched off, so a client can tell "not set up" from a real fault.
+func SSONotEnabled() error { return apperr.Coded(CodeSSONotEnabled, errSSOOff) }
 
 type logSink struct{ l log.Logger }
 
