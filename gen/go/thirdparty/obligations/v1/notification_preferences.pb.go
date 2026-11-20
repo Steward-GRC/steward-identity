@@ -1213,6 +1213,273 @@ func (x *SetDigestWindowResponse) GetSettings() *NotificationSettings {
 	return nil
 }
 
+// QuietHours is a daily window of local hours, [start, end), in an IANA
+// timezone. It may cross midnight (start 22, end 7).
+type QuietHours struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Start         int32                  `protobuf:"varint,1,opt,name=start,proto3" json:"start,omitempty"`
+	End           int32                  `protobuf:"varint,2,opt,name=end,proto3" json:"end,omitempty"`
+	Timezone      string                 `protobuf:"bytes,3,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *QuietHours) Reset() {
+	*x = QuietHours{}
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *QuietHours) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QuietHours) ProtoMessage() {}
+
+func (x *QuietHours) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QuietHours.ProtoReflect.Descriptor instead.
+func (*QuietHours) Descriptor() ([]byte, []int) {
+	return file_steward_obligations_v1_notification_preferences_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *QuietHours) GetStart() int32 {
+	if x != nil {
+		return x.Start
+	}
+	return 0
+}
+
+func (x *QuietHours) GetEnd() int32 {
+	if x != nil {
+		return x.End
+	}
+	return 0
+}
+
+func (x *QuietHours) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+type GetQuietHoursRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetQuietHoursRequest) Reset() {
+	*x = GetQuietHoursRequest{}
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetQuietHoursRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetQuietHoursRequest) ProtoMessage() {}
+
+func (x *GetQuietHoursRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetQuietHoursRequest.ProtoReflect.Descriptor instead.
+func (*GetQuietHoursRequest) Descriptor() ([]byte, []int) {
+	return file_steward_obligations_v1_notification_preferences_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetQuietHoursRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+// quiet_hours is unset when the user has no window stored (the default
+// 22:00 to 07:00 applies).
+type GetQuietHoursResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	QuietHours    *QuietHours            `protobuf:"bytes,1,opt,name=quiet_hours,json=quietHours,proto3" json:"quiet_hours,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetQuietHoursResponse) Reset() {
+	*x = GetQuietHoursResponse{}
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetQuietHoursResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetQuietHoursResponse) ProtoMessage() {}
+
+func (x *GetQuietHoursResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetQuietHoursResponse.ProtoReflect.Descriptor instead.
+func (*GetQuietHoursResponse) Descriptor() ([]byte, []int) {
+	return file_steward_obligations_v1_notification_preferences_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetQuietHoursResponse) GetQuietHours() *QuietHours {
+	if x != nil {
+		return x.QuietHours
+	}
+	return nil
+}
+
+// SetQuietHours stores the window. Neither start nor end set clears it; one
+// without the other, an hour outside 0 to 23, start equal to end or an unknown
+// timezone is NOTIFY_PREF_INVALID. An empty timezone means UTC.
+type SetQuietHoursRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Start         *int32                 `protobuf:"varint,2,opt,name=start,proto3,oneof" json:"start,omitempty"`
+	End           *int32                 `protobuf:"varint,3,opt,name=end,proto3,oneof" json:"end,omitempty"`
+	Timezone      string                 `protobuf:"bytes,4,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetQuietHoursRequest) Reset() {
+	*x = SetQuietHoursRequest{}
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetQuietHoursRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetQuietHoursRequest) ProtoMessage() {}
+
+func (x *SetQuietHoursRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetQuietHoursRequest.ProtoReflect.Descriptor instead.
+func (*SetQuietHoursRequest) Descriptor() ([]byte, []int) {
+	return file_steward_obligations_v1_notification_preferences_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *SetQuietHoursRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *SetQuietHoursRequest) GetStart() int32 {
+	if x != nil && x.Start != nil {
+		return *x.Start
+	}
+	return 0
+}
+
+func (x *SetQuietHoursRequest) GetEnd() int32 {
+	if x != nil && x.End != nil {
+		return *x.End
+	}
+	return 0
+}
+
+func (x *SetQuietHoursRequest) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+type SetQuietHoursResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	QuietHours    *QuietHours            `protobuf:"bytes,1,opt,name=quiet_hours,json=quietHours,proto3" json:"quiet_hours,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetQuietHoursResponse) Reset() {
+	*x = SetQuietHoursResponse{}
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetQuietHoursResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetQuietHoursResponse) ProtoMessage() {}
+
+func (x *SetQuietHoursResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_steward_obligations_v1_notification_preferences_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetQuietHoursResponse.ProtoReflect.Descriptor instead.
+func (*SetQuietHoursResponse) Descriptor() ([]byte, []int) {
+	return file_steward_obligations_v1_notification_preferences_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *SetQuietHoursResponse) GetQuietHours() *QuietHours {
+	if x != nil {
+		return x.QuietHours
+	}
+	return nil
+}
+
 var File_steward_obligations_v1_notification_preferences_proto protoreflect.FileDescriptor
 
 const file_steward_obligations_v1_notification_preferences_proto_rawDesc = "" +
@@ -1279,7 +1546,27 @@ const file_steward_obligations_v1_notification_preferences_proto_rawDesc = "" +
 	"\n" +
 	"weekly_dow\x18\x03 \x01(\x05R\tweeklyDow\"c\n" +
 	"\x17SetDigestWindowResponse\x12H\n" +
-	"\bsettings\x18\x01 \x01(\v2,.steward.obligations.v1.NotificationSettingsR\bsettings*\x94\x01\n" +
+	"\bsettings\x18\x01 \x01(\v2,.steward.obligations.v1.NotificationSettingsR\bsettings\"P\n" +
+	"\n" +
+	"QuietHours\x12\x14\n" +
+	"\x05start\x18\x01 \x01(\x05R\x05start\x12\x10\n" +
+	"\x03end\x18\x02 \x01(\x05R\x03end\x12\x1a\n" +
+	"\btimezone\x18\x03 \x01(\tR\btimezone\"/\n" +
+	"\x14GetQuietHoursRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"\\\n" +
+	"\x15GetQuietHoursResponse\x12C\n" +
+	"\vquiet_hours\x18\x01 \x01(\v2\".steward.obligations.v1.QuietHoursR\n" +
+	"quietHours\"\x8f\x01\n" +
+	"\x14SetQuietHoursRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x19\n" +
+	"\x05start\x18\x02 \x01(\x05H\x00R\x05start\x88\x01\x01\x12\x15\n" +
+	"\x03end\x18\x03 \x01(\x05H\x01R\x03end\x88\x01\x01\x12\x1a\n" +
+	"\btimezone\x18\x04 \x01(\tR\btimezoneB\b\n" +
+	"\x06_startB\x06\n" +
+	"\x04_end\"\\\n" +
+	"\x15SetQuietHoursResponse\x12C\n" +
+	"\vquiet_hours\x18\x01 \x01(\v2\".steward.obligations.v1.QuietHoursR\n" +
+	"quietHours*\x94\x01\n" +
 	"\fNotifCadence\x12\x1d\n" +
 	"\x19NOTIF_CADENCE_UNSPECIFIED\x10\x00\x12\x1b\n" +
 	"\x17NOTIF_CADENCE_IMMEDIATE\x10\x01\x12\x17\n" +
@@ -1298,7 +1585,7 @@ const file_steward_obligations_v1_notification_preferences_proto_rawDesc = "" +
 	"\x1dNOTIF_DELIVERY_IMMEDIATE_ONLY\x10\x01\x12&\n" +
 	"\"NOTIF_DELIVERY_IMMEDIATE_OR_DIGEST\x10\x02\x12$\n" +
 	" NOTIF_DELIVERY_REMINDER_SCHEDULE\x10\x03\x12#\n" +
-	"\x1fNOTIF_DELIVERY_DIGEST_PREFERRED\x10\x042\xd1\x06\n" +
+	"\x1fNOTIF_DELIVERY_DIGEST_PREFERRED\x10\x042\xad\b\n" +
 	"\x10NotifPrefService\x12r\n" +
 	"\x0fUpsertNotifPref\x12..steward.obligations.v1.UpsertNotifPrefRequest\x1a/.steward.obligations.v1.UpsertNotifPrefResponse\x12i\n" +
 	"\fGetNotifPref\x12+.steward.obligations.v1.GetNotifPrefRequest\x1a,.steward.obligations.v1.GetNotifPrefResponse\x12o\n" +
@@ -1306,7 +1593,9 @@ const file_steward_obligations_v1_notification_preferences_proto_rawDesc = "" +
 	"\x17GetNotificationSettings\x126.steward.obligations.v1.GetNotificationSettingsRequest\x1a7.steward.obligations.v1.GetNotificationSettingsResponse\x12{\n" +
 	"\x12SetCategoryCadence\x121.steward.obligations.v1.SetCategoryCadenceRequest\x1a2.steward.obligations.v1.SetCategoryCadenceResponse\x12o\n" +
 	"\x0eSetTypeCadence\x12-.steward.obligations.v1.SetTypeCadenceRequest\x1a..steward.obligations.v1.SetTypeCadenceResponse\x12r\n" +
-	"\x0fSetDigestWindow\x12..steward.obligations.v1.SetDigestWindowRequest\x1a/.steward.obligations.v1.SetDigestWindowResponseBXZVgithub.com/Steward-GRC/steward-identity/gen/go/thirdparty/obligations/v1;obligationsv1b\x06proto3"
+	"\x0fSetDigestWindow\x12..steward.obligations.v1.SetDigestWindowRequest\x1a/.steward.obligations.v1.SetDigestWindowResponse\x12l\n" +
+	"\rGetQuietHours\x12,.steward.obligations.v1.GetQuietHoursRequest\x1a-.steward.obligations.v1.GetQuietHoursResponse\x12l\n" +
+	"\rSetQuietHours\x12,.steward.obligations.v1.SetQuietHoursRequest\x1a-.steward.obligations.v1.SetQuietHoursResponseBXZVgithub.com/Steward-GRC/steward-identity/gen/go/thirdparty/obligations/v1;obligationsv1b\x06proto3"
 
 var (
 	file_steward_obligations_v1_notification_preferences_proto_rawDescOnce sync.Once
@@ -1321,7 +1610,7 @@ func file_steward_obligations_v1_notification_preferences_proto_rawDescGZIP() []
 }
 
 var file_steward_obligations_v1_notification_preferences_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_steward_obligations_v1_notification_preferences_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_steward_obligations_v1_notification_preferences_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_steward_obligations_v1_notification_preferences_proto_goTypes = []any{
 	(NotifCadence)(0),                       // 0: steward.obligations.v1.NotifCadence
 	(NotifCategory)(0),                      // 1: steward.obligations.v1.NotifCategory
@@ -1345,7 +1634,12 @@ var file_steward_obligations_v1_notification_preferences_proto_goTypes = []any{
 	(*SetTypeCadenceResponse)(nil),          // 19: steward.obligations.v1.SetTypeCadenceResponse
 	(*SetDigestWindowRequest)(nil),          // 20: steward.obligations.v1.SetDigestWindowRequest
 	(*SetDigestWindowResponse)(nil),         // 21: steward.obligations.v1.SetDigestWindowResponse
-	(*NotificationPref)(nil),                // 22: steward.obligations.v1.NotificationPref
+	(*QuietHours)(nil),                      // 22: steward.obligations.v1.QuietHours
+	(*GetQuietHoursRequest)(nil),            // 23: steward.obligations.v1.GetQuietHoursRequest
+	(*GetQuietHoursResponse)(nil),           // 24: steward.obligations.v1.GetQuietHoursResponse
+	(*SetQuietHoursRequest)(nil),            // 25: steward.obligations.v1.SetQuietHoursRequest
+	(*SetQuietHoursResponse)(nil),           // 26: steward.obligations.v1.SetQuietHoursResponse
+	(*NotificationPref)(nil),                // 27: steward.obligations.v1.NotificationPref
 }
 var file_steward_obligations_v1_notification_preferences_proto_depIdxs = []int32{
 	1,  // 0: steward.obligations.v1.NotifTypeDef.category:type_name -> steward.obligations.v1.NotifCategory
@@ -1355,13 +1649,13 @@ var file_steward_obligations_v1_notification_preferences_proto_depIdxs = []int32
 	1,  // 4: steward.obligations.v1.TypePref.category:type_name -> steward.obligations.v1.NotifCategory
 	0,  // 5: steward.obligations.v1.TypePref.cadence:type_name -> steward.obligations.v1.NotifCadence
 	2,  // 6: steward.obligations.v1.TypePref.delivery:type_name -> steward.obligations.v1.NotifDelivery
-	22, // 7: steward.obligations.v1.NotificationSettings.channels:type_name -> steward.obligations.v1.NotificationPref
+	27, // 7: steward.obligations.v1.NotificationSettings.channels:type_name -> steward.obligations.v1.NotificationPref
 	4,  // 8: steward.obligations.v1.NotificationSettings.categories:type_name -> steward.obligations.v1.CategoryPref
 	5,  // 9: steward.obligations.v1.NotificationSettings.overrides:type_name -> steward.obligations.v1.TypePref
 	6,  // 10: steward.obligations.v1.NotificationSettings.digest:type_name -> steward.obligations.v1.DigestWindow
-	22, // 11: steward.obligations.v1.UpsertNotifPrefRequest.pref:type_name -> steward.obligations.v1.NotificationPref
-	22, // 12: steward.obligations.v1.UpsertNotifPrefResponse.pref:type_name -> steward.obligations.v1.NotificationPref
-	22, // 13: steward.obligations.v1.GetNotifPrefResponse.pref:type_name -> steward.obligations.v1.NotificationPref
+	27, // 11: steward.obligations.v1.UpsertNotifPrefRequest.pref:type_name -> steward.obligations.v1.NotificationPref
+	27, // 12: steward.obligations.v1.UpsertNotifPrefResponse.pref:type_name -> steward.obligations.v1.NotificationPref
+	27, // 13: steward.obligations.v1.GetNotifPrefResponse.pref:type_name -> steward.obligations.v1.NotificationPref
 	3,  // 14: steward.obligations.v1.ListNotifTypesResponse.types:type_name -> steward.obligations.v1.NotifTypeDef
 	7,  // 15: steward.obligations.v1.GetNotificationSettingsResponse.settings:type_name -> steward.obligations.v1.NotificationSettings
 	1,  // 16: steward.obligations.v1.SetCategoryCadenceRequest.category:type_name -> steward.obligations.v1.NotifCategory
@@ -1370,25 +1664,31 @@ var file_steward_obligations_v1_notification_preferences_proto_depIdxs = []int32
 	0,  // 19: steward.obligations.v1.SetTypeCadenceRequest.cadence:type_name -> steward.obligations.v1.NotifCadence
 	7,  // 20: steward.obligations.v1.SetTypeCadenceResponse.settings:type_name -> steward.obligations.v1.NotificationSettings
 	7,  // 21: steward.obligations.v1.SetDigestWindowResponse.settings:type_name -> steward.obligations.v1.NotificationSettings
-	8,  // 22: steward.obligations.v1.NotifPrefService.UpsertNotifPref:input_type -> steward.obligations.v1.UpsertNotifPrefRequest
-	10, // 23: steward.obligations.v1.NotifPrefService.GetNotifPref:input_type -> steward.obligations.v1.GetNotifPrefRequest
-	12, // 24: steward.obligations.v1.NotifPrefService.ListNotifTypes:input_type -> steward.obligations.v1.ListNotifTypesRequest
-	14, // 25: steward.obligations.v1.NotifPrefService.GetNotificationSettings:input_type -> steward.obligations.v1.GetNotificationSettingsRequest
-	16, // 26: steward.obligations.v1.NotifPrefService.SetCategoryCadence:input_type -> steward.obligations.v1.SetCategoryCadenceRequest
-	18, // 27: steward.obligations.v1.NotifPrefService.SetTypeCadence:input_type -> steward.obligations.v1.SetTypeCadenceRequest
-	20, // 28: steward.obligations.v1.NotifPrefService.SetDigestWindow:input_type -> steward.obligations.v1.SetDigestWindowRequest
-	9,  // 29: steward.obligations.v1.NotifPrefService.UpsertNotifPref:output_type -> steward.obligations.v1.UpsertNotifPrefResponse
-	11, // 30: steward.obligations.v1.NotifPrefService.GetNotifPref:output_type -> steward.obligations.v1.GetNotifPrefResponse
-	13, // 31: steward.obligations.v1.NotifPrefService.ListNotifTypes:output_type -> steward.obligations.v1.ListNotifTypesResponse
-	15, // 32: steward.obligations.v1.NotifPrefService.GetNotificationSettings:output_type -> steward.obligations.v1.GetNotificationSettingsResponse
-	17, // 33: steward.obligations.v1.NotifPrefService.SetCategoryCadence:output_type -> steward.obligations.v1.SetCategoryCadenceResponse
-	19, // 34: steward.obligations.v1.NotifPrefService.SetTypeCadence:output_type -> steward.obligations.v1.SetTypeCadenceResponse
-	21, // 35: steward.obligations.v1.NotifPrefService.SetDigestWindow:output_type -> steward.obligations.v1.SetDigestWindowResponse
-	29, // [29:36] is the sub-list for method output_type
-	22, // [22:29] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	22, // 22: steward.obligations.v1.GetQuietHoursResponse.quiet_hours:type_name -> steward.obligations.v1.QuietHours
+	22, // 23: steward.obligations.v1.SetQuietHoursResponse.quiet_hours:type_name -> steward.obligations.v1.QuietHours
+	8,  // 24: steward.obligations.v1.NotifPrefService.UpsertNotifPref:input_type -> steward.obligations.v1.UpsertNotifPrefRequest
+	10, // 25: steward.obligations.v1.NotifPrefService.GetNotifPref:input_type -> steward.obligations.v1.GetNotifPrefRequest
+	12, // 26: steward.obligations.v1.NotifPrefService.ListNotifTypes:input_type -> steward.obligations.v1.ListNotifTypesRequest
+	14, // 27: steward.obligations.v1.NotifPrefService.GetNotificationSettings:input_type -> steward.obligations.v1.GetNotificationSettingsRequest
+	16, // 28: steward.obligations.v1.NotifPrefService.SetCategoryCadence:input_type -> steward.obligations.v1.SetCategoryCadenceRequest
+	18, // 29: steward.obligations.v1.NotifPrefService.SetTypeCadence:input_type -> steward.obligations.v1.SetTypeCadenceRequest
+	20, // 30: steward.obligations.v1.NotifPrefService.SetDigestWindow:input_type -> steward.obligations.v1.SetDigestWindowRequest
+	23, // 31: steward.obligations.v1.NotifPrefService.GetQuietHours:input_type -> steward.obligations.v1.GetQuietHoursRequest
+	25, // 32: steward.obligations.v1.NotifPrefService.SetQuietHours:input_type -> steward.obligations.v1.SetQuietHoursRequest
+	9,  // 33: steward.obligations.v1.NotifPrefService.UpsertNotifPref:output_type -> steward.obligations.v1.UpsertNotifPrefResponse
+	11, // 34: steward.obligations.v1.NotifPrefService.GetNotifPref:output_type -> steward.obligations.v1.GetNotifPrefResponse
+	13, // 35: steward.obligations.v1.NotifPrefService.ListNotifTypes:output_type -> steward.obligations.v1.ListNotifTypesResponse
+	15, // 36: steward.obligations.v1.NotifPrefService.GetNotificationSettings:output_type -> steward.obligations.v1.GetNotificationSettingsResponse
+	17, // 37: steward.obligations.v1.NotifPrefService.SetCategoryCadence:output_type -> steward.obligations.v1.SetCategoryCadenceResponse
+	19, // 38: steward.obligations.v1.NotifPrefService.SetTypeCadence:output_type -> steward.obligations.v1.SetTypeCadenceResponse
+	21, // 39: steward.obligations.v1.NotifPrefService.SetDigestWindow:output_type -> steward.obligations.v1.SetDigestWindowResponse
+	24, // 40: steward.obligations.v1.NotifPrefService.GetQuietHours:output_type -> steward.obligations.v1.GetQuietHoursResponse
+	26, // 41: steward.obligations.v1.NotifPrefService.SetQuietHours:output_type -> steward.obligations.v1.SetQuietHoursResponse
+	33, // [33:42] is the sub-list for method output_type
+	24, // [24:33] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_steward_obligations_v1_notification_preferences_proto_init() }
@@ -1397,13 +1697,14 @@ func file_steward_obligations_v1_notification_preferences_proto_init() {
 		return
 	}
 	file_steward_obligations_v1_obligations_proto_init()
+	file_steward_obligations_v1_notification_preferences_proto_msgTypes[22].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_steward_obligations_v1_notification_preferences_proto_rawDesc), len(file_steward_obligations_v1_notification_preferences_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   19,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -257,6 +257,7 @@ var AckService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	ObligationService_GetMyObligations_FullMethodName          = "/steward.obligations.v1.ObligationService/GetMyObligations"
+	ObligationService_ListMyAcknowledgments_FullMethodName     = "/steward.obligations.v1.ObligationService/ListMyAcknowledgments"
 	ObligationService_GetObligatedAudienceCount_FullMethodName = "/steward.obligations.v1.ObligationService/GetObligatedAudienceCount"
 	ObligationService_MyAckSummary_FullMethodName              = "/steward.obligations.v1.ObligationService/MyAckSummary"
 )
@@ -266,6 +267,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ObligationServiceClient interface {
 	GetMyObligations(ctx context.Context, in *GetMyObligationsRequest, opts ...grpc.CallOption) (*GetMyObligationsResponse, error)
+	// ListMyAcknowledgments answers the person's recent acknowledgements, newest
+	// first, for the "Recently acknowledged" card on My work.
+	ListMyAcknowledgments(ctx context.Context, in *ListMyAcknowledgmentsRequest, opts ...grpc.CallOption) (*ListMyAcknowledgmentsResponse, error)
 	GetObligatedAudienceCount(ctx context.Context, in *GetObligatedAudienceCountRequest, opts ...grpc.CallOption) (*GetObligatedAudienceCountResponse, error)
 	MyAckSummary(ctx context.Context, in *MyAckSummaryRequest, opts ...grpc.CallOption) (*MyAckSummaryResponse, error)
 }
@@ -282,6 +286,16 @@ func (c *obligationServiceClient) GetMyObligations(ctx context.Context, in *GetM
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetMyObligationsResponse)
 	err := c.cc.Invoke(ctx, ObligationService_GetMyObligations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *obligationServiceClient) ListMyAcknowledgments(ctx context.Context, in *ListMyAcknowledgmentsRequest, opts ...grpc.CallOption) (*ListMyAcknowledgmentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListMyAcknowledgmentsResponse)
+	err := c.cc.Invoke(ctx, ObligationService_ListMyAcknowledgments_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -313,6 +327,9 @@ func (c *obligationServiceClient) MyAckSummary(ctx context.Context, in *MyAckSum
 // for forward compatibility.
 type ObligationServiceServer interface {
 	GetMyObligations(context.Context, *GetMyObligationsRequest) (*GetMyObligationsResponse, error)
+	// ListMyAcknowledgments answers the person's recent acknowledgements, newest
+	// first, for the "Recently acknowledged" card on My work.
+	ListMyAcknowledgments(context.Context, *ListMyAcknowledgmentsRequest) (*ListMyAcknowledgmentsResponse, error)
 	GetObligatedAudienceCount(context.Context, *GetObligatedAudienceCountRequest) (*GetObligatedAudienceCountResponse, error)
 	MyAckSummary(context.Context, *MyAckSummaryRequest) (*MyAckSummaryResponse, error)
 	mustEmbedUnimplementedObligationServiceServer()
@@ -327,6 +344,9 @@ type UnimplementedObligationServiceServer struct{}
 
 func (UnimplementedObligationServiceServer) GetMyObligations(context.Context, *GetMyObligationsRequest) (*GetMyObligationsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetMyObligations not implemented")
+}
+func (UnimplementedObligationServiceServer) ListMyAcknowledgments(context.Context, *ListMyAcknowledgmentsRequest) (*ListMyAcknowledgmentsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMyAcknowledgments not implemented")
 }
 func (UnimplementedObligationServiceServer) GetObligatedAudienceCount(context.Context, *GetObligatedAudienceCountRequest) (*GetObligatedAudienceCountResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetObligatedAudienceCount not implemented")
@@ -369,6 +389,24 @@ func _ObligationService_GetMyObligations_Handler(srv interface{}, ctx context.Co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ObligationServiceServer).GetMyObligations(ctx, req.(*GetMyObligationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ObligationService_ListMyAcknowledgments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMyAcknowledgmentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ObligationServiceServer).ListMyAcknowledgments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ObligationService_ListMyAcknowledgments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ObligationServiceServer).ListMyAcknowledgments(ctx, req.(*ListMyAcknowledgmentsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -419,6 +457,10 @@ var ObligationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMyObligations",
 			Handler:    _ObligationService_GetMyObligations_Handler,
+		},
+		{
+			MethodName: "ListMyAcknowledgments",
+			Handler:    _ObligationService_ListMyAcknowledgments_Handler,
 		},
 		{
 			MethodName: "GetObligatedAudienceCount",

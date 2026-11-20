@@ -29,6 +29,8 @@ const (
 	NotifPrefService_SetCategoryCadence_FullMethodName      = "/steward.obligations.v1.NotifPrefService/SetCategoryCadence"
 	NotifPrefService_SetTypeCadence_FullMethodName          = "/steward.obligations.v1.NotifPrefService/SetTypeCadence"
 	NotifPrefService_SetDigestWindow_FullMethodName         = "/steward.obligations.v1.NotifPrefService/SetDigestWindow"
+	NotifPrefService_GetQuietHours_FullMethodName           = "/steward.obligations.v1.NotifPrefService/GetQuietHours"
+	NotifPrefService_SetQuietHours_FullMethodName           = "/steward.obligations.v1.NotifPrefService/SetQuietHours"
 )
 
 // NotifPrefServiceClient is the client API for NotifPrefService service.
@@ -48,6 +50,13 @@ type NotifPrefServiceClient interface {
 	SetCategoryCadence(ctx context.Context, in *SetCategoryCadenceRequest, opts ...grpc.CallOption) (*SetCategoryCadenceResponse, error)
 	SetTypeCadence(ctx context.Context, in *SetTypeCadenceRequest, opts ...grpc.CallOption) (*SetTypeCadenceResponse, error)
 	SetDigestWindow(ctx context.Context, in *SetDigestWindowRequest, opts ...grpc.CallOption) (*SetDigestWindowResponse, error)
+	// Per-user quiet hours: a window in which email and push are held. In-app
+	// is never held. Security and transactional kinds, and any critical-severity
+	// kind, bypass the window; the other kinds, high-severity compliance ones
+	// (ack-required, policy-ack-reminder, review-due) included, are held. A held
+	// message is not sent later.
+	GetQuietHours(ctx context.Context, in *GetQuietHoursRequest, opts ...grpc.CallOption) (*GetQuietHoursResponse, error)
+	SetQuietHours(ctx context.Context, in *SetQuietHoursRequest, opts ...grpc.CallOption) (*SetQuietHoursResponse, error)
 }
 
 type notifPrefServiceClient struct {
@@ -128,6 +137,26 @@ func (c *notifPrefServiceClient) SetDigestWindow(ctx context.Context, in *SetDig
 	return out, nil
 }
 
+func (c *notifPrefServiceClient) GetQuietHours(ctx context.Context, in *GetQuietHoursRequest, opts ...grpc.CallOption) (*GetQuietHoursResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetQuietHoursResponse)
+	err := c.cc.Invoke(ctx, NotifPrefService_GetQuietHours_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notifPrefServiceClient) SetQuietHours(ctx context.Context, in *SetQuietHoursRequest, opts ...grpc.CallOption) (*SetQuietHoursResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetQuietHoursResponse)
+	err := c.cc.Invoke(ctx, NotifPrefService_SetQuietHours_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotifPrefServiceServer is the server API for NotifPrefService service.
 // All implementations must embed UnimplementedNotifPrefServiceServer
 // for forward compatibility.
@@ -145,6 +174,13 @@ type NotifPrefServiceServer interface {
 	SetCategoryCadence(context.Context, *SetCategoryCadenceRequest) (*SetCategoryCadenceResponse, error)
 	SetTypeCadence(context.Context, *SetTypeCadenceRequest) (*SetTypeCadenceResponse, error)
 	SetDigestWindow(context.Context, *SetDigestWindowRequest) (*SetDigestWindowResponse, error)
+	// Per-user quiet hours: a window in which email and push are held. In-app
+	// is never held. Security and transactional kinds, and any critical-severity
+	// kind, bypass the window; the other kinds, high-severity compliance ones
+	// (ack-required, policy-ack-reminder, review-due) included, are held. A held
+	// message is not sent later.
+	GetQuietHours(context.Context, *GetQuietHoursRequest) (*GetQuietHoursResponse, error)
+	SetQuietHours(context.Context, *SetQuietHoursRequest) (*SetQuietHoursResponse, error)
 	mustEmbedUnimplementedNotifPrefServiceServer()
 }
 
@@ -175,6 +211,12 @@ func (UnimplementedNotifPrefServiceServer) SetTypeCadence(context.Context, *SetT
 }
 func (UnimplementedNotifPrefServiceServer) SetDigestWindow(context.Context, *SetDigestWindowRequest) (*SetDigestWindowResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetDigestWindow not implemented")
+}
+func (UnimplementedNotifPrefServiceServer) GetQuietHours(context.Context, *GetQuietHoursRequest) (*GetQuietHoursResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetQuietHours not implemented")
+}
+func (UnimplementedNotifPrefServiceServer) SetQuietHours(context.Context, *SetQuietHoursRequest) (*SetQuietHoursResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetQuietHours not implemented")
 }
 func (UnimplementedNotifPrefServiceServer) mustEmbedUnimplementedNotifPrefServiceServer() {}
 func (UnimplementedNotifPrefServiceServer) testEmbeddedByValue()                          {}
@@ -323,6 +365,42 @@ func _NotifPrefService_SetDigestWindow_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotifPrefService_GetQuietHours_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetQuietHoursRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotifPrefServiceServer).GetQuietHours(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotifPrefService_GetQuietHours_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotifPrefServiceServer).GetQuietHours(ctx, req.(*GetQuietHoursRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotifPrefService_SetQuietHours_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetQuietHoursRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotifPrefServiceServer).SetQuietHours(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotifPrefService_SetQuietHours_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotifPrefServiceServer).SetQuietHours(ctx, req.(*SetQuietHoursRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NotifPrefService_ServiceDesc is the grpc.ServiceDesc for NotifPrefService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -357,6 +435,14 @@ var NotifPrefService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetDigestWindow",
 			Handler:    _NotifPrefService_SetDigestWindow_Handler,
+		},
+		{
+			MethodName: "GetQuietHours",
+			Handler:    _NotifPrefService_GetQuietHours_Handler,
+		},
+		{
+			MethodName: "SetQuietHours",
+			Handler:    _NotifPrefService_SetQuietHours_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
