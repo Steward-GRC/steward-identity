@@ -165,6 +165,7 @@ type OverdueEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	DueAt         *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=due_at,json=dueAt,proto3" json:"due_at,omitempty"` // unset when no due date applies
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -211,6 +212,13 @@ func (x *OverdueEntry) GetEmail() string {
 		return x.Email
 	}
 	return ""
+}
+
+func (x *OverdueEntry) GetDueAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DueAt
+	}
+	return nil
 }
 
 type GetAckRosterRequest struct {
@@ -270,6 +278,7 @@ type AckRosterEntry struct {
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	AckedAt       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=acked_at,json=ackedAt,proto3" json:"acked_at,omitempty"` // unset for pending entries
+	DueAt         *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=due_at,json=dueAt,proto3" json:"due_at,omitempty"`       // pending entries only; unset once acknowledged or when no due date applies
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -321,6 +330,13 @@ func (x *AckRosterEntry) GetEmail() string {
 func (x *AckRosterEntry) GetAckedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.AckedAt
+	}
+	return nil
+}
+
+func (x *AckRosterEntry) GetDueAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DueAt
 	}
 	return nil
 }
@@ -660,17 +676,19 @@ const file_steward_obligations_v1_reporting_proto_rawDesc = "" +
 	"\x0ecompletion_pct\x18\x03 \x01(\x02R\rcompletionPct\x12>\n" +
 	"\aoverdue\x18\x04 \x03(\v2$.steward.obligations.v1.OverdueEntryR\aoverdue\x12%\n" +
 	"\x0favg_days_to_ack\x18\x05 \x01(\x02R\favgDaysToAck\x123\n" +
-	"\x16viewed_not_acked_count\x18\x06 \x01(\x05R\x13viewedNotAckedCount\"=\n" +
+	"\x16viewed_not_acked_count\x18\x06 \x01(\x05R\x13viewedNotAckedCount\"p\n" +
 	"\fOverdueEntry\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\"\\\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x121\n" +
+	"\x06due_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x05dueAt\"\\\n" +
 	"\x13GetAckRosterRequest\x12*\n" +
 	"\x11policy_version_id\x18\x01 \x01(\tR\x0fpolicyVersionId\x12\x19\n" +
-	"\bgroup_id\x18\x02 \x01(\tR\agroupId\"v\n" +
+	"\bgroup_id\x18\x02 \x01(\tR\agroupId\"\xa9\x01\n" +
 	"\x0eAckRosterEntry\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x125\n" +
-	"\backed_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\aackedAt\"\x96\x01\n" +
+	"\backed_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\aackedAt\x121\n" +
+	"\x06due_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x05dueAt\"\x96\x01\n" +
 	"\x14GetAckRosterResponse\x12<\n" +
 	"\x05acked\x18\x01 \x03(\v2&.steward.obligations.v1.AckRosterEntryR\x05acked\x12@\n" +
 	"\apending\x18\x02 \x03(\v2&.steward.obligations.v1.AckRosterEntryR\apending\"r\n" +
@@ -726,23 +744,25 @@ var file_steward_obligations_v1_reporting_proto_goTypes = []any{
 }
 var file_steward_obligations_v1_reporting_proto_depIdxs = []int32{
 	2,  // 0: steward.obligations.v1.GetCompletionReportResponse.overdue:type_name -> steward.obligations.v1.OverdueEntry
-	11, // 1: steward.obligations.v1.AckRosterEntry.acked_at:type_name -> google.protobuf.Timestamp
-	4,  // 2: steward.obligations.v1.GetAckRosterResponse.acked:type_name -> steward.obligations.v1.AckRosterEntry
-	4,  // 3: steward.obligations.v1.GetAckRosterResponse.pending:type_name -> steward.obligations.v1.AckRosterEntry
-	7,  // 4: steward.obligations.v1.GetAckActivityResponse.days:type_name -> steward.obligations.v1.AckActivityDay
-	0,  // 5: steward.obligations.v1.ReportingService.GetCompletionReport:input_type -> steward.obligations.v1.GetCompletionReportRequest
-	3,  // 6: steward.obligations.v1.ReportingService.GetAckRoster:input_type -> steward.obligations.v1.GetAckRosterRequest
-	6,  // 7: steward.obligations.v1.ReportingService.GetAckActivity:input_type -> steward.obligations.v1.GetAckActivityRequest
-	9,  // 8: steward.obligations.v1.ReportingService.ExportAcks:input_type -> steward.obligations.v1.ExportAcksRequest
-	1,  // 9: steward.obligations.v1.ReportingService.GetCompletionReport:output_type -> steward.obligations.v1.GetCompletionReportResponse
-	5,  // 10: steward.obligations.v1.ReportingService.GetAckRoster:output_type -> steward.obligations.v1.GetAckRosterResponse
-	8,  // 11: steward.obligations.v1.ReportingService.GetAckActivity:output_type -> steward.obligations.v1.GetAckActivityResponse
-	10, // 12: steward.obligations.v1.ReportingService.ExportAcks:output_type -> steward.obligations.v1.ExportAcksResponse
-	9,  // [9:13] is the sub-list for method output_type
-	5,  // [5:9] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	11, // 1: steward.obligations.v1.OverdueEntry.due_at:type_name -> google.protobuf.Timestamp
+	11, // 2: steward.obligations.v1.AckRosterEntry.acked_at:type_name -> google.protobuf.Timestamp
+	11, // 3: steward.obligations.v1.AckRosterEntry.due_at:type_name -> google.protobuf.Timestamp
+	4,  // 4: steward.obligations.v1.GetAckRosterResponse.acked:type_name -> steward.obligations.v1.AckRosterEntry
+	4,  // 5: steward.obligations.v1.GetAckRosterResponse.pending:type_name -> steward.obligations.v1.AckRosterEntry
+	7,  // 6: steward.obligations.v1.GetAckActivityResponse.days:type_name -> steward.obligations.v1.AckActivityDay
+	0,  // 7: steward.obligations.v1.ReportingService.GetCompletionReport:input_type -> steward.obligations.v1.GetCompletionReportRequest
+	3,  // 8: steward.obligations.v1.ReportingService.GetAckRoster:input_type -> steward.obligations.v1.GetAckRosterRequest
+	6,  // 9: steward.obligations.v1.ReportingService.GetAckActivity:input_type -> steward.obligations.v1.GetAckActivityRequest
+	9,  // 10: steward.obligations.v1.ReportingService.ExportAcks:input_type -> steward.obligations.v1.ExportAcksRequest
+	1,  // 11: steward.obligations.v1.ReportingService.GetCompletionReport:output_type -> steward.obligations.v1.GetCompletionReportResponse
+	5,  // 12: steward.obligations.v1.ReportingService.GetAckRoster:output_type -> steward.obligations.v1.GetAckRosterResponse
+	8,  // 13: steward.obligations.v1.ReportingService.GetAckActivity:output_type -> steward.obligations.v1.GetAckActivityResponse
+	10, // 14: steward.obligations.v1.ReportingService.ExportAcks:output_type -> steward.obligations.v1.ExportAcksResponse
+	11, // [11:15] is the sub-list for method output_type
+	7,  // [7:11] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_steward_obligations_v1_reporting_proto_init() }
