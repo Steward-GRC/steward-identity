@@ -274,7 +274,10 @@ type Template struct {
 	Code string `protobuf:"bytes,4,opt,name=code,proto3" json:"code,omitempty"`
 	// RFC 3339; empty while active. A retired template is hidden, but its
 	// published versions stay so the documents pinned to them keep working.
-	RetiredAt     string `protobuf:"bytes,5,opt,name=retired_at,json=retiredAt,proto3" json:"retired_at,omitempty"`
+	RetiredAt string `protobuf:"bytes,5,opt,name=retired_at,json=retiredAt,proto3" json:"retired_at,omitempty"`
+	// The latest of a rename and any version of the template being created or
+	// published.
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -344,14 +347,31 @@ func (x *Template) GetRetiredAt() string {
 	return ""
 }
 
+func (x *Template) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
 type TemplateVersion struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	TemplateId    string                 `protobuf:"bytes,2,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
-	VersionNo     int32                  `protobuf:"varint,3,opt,name=version_no,json=versionNo,proto3" json:"version_no,omitempty"`
-	Status        TemplateVersionStatus  `protobuf:"varint,4,opt,name=status,proto3,enum=steward.core.v1.TemplateVersionStatus" json:"status,omitempty"`
-	Sections      []*Section             `protobuf:"bytes,5,rep,name=sections,proto3" json:"sections,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	TemplateId string                 `protobuf:"bytes,2,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	VersionNo  int32                  `protobuf:"varint,3,opt,name=version_no,json=versionNo,proto3" json:"version_no,omitempty"`
+	Status     TemplateVersionStatus  `protobuf:"varint,4,opt,name=status,proto3,enum=steward.core.v1.TemplateVersionStatus" json:"status,omitempty"`
+	Sections   []*Section             `protobuf:"bytes,5,rep,name=sections,proto3" json:"sections,omitempty"`
+	CreatedAt  *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Stored at publish, from the change against the version before (the first
+	// is 1.0.0). For a draft it is the number a publish would give it now.
+	SemanticVersion *SemanticVersion `protobuf:"bytes,7,opt,name=semantic_version,json=semanticVersion,proto3" json:"semantic_version,omitempty"`
+	// What the version published as; for a draft, what it would publish as now.
+	// A required section added, dropped or turned required is MAJOR; an optional
+	// section added or dropped, or changed boilerplate text, is MINOR; the rest
+	// (titles, order, heading level) is FIX.
+	ChangeType ChangeType `protobuf:"varint,8,opt,name=change_type,json=changeType,proto3,enum=steward.core.v1.ChangeType" json:"change_type,omitempty"`
+	// Unset until the version is published.
+	PublishedAt   *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=published_at,json=publishedAt,proto3" json:"published_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -424,6 +444,27 @@ func (x *TemplateVersion) GetSections() []*Section {
 func (x *TemplateVersion) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *TemplateVersion) GetSemanticVersion() *SemanticVersion {
+	if x != nil {
+		return x.SemanticVersion
+	}
+	return nil
+}
+
+func (x *TemplateVersion) GetChangeType() ChangeType {
+	if x != nil {
+		return x.ChangeType
+	}
+	return ChangeType_CHANGE_TYPE_UNSPECIFIED
+}
+
+func (x *TemplateVersion) GetPublishedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.PublishedAt
 	}
 	return nil
 }
@@ -1464,7 +1505,7 @@ var File_steward_core_v1_template_proto protoreflect.FileDescriptor
 
 const file_steward_core_v1_template_proto_rawDesc = "" +
 	"\n" +
-	"\x1esteward/core/v1/template.proto\x12\x0fsteward.core.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"Z\n" +
+	"\x1esteward/core/v1/template.proto\x12\x0fsteward.core.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1csteward/core/v1/semver.proto\"Z\n" +
 	"\x05Block\x12.\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x1a.steward.core.v1.BlockTypeR\x04type\x12!\n" +
 	"\fcontent_json\x18\x02 \x01(\tR\vcontentJson\"\xa9\x01\n" +
@@ -1474,14 +1515,16 @@ const file_steward_core_v1_template_proto_rawDesc = "" +
 	"\x05order\x18\x03 \x01(\x05R\x05order\x12.\n" +
 	"\x06blocks\x18\x04 \x03(\v2\x16.steward.core.v1.BlockR\x06blocks\x12\x14\n" +
 	"\x05level\x18\x05 \x01(\x05R\x05level\x12\x1a\n" +
-	"\brequired\x18\x06 \x01(\bR\brequired\"\x8d\x01\n" +
+	"\brequired\x18\x06 \x01(\bR\brequired\"\xc8\x01\n" +
 	"\bTemplate\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12*\n" +
 	"\x11owner_category_id\x18\x03 \x01(\tR\x0fownerCategoryId\x12\x12\n" +
 	"\x04code\x18\x04 \x01(\tR\x04code\x12\x1d\n" +
 	"\n" +
-	"retired_at\x18\x05 \x01(\tR\tretiredAt\"\x92\x02\n" +
+	"retired_at\x18\x05 \x01(\tR\tretiredAt\x129\n" +
+	"\n" +
+	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xdc\x03\n" +
 	"\x0fTemplateVersion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vtemplate_id\x18\x02 \x01(\tR\n" +
@@ -1491,7 +1534,11 @@ const file_steward_core_v1_template_proto_rawDesc = "" +
 	"\x06status\x18\x04 \x01(\x0e2&.steward.core.v1.TemplateVersionStatusR\x06status\x124\n" +
 	"\bsections\x18\x05 \x03(\v2\x18.steward.core.v1.SectionR\bsections\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"{\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12K\n" +
+	"\x10semantic_version\x18\a \x01(\v2 .steward.core.v1.SemanticVersionR\x0fsemanticVersion\x12<\n" +
+	"\vchange_type\x18\b \x01(\x0e2\x1b.steward.core.v1.ChangeTypeR\n" +
+	"changeType\x12=\n" +
+	"\fpublished_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\vpublishedAt\"{\n" +
 	"\x15CreateTemplateRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12*\n" +
 	"\x11owner_category_id\x18\x02 \x01(\tR\x0fownerCategoryId\x12\"\n" +
@@ -1612,51 +1659,57 @@ var file_steward_core_v1_template_proto_goTypes = []any{
 	(*RenameTemplateRequest)(nil),                 // 26: steward.core.v1.RenameTemplateRequest
 	(*RenameTemplateResponse)(nil),                // 27: steward.core.v1.RenameTemplateResponse
 	(*timestamppb.Timestamp)(nil),                 // 28: google.protobuf.Timestamp
+	(*SemanticVersion)(nil),                       // 29: steward.core.v1.SemanticVersion
+	(ChangeType)(0),                               // 30: steward.core.v1.ChangeType
 }
 var file_steward_core_v1_template_proto_depIdxs = []int32{
 	1,  // 0: steward.core.v1.Block.type:type_name -> steward.core.v1.BlockType
 	2,  // 1: steward.core.v1.Section.blocks:type_name -> steward.core.v1.Block
-	0,  // 2: steward.core.v1.TemplateVersion.status:type_name -> steward.core.v1.TemplateVersionStatus
-	3,  // 3: steward.core.v1.TemplateVersion.sections:type_name -> steward.core.v1.Section
-	28, // 4: steward.core.v1.TemplateVersion.created_at:type_name -> google.protobuf.Timestamp
-	4,  // 5: steward.core.v1.CreateTemplateResponse.template:type_name -> steward.core.v1.Template
-	3,  // 6: steward.core.v1.CreateTemplateVersionRequest.sections:type_name -> steward.core.v1.Section
-	5,  // 7: steward.core.v1.CreateTemplateVersionResponse.version:type_name -> steward.core.v1.TemplateVersion
-	5,  // 8: steward.core.v1.PublishTemplateVersionResponse.version:type_name -> steward.core.v1.TemplateVersion
-	5,  // 9: steward.core.v1.GetLatestTemplateVersionResponse.version:type_name -> steward.core.v1.TemplateVersion
-	3,  // 10: steward.core.v1.UpdateTemplateVersionSectionsRequest.sections:type_name -> steward.core.v1.Section
-	5,  // 11: steward.core.v1.UpdateTemplateVersionSectionsResponse.version:type_name -> steward.core.v1.TemplateVersion
-	5,  // 12: steward.core.v1.ListTemplateVersionsResponse.versions:type_name -> steward.core.v1.TemplateVersion
-	4,  // 13: steward.core.v1.ListTemplatesResponse.templates:type_name -> steward.core.v1.Template
-	4,  // 14: steward.core.v1.RetireTemplateResponse.template:type_name -> steward.core.v1.Template
-	4,  // 15: steward.core.v1.RenameTemplateResponse.template:type_name -> steward.core.v1.Template
-	6,  // 16: steward.core.v1.TemplateService.CreateTemplate:input_type -> steward.core.v1.CreateTemplateRequest
-	8,  // 17: steward.core.v1.TemplateService.CreateTemplateVersion:input_type -> steward.core.v1.CreateTemplateVersionRequest
-	10, // 18: steward.core.v1.TemplateService.PublishTemplateVersion:input_type -> steward.core.v1.PublishTemplateVersionRequest
-	12, // 19: steward.core.v1.TemplateService.GetLatestTemplateVersion:input_type -> steward.core.v1.GetLatestTemplateVersionRequest
-	14, // 20: steward.core.v1.TemplateService.UpdateTemplateVersionSections:input_type -> steward.core.v1.UpdateTemplateVersionSectionsRequest
-	16, // 21: steward.core.v1.TemplateService.ListTemplateVersions:input_type -> steward.core.v1.ListTemplateVersionsRequest
-	18, // 22: steward.core.v1.TemplateService.DeleteTemplateVersion:input_type -> steward.core.v1.DeleteTemplateVersionRequest
-	20, // 23: steward.core.v1.TemplateService.ListTemplates:input_type -> steward.core.v1.ListTemplatesRequest
-	22, // 24: steward.core.v1.TemplateService.RetireTemplate:input_type -> steward.core.v1.RetireTemplateRequest
-	24, // 25: steward.core.v1.TemplateService.DeleteTemplate:input_type -> steward.core.v1.DeleteTemplateRequest
-	26, // 26: steward.core.v1.TemplateService.RenameTemplate:input_type -> steward.core.v1.RenameTemplateRequest
-	7,  // 27: steward.core.v1.TemplateService.CreateTemplate:output_type -> steward.core.v1.CreateTemplateResponse
-	9,  // 28: steward.core.v1.TemplateService.CreateTemplateVersion:output_type -> steward.core.v1.CreateTemplateVersionResponse
-	11, // 29: steward.core.v1.TemplateService.PublishTemplateVersion:output_type -> steward.core.v1.PublishTemplateVersionResponse
-	13, // 30: steward.core.v1.TemplateService.GetLatestTemplateVersion:output_type -> steward.core.v1.GetLatestTemplateVersionResponse
-	15, // 31: steward.core.v1.TemplateService.UpdateTemplateVersionSections:output_type -> steward.core.v1.UpdateTemplateVersionSectionsResponse
-	17, // 32: steward.core.v1.TemplateService.ListTemplateVersions:output_type -> steward.core.v1.ListTemplateVersionsResponse
-	19, // 33: steward.core.v1.TemplateService.DeleteTemplateVersion:output_type -> steward.core.v1.DeleteTemplateVersionResponse
-	21, // 34: steward.core.v1.TemplateService.ListTemplates:output_type -> steward.core.v1.ListTemplatesResponse
-	23, // 35: steward.core.v1.TemplateService.RetireTemplate:output_type -> steward.core.v1.RetireTemplateResponse
-	25, // 36: steward.core.v1.TemplateService.DeleteTemplate:output_type -> steward.core.v1.DeleteTemplateResponse
-	27, // 37: steward.core.v1.TemplateService.RenameTemplate:output_type -> steward.core.v1.RenameTemplateResponse
-	27, // [27:38] is the sub-list for method output_type
-	16, // [16:27] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	28, // 2: steward.core.v1.Template.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 3: steward.core.v1.TemplateVersion.status:type_name -> steward.core.v1.TemplateVersionStatus
+	3,  // 4: steward.core.v1.TemplateVersion.sections:type_name -> steward.core.v1.Section
+	28, // 5: steward.core.v1.TemplateVersion.created_at:type_name -> google.protobuf.Timestamp
+	29, // 6: steward.core.v1.TemplateVersion.semantic_version:type_name -> steward.core.v1.SemanticVersion
+	30, // 7: steward.core.v1.TemplateVersion.change_type:type_name -> steward.core.v1.ChangeType
+	28, // 8: steward.core.v1.TemplateVersion.published_at:type_name -> google.protobuf.Timestamp
+	4,  // 9: steward.core.v1.CreateTemplateResponse.template:type_name -> steward.core.v1.Template
+	3,  // 10: steward.core.v1.CreateTemplateVersionRequest.sections:type_name -> steward.core.v1.Section
+	5,  // 11: steward.core.v1.CreateTemplateVersionResponse.version:type_name -> steward.core.v1.TemplateVersion
+	5,  // 12: steward.core.v1.PublishTemplateVersionResponse.version:type_name -> steward.core.v1.TemplateVersion
+	5,  // 13: steward.core.v1.GetLatestTemplateVersionResponse.version:type_name -> steward.core.v1.TemplateVersion
+	3,  // 14: steward.core.v1.UpdateTemplateVersionSectionsRequest.sections:type_name -> steward.core.v1.Section
+	5,  // 15: steward.core.v1.UpdateTemplateVersionSectionsResponse.version:type_name -> steward.core.v1.TemplateVersion
+	5,  // 16: steward.core.v1.ListTemplateVersionsResponse.versions:type_name -> steward.core.v1.TemplateVersion
+	4,  // 17: steward.core.v1.ListTemplatesResponse.templates:type_name -> steward.core.v1.Template
+	4,  // 18: steward.core.v1.RetireTemplateResponse.template:type_name -> steward.core.v1.Template
+	4,  // 19: steward.core.v1.RenameTemplateResponse.template:type_name -> steward.core.v1.Template
+	6,  // 20: steward.core.v1.TemplateService.CreateTemplate:input_type -> steward.core.v1.CreateTemplateRequest
+	8,  // 21: steward.core.v1.TemplateService.CreateTemplateVersion:input_type -> steward.core.v1.CreateTemplateVersionRequest
+	10, // 22: steward.core.v1.TemplateService.PublishTemplateVersion:input_type -> steward.core.v1.PublishTemplateVersionRequest
+	12, // 23: steward.core.v1.TemplateService.GetLatestTemplateVersion:input_type -> steward.core.v1.GetLatestTemplateVersionRequest
+	14, // 24: steward.core.v1.TemplateService.UpdateTemplateVersionSections:input_type -> steward.core.v1.UpdateTemplateVersionSectionsRequest
+	16, // 25: steward.core.v1.TemplateService.ListTemplateVersions:input_type -> steward.core.v1.ListTemplateVersionsRequest
+	18, // 26: steward.core.v1.TemplateService.DeleteTemplateVersion:input_type -> steward.core.v1.DeleteTemplateVersionRequest
+	20, // 27: steward.core.v1.TemplateService.ListTemplates:input_type -> steward.core.v1.ListTemplatesRequest
+	22, // 28: steward.core.v1.TemplateService.RetireTemplate:input_type -> steward.core.v1.RetireTemplateRequest
+	24, // 29: steward.core.v1.TemplateService.DeleteTemplate:input_type -> steward.core.v1.DeleteTemplateRequest
+	26, // 30: steward.core.v1.TemplateService.RenameTemplate:input_type -> steward.core.v1.RenameTemplateRequest
+	7,  // 31: steward.core.v1.TemplateService.CreateTemplate:output_type -> steward.core.v1.CreateTemplateResponse
+	9,  // 32: steward.core.v1.TemplateService.CreateTemplateVersion:output_type -> steward.core.v1.CreateTemplateVersionResponse
+	11, // 33: steward.core.v1.TemplateService.PublishTemplateVersion:output_type -> steward.core.v1.PublishTemplateVersionResponse
+	13, // 34: steward.core.v1.TemplateService.GetLatestTemplateVersion:output_type -> steward.core.v1.GetLatestTemplateVersionResponse
+	15, // 35: steward.core.v1.TemplateService.UpdateTemplateVersionSections:output_type -> steward.core.v1.UpdateTemplateVersionSectionsResponse
+	17, // 36: steward.core.v1.TemplateService.ListTemplateVersions:output_type -> steward.core.v1.ListTemplateVersionsResponse
+	19, // 37: steward.core.v1.TemplateService.DeleteTemplateVersion:output_type -> steward.core.v1.DeleteTemplateVersionResponse
+	21, // 38: steward.core.v1.TemplateService.ListTemplates:output_type -> steward.core.v1.ListTemplatesResponse
+	23, // 39: steward.core.v1.TemplateService.RetireTemplate:output_type -> steward.core.v1.RetireTemplateResponse
+	25, // 40: steward.core.v1.TemplateService.DeleteTemplate:output_type -> steward.core.v1.DeleteTemplateResponse
+	27, // 41: steward.core.v1.TemplateService.RenameTemplate:output_type -> steward.core.v1.RenameTemplateResponse
+	31, // [31:42] is the sub-list for method output_type
+	20, // [20:31] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_steward_core_v1_template_proto_init() }
@@ -1664,6 +1717,7 @@ func file_steward_core_v1_template_proto_init() {
 	if File_steward_core_v1_template_proto != nil {
 		return
 	}
+	file_steward_core_v1_semver_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
